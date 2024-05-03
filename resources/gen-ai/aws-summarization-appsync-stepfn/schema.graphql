@@ -1,0 +1,50 @@
+type FileStatus @aws_iam
+@aws_cognito_user_pools {
+	name: String
+	status: String
+	summary: String
+}
+
+input FileStatusInput {
+	name: String
+	status: String
+	summary: String
+}
+
+type SummaryDocs @aws_iam
+@aws_cognito_user_pools {
+	summary_job_id: ID
+	files: [FileStatus]
+}
+
+input SummaryDocsInput {
+	summary_job_id: ID
+	files: [FileStatusInput]
+	ignore_existing: Boolean
+}
+
+type Mutation @aws_iam
+@aws_cognito_user_pools {
+	generateSummary(summaryInput: SummaryDocsInput!): SummaryDocs
+	updateSummaryJobStatus(summary_job_id: ID,files: [FileStatusInput]
+	): SummaryDocs
+}
+
+type Query @aws_iam
+@aws_cognito_user_pools {
+	getSummary: SummaryDocs
+}
+
+type Subscription @aws_iam
+@aws_cognito_user_pools {
+	generateSummary(summaryInput: SummaryDocsInput!): SummaryDocs
+		@aws_subscribe(mutations: ["generateSummary"])
+	updateSummaryJobStatus(summary_job_id: ID): SummaryDocs
+		@aws_subscribe(mutations: ["updateSummaryJobStatus"])
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+}
