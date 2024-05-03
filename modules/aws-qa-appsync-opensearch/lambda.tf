@@ -3,6 +3,28 @@ resource "aws_ecr_repository" "question_answering_function" {
   name = "question_answering_function-${var.stage}"
 }
 
+# Manage ECR image versions
+resource "aws_ecr_lifecycle_policy" "question_answering_function_policy" {
+  repository = aws_ecr_repository.question_answering_function.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep last 10 images"
+        selection = {
+          tagStatus = "untagged"
+          countType = "imageCountMoreThan"
+          countNumber = 10
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}
+
 # Build and push Docker image to ECR
 resource "null_resource" "build_and_push_image" {
   triggers = {
