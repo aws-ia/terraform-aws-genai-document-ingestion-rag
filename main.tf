@@ -35,7 +35,7 @@ module "my_module" {
   logging_bucket_props = null
   open_search_index_name = null
   open_search_secret = {arn = "some_arn", secret_name = "secret_name"}
-  stage = "-dev"
+  stage = var.stage
   vpc_props = {
     name: "VPC"
     cidr_block: "10.0.0.0/16"
