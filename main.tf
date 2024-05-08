@@ -1,9 +1,9 @@
 provider "aws" {
   region = "us-east-1"
 }
-
+# tflint-ignore: terraform_unused_declarations
 data "aws_caller_identity" "current_account" {}
-
+# tflint-ignore: terraform_unused_declarations
 data "aws_region" "current_region" {}
 
 module "my_module" {

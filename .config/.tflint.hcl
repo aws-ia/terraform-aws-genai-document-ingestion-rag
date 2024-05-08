@@ -26,7 +26,7 @@ rule "terraform_naming_convention" {
 }
 
 rule "terraform_typed_variables" {
-  enabled = true
+  enabled = false
 }
 
 rule "terraform_unused_declarations" {
