@@ -1,7 +1,7 @@
 # General variables
 variable "stage" {
   description = "The stage for the deployment, default is '-dev'"
-  default = "-dev"
+  default = "_dev"
 }
 
 variable "observability" {
