@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "open_search_secret_policy_document" {
 data "aws_iam_policy_document" "s3_read_policy" {
   statement {
     effect = "Allow"
-    actions = ["s3:GetObject", "s3:GetObject*", "s3:GetBucket*", "s3:List*"]
+    actions = ["s3:GetObject", "s3:GetBucket", "s3:ListBucket"]
     resources = [
       "arn:aws:s3:::${aws_s3_bucket.input_assets_qa_bucket.bucket}",
       "arn:aws:s3:::${aws_s3_bucket.input_assets_qa_bucket.bucket}/*",]
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "opensearch_access_policy" {
       "arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/${var.existing_opensearch_domain.domain_name}/*",
       "arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/${var.existing_opensearch_domain.domain_name}",
     ]
-    actions = ["es:*"]
+    actions = ["es:ESHttpGet", "es:ESHttpPut", "es:ESHttpPost", "es:ESHttpDelete", "es:ESHttpHead"]
   }
 }
 

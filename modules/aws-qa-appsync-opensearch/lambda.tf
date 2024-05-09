@@ -1,6 +1,10 @@
 # Create an ECR repository
 resource "aws_ecr_repository" "question_answering_function" {
   name = "question_answering_function${var.stage}"
+  image_scanning_configuration = {
+    scan_on_push = true
+  }
+  image_tag_mutability = "IMMUTABLE"
 }
 
 # Manage ECR image versions

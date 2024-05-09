@@ -1,57 +1,41 @@
-# Create an ECR repository
-resource "aws_ecr_repository" "question_answering_function" {
-  name = "question_answering_function-${var.stage}"
-}
+#
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+# with the License. A copy of the License is located at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+import json
+import os
+from typing import Dict
+from qa_agent import run_question_answering
+from aws_lambda_powertools import Logger, Tracer, Metrics
+from aws_lambda_powertools.utilities.typing import LambdaContext
 
-# Build and push Docker image to ECR
-resource "null_resource" "build_and_push_image" {
-  triggers = {
-    always_run = timestamp()
-  }
+logger = Logger(service="QUESTION_ANSWERING")
+tracer = Tracer(service="QUESTION_ANSWERING")
+metrics = Metrics(namespace="question_answering", service="QUESTION_ANSWERING")
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      # Build Docker image
-      docker build -t ${aws_ecr_repository.question_answering_function.repository_url}:latest .
-      # Authenticate Docker with ECR
-      aws ecr get-login-password --region ${data.aws_region.current.name} | docker login --username AWS --password-stdin ${aws_ecr_repository.question_answering_function.registry_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com
-      # Push Docker image to ECR
-      docker push ${aws_ecr_repository.question_answering_function.repository_url}:latest
-    EOT
-  }
-}
+@logger.inject_lambda_context(log_event=True)
+@tracer.capture_lambda_handler
+@metrics.log_metrics(capture_cold_start_metric=True)
+def handler(event,  context: LambdaContext) -> dict:
 
-# Create Lambda function using Docker image from ECR
-resource "aws_lambda_function" "question_answering_function" {
-  function_name    = "question_answering_function"
-  role             = aws_iam_role.question_answering_function_role.arn
-  handler          = "not_required_for_containers"
-  runtime          = "provided.al2"
-  timeout          = 900
-  memory_size      = 1024
-  image_uri        = "${aws_ecr_repository.question_answering_function.repository_url}:latest"
-  vpc_config {
-    security_group_ids = [local.security_group_id]
-    subnet_ids         = [aws_subnet.private_subnet.id]
-  }
+    arguments = event['detail']
 
-  environment {
-    variables = {
-      GRAPHQL_URL = aws_appsync_graphql_api.question_answering_graphql_api.uris["GRAPHQL"]
-      INPUT_BUCKET = aws_s3_bucket.input_assets_qa_bucket.bucket
-      OPENSEARCH_DOMAIN_ENDPOINT = var.existing_opensearch_domain.endpoint
-      OPENSEARCH_INDEX = var.open_search_index_name
-      OPENSEARCH_SECRET_ID = local.secret_id
-    }
-  }
+    job_id = arguments['jobid']
 
-  depends_on = [null_resource.build_and_push_image]
-}
+    # Add a correlationId (tracking code).
+    logger.set_correlation_id(job_id)
+    metrics.add_metadata(key='correlationId', value=job_id)
+    tracer.put_annotation(key="correlationId", value=job_id)
 
-resource "aws_lambda_permission" "grant_invoke_lambda" {
-  statement_id  = "AllowAppSyncToInvokeLambda"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.question_answering_function.arn
-  principal     = "appsync.amazonaws.com"
-  source_arn    = aws_appsync_datasource.event_bridge_datasource.arn
-}
+    llm_response = run_question_answering(arguments)
+
+    print(f"llm_response is {llm_response}")
+    return llm_response
