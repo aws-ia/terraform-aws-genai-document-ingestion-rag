@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_log_group" "qa_construct_log_group" {
-  name       = "qaConstructLogGroup",
-  kms_key_id = aws_kms_key.customer_managed_kms_key.arn  # Ensure the KMS key is defined
+  name       = "qaConstructLogGroup"
+  kms_key_id = aws_kms_key.customer_managed_kms_key.arn
 }
 
 resource "aws_flow_log" "flow_log" {

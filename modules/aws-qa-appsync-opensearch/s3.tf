@@ -56,8 +56,7 @@ resource "aws_s3_bucket_policy" "server_access_log_bucket_policy" {
 
 # Bucket containing the inputs assets (documents - text format) uploaded by the user
 resource "aws_s3_bucket" "input_assets_qa_bucket" {
-  bucket = local.bucket_inputs_assets_props_bool ? var.bucket_inputs_assets_props.bucket_name :
-    format("input-asset-qa-bucket%s-%s", var.stage, data.aws_caller_identity.current.account_id)
+  bucket = local.bucket_inputs_assets_props_bool ? var.bucket_inputs_assets_props.bucket_name : format("input-asset-qa-bucket%s-%s", var.stage, data.aws_caller_identity.current.account_id)
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -68,7 +67,7 @@ resource "aws_s3_bucket" "input_assets_qa_bucket" {
   }
 
   logging {
-    target_bucket = aws_s3_bucket.server_access_log_bucket.bucket.id
+    target_bucket = aws_s3_bucket.server_access_log_bucket.id
     target_prefix = "log/"
   }
 }

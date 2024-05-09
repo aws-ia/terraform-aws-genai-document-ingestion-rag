@@ -7,6 +7,11 @@ resource "aws_ecr_repository" "question_answering_function" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key = aws_kms_key.ecr_kms_key.arn  # Referencing the KMS key
+  }
 }
 
 # Manage ECR image versions
@@ -29,6 +34,12 @@ resource "aws_ecr_lifecycle_policy" "question_answering_function_policy" {
       }
     ]
   })
+}
+
+resource "aws_kms_key" "ecr_kms_key" {
+  description             = "KMS key for encrypting ECR images"
+  enable_key_rotation     = true
+  deletion_window_in_days = 10
 }
 
 # Build and push Docker image to ECR
