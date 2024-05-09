@@ -12,14 +12,15 @@ resource "aws_vpc" "vpc" {
 
 # Security group
 resource "aws_security_group" "security_group" {
-  name = local.existing_security_group_id_bool ? null : "securityGroup${var.stage}"
-  vpc_id = local.existing_security_group_id_bool ? null : aws_vpc.vpc.id
+  name        = local.existing_security_group_id_bool ? null : "securityGroup${var.stage}"
+  description = "Security group for ${var.stage} environment"
+  vpc_id      = local.existing_security_group_id_bool ? null : aws_vpc.vpc.id
 }
 
 # Private subnet
 resource "aws_subnet" "private_subnet" {
-  vpc_id = local.vpc_id
-  cidr_block = local.existing_vpc_bool ? var.vpc_props.cidr_block : aws_vpc.vpc.cidr_block
+  vpc_id                  = local.vpc_id
+  cidr_block              = local.existing_vpc_bool ? var.vpc_props.cidr_block : aws_vpc.vpc.cidr_block
   map_public_ip_on_launch = false
   tags = {
     Name = "PrivateSubnet-${var.stage}"

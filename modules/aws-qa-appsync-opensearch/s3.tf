@@ -56,14 +56,20 @@ resource "aws_s3_bucket_policy" "server_access_log_bucket_policy" {
 
 # Bucket containing the inputs assets (documents - text format) uploaded by the user
 resource "aws_s3_bucket" "input_assets_qa_bucket" {
-  bucket = local.bucket_inputs_assets_props_bool ? var.bucket_inputs_assets_props.bucket_name : format("input-asset-qa-bucket%s-%s", var.stage, data.aws_caller_identity.current.account_id)
+  bucket = local.bucket_inputs_assets_props_bool ? var.bucket_inputs_assets_props.bucket_name :
+    format("input-asset-qa-bucket%s-%s", var.stage, data.aws_caller_identity.current.account_id)
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm = "aws:kms"
+        sse_algorithm     = "aws:kms"
         kms_master_key_id = aws_kms_key.customer_managed_kms_key.arn
       }
     }
+  }
+
+  logging {
+    target_bucket = aws_s3_bucket.server_access_log_bucket.bucket.id
+    target_prefix = "log/"
   }
 }
 
@@ -76,7 +82,7 @@ resource "aws_s3_bucket_public_access_block" "input_assets_qa_bucket_public_acce
 }
 
 resource "aws_s3_bucket_public_access_block" "server_access_log_bucket_public_access_block" {
-  bucket = aws_s3_bucket.server_access_log_bucket.id
+  bucket                  = aws_s3_bucket.server_access_log_bucket.id
   block_public_acls       = true
   ignore_public_acls      = true
   block_public_policy     = true

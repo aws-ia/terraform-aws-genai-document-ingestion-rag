@@ -62,7 +62,9 @@ resource "aws_lambda_function" "question_answering_function" {
     security_group_ids = [local.security_group_id]
     subnet_ids         = [aws_subnet.private_subnet.id]
   }
-
+  tracing_config {
+    mode = "Active"
+  }
   environment {
     variables = {
       GRAPHQL_URL                = aws_appsync_graphql_api.question_answering_graphql_api.uris["GRAPHQL"]
