@@ -46,6 +46,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "server_access_log_bucket_lifec
     expiration {
       days = 90
     }
+    abort_incomplete_multipart_upload_days = 7
   }
 }
 
@@ -110,5 +111,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "input_assets_qa_bucket_lifecyc
     expiration {
       days = 90
     }
+    abort_incomplete_multipart_upload_days = 7
   }
 }

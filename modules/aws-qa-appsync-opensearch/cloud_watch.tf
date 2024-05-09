@@ -1,6 +1,7 @@
 resource "aws_cloudwatch_log_group" "qa_construct_log_group" {
   name       = "qaConstructLogGroup"
   kms_key_id = aws_kms_key.customer_managed_kms_key.arn
+  retention_in_days = 365  # Retain logs for 1 year
 }
 
 resource "aws_flow_log" "flow_log" {

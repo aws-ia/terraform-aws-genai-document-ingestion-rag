@@ -84,9 +84,15 @@ resource "aws_lambda_function" "question_answering_function" {
       OPENSEARCH_INDEX           = var.open_search_index_name
       OPENSEARCH_SECRET_ID       = local.secret_id
     }
+    kms_key_arn = aws_kms_key.customer_managed_kms_key.arn
   }
 
+  dead_letter_config {
+    target_arn = aws_sqs_queue.dlq.arn
+  }
+  reserved_concurrent_executions = 10
   depends_on = [null_resource.build_and_push_image]
+  code_signing_config_arn = aws_lambda_code_signing_config.question_answering_function.arn
 }
 
 resource "aws_lambda_permission" "grant_invoke_lambda" {
