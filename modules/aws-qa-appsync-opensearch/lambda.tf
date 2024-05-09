@@ -1,10 +1,12 @@
 # Create an ECR repository
 resource "aws_ecr_repository" "question_answering_function" {
   name = "question_answering_function${var.stage}"
-  image_scanning_configuration = {
+
+  image_tag_mutability = "IMMUTABLE"
+
+  image_scanning_configuration {
     scan_on_push = true
   }
-  image_tag_mutability = "IMMUTABLE"
 }
 
 # Manage ECR image versions
@@ -17,8 +19,8 @@ resource "aws_ecr_lifecycle_policy" "question_answering_function_policy" {
         rulePriority = 1
         description  = "Keep last 10 images"
         selection = {
-          tagStatus = "untagged"
-          countType = "imageCountMoreThan"
+          tagStatus   = "untagged"
+          countType   = "imageCountMoreThan"
           countNumber = 10
         }
         action = {
@@ -49,13 +51,13 @@ resource "null_resource" "build_and_push_image" {
 
 # Create Lambda function using Docker image from ECR
 resource "aws_lambda_function" "question_answering_function" {
-  function_name    = "question_answering_function"
-  role             = aws_iam_role.question_answering_function_role.arn
-  handler          = "not_required_for_containers"
-  runtime          = "provided.al2"
-  timeout          = 900
-  memory_size      = 1024
-  image_uri        = "${aws_ecr_repository.question_answering_function.repository_url}:latest"
+  function_name = "question_answering_function"
+  role          = aws_iam_role.question_answering_function_role.arn
+  handler       = "not_required_for_containers"
+  runtime       = "provided.al2"
+  timeout       = 900
+  memory_size   = 1024
+  image_uri     = "${aws_ecr_repository.question_answering_function.repository_url}:latest"
   vpc_config {
     security_group_ids = [local.security_group_id]
     subnet_ids         = [aws_subnet.private_subnet.id]
@@ -63,11 +65,11 @@ resource "aws_lambda_function" "question_answering_function" {
 
   environment {
     variables = {
-      GRAPHQL_URL = aws_appsync_graphql_api.question_answering_graphql_api.uris["GRAPHQL"]
-      INPUT_BUCKET = aws_s3_bucket.input_assets_qa_bucket.bucket
+      GRAPHQL_URL                = aws_appsync_graphql_api.question_answering_graphql_api.uris["GRAPHQL"]
+      INPUT_BUCKET               = aws_s3_bucket.input_assets_qa_bucket.bucket
       OPENSEARCH_DOMAIN_ENDPOINT = var.existing_opensearch_domain.endpoint
-      OPENSEARCH_INDEX = var.open_search_index_name
-      OPENSEARCH_SECRET_ID = local.secret_id
+      OPENSEARCH_INDEX           = var.open_search_index_name
+      OPENSEARCH_SECRET_ID       = local.secret_id
     }
   }
 

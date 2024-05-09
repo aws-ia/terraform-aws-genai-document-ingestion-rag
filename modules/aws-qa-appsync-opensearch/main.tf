@@ -31,5 +31,5 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.question_answering_function.arn
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.trigger.arn
+  source_arn    = aws_cloudwatch_event_rule.question_answering_rule.arn
 }
