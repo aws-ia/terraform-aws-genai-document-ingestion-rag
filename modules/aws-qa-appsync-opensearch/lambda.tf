@@ -60,6 +60,36 @@ resource "null_resource" "build_and_push_image" {
   }
 }
 
+resource "aws_sqs_queue" "dlq" {
+  name = "question_answering_function_dlq"
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_signer_signing_profile" "question_answering_profile" {
+  name            = "qa_sign_profile"
+  platform_id     = "AWSLambda-SHA384-ECDSA"
+
+  signature_validity_period {
+    type  = "DAYS"
+    value = 365
+  }
+
+  tags = {
+    Name = "question_answering Profile"
+  }
+}
+
+resource "aws_lambda_code_signing_config" "question_answering_function" {
+  allowed_publishers {
+    signing_profile_version_arns = [aws_signer_signing_profile.question_answering_profile.arn]
+  }
+
+  policies {
+    untrusted_artifact_on_deployment = "Enforce"
+  }
+}
+
+
 # Create Lambda function using Docker image from ECR
 resource "aws_lambda_function" "question_answering_function" {
   function_name = "question_answering_function"
@@ -84,15 +114,14 @@ resource "aws_lambda_function" "question_answering_function" {
       OPENSEARCH_INDEX           = var.open_search_index_name
       OPENSEARCH_SECRET_ID       = local.secret_id
     }
-    kms_key_arn = aws_kms_key.customer_managed_kms_key.arn
   }
-
   dead_letter_config {
     target_arn = aws_sqs_queue.dlq.arn
   }
   reserved_concurrent_executions = 10
   depends_on = [null_resource.build_and_push_image]
   code_signing_config_arn = aws_lambda_code_signing_config.question_answering_function.arn
+  kms_key_arn = aws_kms_key.customer_managed_kms_key.arn
 }
 
 resource "aws_lambda_permission" "grant_invoke_lambda" {
