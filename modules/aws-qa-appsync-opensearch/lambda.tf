@@ -36,6 +36,14 @@ resource "aws_ecr_lifecycle_policy" "question_answering_function_policy" {
   })
 }
 
+resource "aws_s3_bucket_public_access_block" "waf_logs" {
+  bucket                  = aws_s3_bucket.waf_logs.id
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
+
 resource "aws_kms_key" "ecr_kms_key" {
   description             = "KMS key for encrypting ECR images"
   enable_key_rotation     = true

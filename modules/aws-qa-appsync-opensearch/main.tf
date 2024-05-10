@@ -80,16 +80,14 @@ resource "aws_default_security_group" "default" {
     protocol    = "-1"
     from_port   = 0
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    action      = "deny"
+    cidr_blocks = []
   }
 
   egress {
     protocol    = "-1"
     from_port   = 0
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    action      = "deny"
+    cidr_blocks = []
   }
 }
 

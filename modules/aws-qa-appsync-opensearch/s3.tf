@@ -1,6 +1,27 @@
 # Bucket for storing server access logging
 resource "aws_kms_key" "customer_managed_kms_key" {
   enable_key_rotation = true
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          ]
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 resource "aws_s3_bucket" "server_access_log_bucket" {
@@ -15,6 +36,78 @@ resource "aws_s3_bucket" "server_access_log_bucket" {
       }
     }
   }
+}
+
+resource "aws_kinesis_firehose_delivery_stream" "s3_firehose_stream" {
+  name        = "firehose_delivery_stream_to_s3"
+  destination = "s3"
+
+  s3_configuration {
+    role_arn   = aws_iam_role.firehose_role.arn
+    bucket_arn = aws_s3_bucket.server_access_log_bucket.arn
+    buffer_size = 10 // in MBs
+    buffer_interval = 300 // in seconds
+  }
+  server_side_encryption {
+     enabled=true #default is false
+     key_type = "CUSTOMER_MANAGED_CMK"
+     key_arn = aws_kms_key.customer_managed_kms_key.arn
+   }
+}
+
+resource "aws_s3_bucket" "waf_logs" {
+  bucket = "waf-logs-${var.stage}"
+  acl    = "private"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.customer_managed_kms_key.arn
+      }
+    }
+  }
+
+  lifecycle_rule {
+    id      = "log"
+    enabled = true
+    expiration {
+      days = 365
+    }
+  }
+
+  logging {
+    target_bucket = aws_s3_bucket.waf_logs.id
+    target_prefix = "log/"
+  }
+
+  versioning {
+    enabled = true
+  }
+}
+
+resource "aws_kinesis_firehose_delivery_stream" "waf_logs_stream" {
+  name        = "waf-logs-stream"
+  destination = "s3"
+
+  s3_configuration {
+    role_arn   = aws_iam_role.firehose_role.arn
+    bucket_arn = aws_s3_bucket.waf_logs.arn
+    buffer_size = 10 // in MBs
+    buffer_interval = 300 // in seconds
+  }
+
+  server_side_encryption {
+     enabled=true #default is false
+     key_type = "CUSTOMER_MANAGED_CMK"
+     key_arn = aws_kms_key.customer_managed_kms_key.arn
+   }
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
+  log_destination_configs = [aws_kinesis_firehose_delivery_stream.waf_logs_stream.arn]
+  resource_arn            = aws_wafv2_web_acl.appsync_web_acl.arn
+
 }
 
 resource "aws_sns_topic" "s3_bucket_notification_topic" {

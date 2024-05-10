@@ -114,3 +114,50 @@ resource "aws_iam_role" "qa_construct_role" {
   name               = "qaConstructRole"
   assume_role_policy = data.aws_iam_policy_document.qa_construct_role.json
 }
+
+resource "aws_iam_role" "firehose_role" {
+  name = "firehose_delivery_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "firehose.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "firehose_to_s3_policy" {
+  name        = "firehose_to_s3_policy"
+  description = "Allow Firehose to access S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:PutObject"
+        ],
+        Effect   = "Allow",
+        Resource = [
+          "${aws_s3_bucket.waf_logs.arn}"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_policy_attachment" {
+  role       = aws_iam_role.firehose_role.name
+  policy_arn = aws_iam_policy.firehose_to_s3_policy.arn
+}
