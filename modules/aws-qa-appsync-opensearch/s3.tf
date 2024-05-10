@@ -68,14 +68,6 @@ resource "aws_s3_bucket" "waf_logs" {
     }
   }
 
-  lifecycle_rule {
-    id      = "log"
-    enabled = true
-    expiration {
-      days = 365
-    }
-  }
-
   logging {
     target_bucket = aws_s3_bucket.waf_logs.id
     target_prefix = "log/"
@@ -92,7 +84,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
 
   rule {
     id      = "log"
-    status = true
+    status = "Enabled"
 
     expiration {
       days = 365
