@@ -59,6 +59,11 @@ resource "aws_wafv2_web_acl" "appsync_web_acl" {
   }
 }
 
+resource "aws_wafv2_web_acl_association" "appsync_waf_association" {
+  resource_arn = aws_appsync_graphql_api.question_answering_graphql_api.arn
+  web_acl_arn  = aws_wafv2_web_acl.appsync_web_acl.arn
+}
+
 resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
   name         = "questionAnsweringGraphqlApi${var.stage}"
   schema       = file("${path.module}/schema.graphql")

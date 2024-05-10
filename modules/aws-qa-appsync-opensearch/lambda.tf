@@ -47,8 +47,7 @@ resource "aws_kms_key" "ecr_kms_key" {
         Effect = "Allow"
         Principal = {
           AWS = [
-            "arn:aws:iam::123456789012:role/ECRImageEncryptionRole",
-            "arn:aws:iam::123456789012:role/AnotherSpecificRole"
+            aws_iam_role.question_answering_function_role.arn,
           ]
         }
         Action   = [
