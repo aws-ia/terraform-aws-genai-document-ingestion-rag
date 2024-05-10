@@ -28,6 +28,27 @@ resource "aws_security_group" "security_group" {
   }
 }
 
+resource "aws_security_group_rule" "secure_group_egress_https" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["10.10.10.0/24"] // Adjust the CIDR to match required external services
+  security_group_id = aws_security_group.security_group.id
+  description       = "Allow necessary outbound traffic to specific services on HTTPS"
+}
+
+// Additional egress rules can be added similarly
+resource "aws_security_group_rule" "secure_group_egress_other" {
+  type              = "egress"
+  from_port         = 1024
+  to_port           = 2048
+  protocol          = "tcp"
+  cidr_blocks       = ["10.20.30.0/24"] // Example CIDR for other services
+  security_group_id = aws_security_group.security_group.id
+  description       = "Allow necessary outbound traffic to other specific services"
+}
+
 // Restrict HTTP access to known IPs if HTTP is necessary, otherwise remove or switch to HTTPS
 resource "aws_security_group_rule" "allow_http" {
   type              = "ingress"
