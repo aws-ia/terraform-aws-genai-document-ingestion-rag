@@ -83,7 +83,6 @@ resource "aws_default_security_group" "default" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
     description = "Deny all inbound traffic"
-    type        = "ingress"
   }
 
   egress {
@@ -92,7 +91,6 @@ resource "aws_default_security_group" "default" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
     description = "Deny all outbound traffic"
-    type        = "egress"
   }
 }
 

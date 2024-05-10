@@ -86,6 +86,24 @@ resource "aws_s3_bucket" "waf_logs" {
   }
 }
 
+# Separate resource for lifecycle configuration
+resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
+  bucket = aws_s3_bucket.waf_logs.id
+
+  rule {
+    id      = "log"
+    enabled = true
+
+    expiration {
+      days = 365
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
 resource "aws_kinesis_firehose_delivery_stream" "waf_logs_stream" {
   name        = "waf-logs-stream"
   destination = "s3"
