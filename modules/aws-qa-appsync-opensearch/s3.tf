@@ -190,6 +190,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "server_access_log
   }
 }
 
+resource "aws_s3_bucket_versioning" "waf_logs_bucket_versioning" {
+  bucket = aws_s3_bucket.waf_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_versioning" "server_access_log_bucket_versioning" {
   bucket = aws_s3_bucket.server_access_log_bucket.id
   versioning_configuration {
