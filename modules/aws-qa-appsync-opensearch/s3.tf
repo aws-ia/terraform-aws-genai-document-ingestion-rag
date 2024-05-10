@@ -270,3 +270,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "input_assets_qa_bucket_lifecyc
     }
   }
 }
+
+
+resource "aws_s3_bucket_notification" "waf_logs_notification" {
+  bucket = aws_s3_bucket.waf_logs.id
+
+  topic {
+    topic_arn = aws_sns_topic.s3_bucket_notification_topic.arn
+    events    = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
+  }
+}

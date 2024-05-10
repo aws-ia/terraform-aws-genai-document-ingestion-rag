@@ -73,6 +73,7 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
+
 resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.vpc.id
 
@@ -80,14 +81,18 @@ resource "aws_default_security_group" "default" {
     protocol    = "-1"
     from_port   = 0
     to_port     = 0
-    cidr_blocks = []
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Deny all inbound traffic"
+    type        = "ingress"
   }
 
   egress {
     protocol    = "-1"
     from_port   = 0
     to_port     = 0
-    cidr_blocks = []
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Deny all outbound traffic"
+    type        = "egress"
   }
 }
 
