@@ -92,7 +92,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
 
   rule {
     id      = "log"
-    enabled = true
+    status = true
 
     expiration {
       days = 365
