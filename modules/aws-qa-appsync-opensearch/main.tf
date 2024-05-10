@@ -12,61 +12,53 @@ resource "aws_vpc" "vpc" {
   cidr_block = local.existing_vpc_bool ? null : var.vpc_props.cidr_block
 }
 
-// Security group with restricted egress and ingress
+// Security group creation without embedded egress rules
 resource "aws_security_group" "security_group" {
   name        = "secureGroup${var.stage}"
   description = "Security group for ${var.stage} environment with controlled access"
   vpc_id      = aws_vpc.vpc.id
-
-  // Define egress to only specific required services or IPs
-  egress {
-    description = "Allow necessary outbound traffic to specific services"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["10.10.10.0/24"] // Example CIDR for required external services; adjust as necessary
-  }
 }
 
+// Separate egress rule for HTTPS traffic
 resource "aws_security_group_rule" "secure_group_egress_https" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["10.10.10.0/24"] // Adjust the CIDR to match required external services
+  cidr_blocks       = ["10.10.10.0/24"] // Adjust to the necessary external service CIDR
   security_group_id = aws_security_group.security_group.id
   description       = "Allow necessary outbound traffic to specific services on HTTPS"
 }
 
-// Additional egress rules can be added similarly
+// Additional egress rules for other specific services
 resource "aws_security_group_rule" "secure_group_egress_other" {
   type              = "egress"
   from_port         = 1024
   to_port           = 2048
   protocol          = "tcp"
-  cidr_blocks       = ["10.20.30.0/24"] // Example CIDR for other services
+  cidr_blocks       = ["10.20.30.0/24"] // Adjust as necessary for other services
   security_group_id = aws_security_group.security_group.id
   description       = "Allow necessary outbound traffic to other specific services"
 }
 
-// Restrict HTTP access to known IPs if HTTP is necessary, otherwise remove or switch to HTTPS
+// Example ingress rule for HTTP (restrict to necessary sources)
 resource "aws_security_group_rule" "allow_http" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["10.0.0.0/16"] // Example CIDR, replace with actual IPs needing access
+  cidr_blocks       = ["10.0.0.0/16"] // Adjust to the actual IPs needing access
   security_group_id = aws_security_group.security_group.id
   description       = "Allow HTTP traffic from specific IPs"
 }
 
-// HTTPS access; consider whether this should be open to the entire internet
+// Example ingress rule for HTTPS (consider security implications of wide access)
 resource "aws_security_group_rule" "allow_https" {
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["10.10.10.0/24"] // Replace with actual IPs or remove if no external access is necessary
+  cidr_blocks       = ["10.10.10.0/24"] // Adjust or remove if external access is not necessary
   security_group_id = aws_security_group.security_group.id
   description       = "Allow HTTPS traffic from specific trusted sources"
 }
