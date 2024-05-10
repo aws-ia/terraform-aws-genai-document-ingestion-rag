@@ -161,3 +161,7 @@ resource "aws_iam_role_policy_attachment" "firehose_policy_attachment" {
   role       = aws_iam_role.firehose_role.name
   policy_arn = aws_iam_policy.firehose_to_s3_policy.arn
 }
+
+resource "aws_iam_service_linked_role" "opensearch_service_linked_role" {
+  aws_service_name = "opensearchservice.amazonaws.com"
+}

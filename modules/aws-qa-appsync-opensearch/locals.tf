@@ -1,3 +1,4 @@
+
 locals {
   # Boolean values for conditions
   existing_input_assets_bucket_obj_bool = var.existing_input_assets_bucket_obj != null ? length(tolist([var.existing_input_assets_bucket_obj])) > 0 : false
@@ -21,7 +22,7 @@ locals {
     (local.existing_input_assets_bucket_obj_bool && (local.logging_bucket_props_bool || local.log_s3_access_logs_bool)) ? "Error - If existing_input_assets_bucket_obj is provided, supplying logging_bucket_props or log_s3_access_logs is an error." : null,
     ((coalesce(var.deploy_vpc, true) || local.vpc_props_bool) && local.existing_vpc_bool) ? "Error - Either provide an existingVpc or some combination of deployVpc and vpcProps, but not both." : null
   ])
-  security_group_id = local.existing_security_group_id_bool ? var.existing_security_group_id : aws_security_group.security_group.id
+  security_group_id = local.existing_security_group_id_bool ? var.existing_security_group_id : aws_security_group.security_group_primary.id
   vpc_id = local.existing_vpc_bool ? var.existing_vpc.id : aws_vpc.vpc.id
   input_assets_bucket_name = local.existing_input_assets_bucket_obj_bool ? var.existing_input_assets_bucket_obj.bucket : aws_s3_bucket.input_assets_qa_bucket.bucket
   input_assets_bucket_id = local.existing_input_assets_bucket_obj_bool ? var.existing_input_assets_bucket_obj.id : aws_s3_bucket.input_assets_qa_bucket.id

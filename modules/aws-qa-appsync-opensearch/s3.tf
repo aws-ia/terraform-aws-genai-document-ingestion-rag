@@ -78,6 +78,21 @@ resource "aws_s3_bucket" "waf_logs" {
   }
 }
 
+resource "aws_s3_bucket_replication_configuration" "multi_region_replication" {
+   depends_on = [aws_s3_bucket_versioning.waf_logs_bucket_versioning]
+   role   = aws_iam_role.firehose_role.arn
+   bucket = aws_s3_bucket.waf_logs.id
+
+   rule {
+     status = "Enabled"
+
+     destination {
+       bucket        = aws_s3_bucket.waf_logs.id
+       storage_class = "STANDARD"
+     }
+   }
+ }
+
 # Separate resource for lifecycle configuration
 resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
   bucket = aws_s3_bucket.waf_logs.id

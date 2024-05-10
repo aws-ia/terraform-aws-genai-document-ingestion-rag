@@ -35,3 +35,6 @@ variable "id" {}
 variable "cognito_user_pool_id" {}
 variable "use_existing_merged_api" {}
 variable "project_version" {}
+variable "domain" {
+    default = "doc-ingestion"
+}

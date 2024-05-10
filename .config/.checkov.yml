@@ -8,6 +8,7 @@ skip-check:
 - CKV2_GCP*
 - CKV_AZURE*
 - CKV2_AZURE*
+- CKV_AWS_317 #Documentation is incorrect
 - CKV_TF_1 # default to Terraform registry instead of Git
 summary-position: bottom
 output: 'cli'

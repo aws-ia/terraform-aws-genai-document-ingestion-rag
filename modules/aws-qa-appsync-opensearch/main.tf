@@ -12,13 +12,6 @@ resource "aws_vpc" "vpc" {
   cidr_block = local.existing_vpc_bool ? null : var.vpc_props.cidr_block
 }
 
-// Security Group for controlling access to resources within the VPC
-resource "aws_security_group" "security_group" {
-  name        = "secureGroup-${var.stage}"
-  description = "Security group for ${var.stage} environment with controlled access"
-  vpc_id      = aws_vpc.vpc.id
-}
-
 // Egress rule for HTTPS traffic
 resource "aws_security_group_rule" "secure_group_egress_https" {
   type              = "egress"
@@ -26,7 +19,7 @@ resource "aws_security_group_rule" "secure_group_egress_https" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["10.10.10.0/24"]  // Specific CIDR for external services
-  security_group_id = aws_security_group.security_group.id
+  security_group_id = aws_security_group.security_group_primary.id
   description       = "Allow HTTPS traffic to specific services"
 }
 
@@ -37,7 +30,7 @@ resource "aws_security_group_rule" "allow_http" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["10.0.0.0/16"]  // Adjust based on actual requirements
-  security_group_id = aws_security_group.security_group.id
+  security_group_id = aws_security_group.security_group_primary.id
   description       = "Allow HTTP traffic from specific IPs"
 }
 
@@ -80,15 +73,11 @@ resource "aws_opensearch_domain" "opensearch_domain" {
   log_publishing_options {
     cloudwatch_log_group_arn = aws_cloudwatch_log_group.opensearch_audit_log.arn
     log_type                 = "AUDIT_LOGS"
-
-    audit_log {
-      enabled = true
-    }
   }
 
   vpc_options {
     subnet_ids         = [aws_subnet.private_subnet.id]
-    security_group_ids = [aws_security_group.security_group.id]
+    security_group_ids = [aws_security_group.security_group_primary.id]
   }
 
   advanced_options = {
@@ -101,7 +90,7 @@ resource "aws_opensearch_domain" "opensearch_domain" {
       Effect    = "Allow",
       Principal = {"AWS": ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]},
       Action    = "es:*",
-      Resource  = "arn:aws:es:${var.region}:${var.account_id}:domain/${var.domain}/*"
+      Resource  = "arn:aws:es:${data.aws_caller_identity.current.account_id}:${data.aws_region.current.name}:domain/${var.domain}/*"
     }]
   })
 
@@ -109,14 +98,20 @@ resource "aws_opensearch_domain" "opensearch_domain" {
     Domain = "TestDomain"
   }
 
-  depends_on = [aws_iam_service_linked_role.example]
+  depends_on = [aws_iam_service_linked_role.opensearch_service_linked_role]
+}
+
+// Security Group for controlling access to resources within the VPC
+resource "aws_security_group" "security_group_primary" {
+  name        = "secureGroup-${var.stage}"
+  description = "Security group for ${var.stage} environment with controlled access"
+  vpc_id      = aws_vpc.vpc.id
 }
 
 resource "aws_cloudwatch_log_group" "opensearch_audit_log" {
   name              = "/aws/opensearch/${var.domain}/audit-log"
   retention_in_days = 365
-kms_key_id        = aws_kms_key.customer_managed_kms_key.arn
-
+  kms_key_id        = aws_kms_key.customer_managed_kms_key.arn
 }
 
 // AWS Lambda permissions for CloudWatch event triggers
