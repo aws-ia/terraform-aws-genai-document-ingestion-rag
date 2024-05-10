@@ -17,6 +17,49 @@ resource "aws_s3_bucket" "server_access_log_bucket" {
   }
 }
 
+resource "aws_sns_topic" "s3_bucket_notification_topic" {
+  name = "s3-bucket-notification-topic"
+  kms_master_key_id = aws_kms_key.customer_managed_kms_key.arn
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.server_access_log_bucket.id
+
+  topic {
+    topic_arn = aws_sns_topic.s3_bucket_notification_topic.arn
+    events    = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "input_assets_replication" {
+  bucket = aws_s3_bucket.input_assets_qa_bucket.id
+
+  role = aws_iam_role.question_answering_function_role.arn
+
+  rule {
+    id     = "replicateAll"
+    status = "Enabled"
+    destination {
+      bucket = aws_s3_bucket.input_assets_qa_bucket.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "server_access_replication" {
+  bucket = aws_s3_bucket.server_access_log_bucket.id
+
+  role = aws_iam_role.question_answering_function_role.arn
+
+  rule {
+    id     = "replicateAll"
+    status = "Enabled"
+
+    destination {
+      bucket = aws_s3_bucket.input_assets_qa_bucket.arn
+    }
+  }
+}
+
 resource "aws_s3_bucket_acl" "server_access_log_bucket_acl" {
   bucket = aws_s3_bucket.server_access_log_bucket.id
   acl    = "private"

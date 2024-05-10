@@ -40,6 +40,28 @@ resource "aws_kms_key" "ecr_kms_key" {
   description             = "KMS key for encrypting ECR images"
   enable_key_rotation     = true
   deletion_window_in_days = 10
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::123456789012:role/ECRImageEncryptionRole",
+            "arn:aws:iam::123456789012:role/AnotherSpecificRole"
+          ]
+        }
+        Action   = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 # Build and push Docker image to ECR
