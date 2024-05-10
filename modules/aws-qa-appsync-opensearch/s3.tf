@@ -118,6 +118,15 @@ resource "aws_s3_bucket" "input_assets_qa_bucket" {
     }
   }
 
+  lifecycle_rule {
+    id      = "log"
+    enabled = true
+
+    expiration {
+      days = 90
+    }
+  }
+
   logging {
     target_bucket = aws_s3_bucket.server_access_log_bucket.id
     target_prefix = "log/"
