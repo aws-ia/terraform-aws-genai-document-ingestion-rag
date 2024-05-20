@@ -187,3 +187,9 @@ variable "id" {
   description = "ID for the resource"
   type = string
 }
+
+variable "bucket_prefix" {
+  description = "Prefix for usage with s3 bucketnames"
+  type = string
+  default = "gen-ai"
+}
