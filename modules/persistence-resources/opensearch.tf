@@ -41,32 +41,88 @@ resource "aws_opensearch_domain" "opensearch_domain" {
   access_policies = data.aws_iam_policy_document.opensearch_domain_policy
 }
 
-resource "aws_opensearchserverless_security_policy" "opensearch_serverless_collection_policy" {
-  count = var.open_search-service_type == "aoss" ? 1 : 0
-  name = "${var.open_search_props.collection_name}_collection_policy"
-  type = "encryption"
+resource "aws_opensearchserverless_security_policy" "encryption_policy" {
+  name        = "${var.open_search_props.collection_name}-encryption-policy"
+  type        = "encryption"
+  description = "encryption policy for ${var.open_search_props.collection_name}"
   policy = jsonencode({
-    "Rules" = [
+    Rules = [
       {
         Resource = [
-          "collection/${var.open_search_props.collectionName}"
+          "collection/${var.open_search_props.collection_name}"
         ],
         ResourceType = "collection"
-        SourceVPCEs = var.open_search_props.open_search_vpc_endpoint_id,
-        AllowFromPublic: false,
-      },
-            {
-        Resource = [
-          "collection/${var.open_search_props.collectionName}"
-        ],
-        ResourceType = "dashboard"
-        SourceVPCEs = var.open_search_props.open_search_vpc_endpoint_id,
-        AllowFromPublic: false,
       }
     ],
-    "AWSOwnedKey" = true
+    AWSOwnedKey = true
   })
 }
+
+
+resource "aws_opensearchserverless_security_policy" "opensearch_serverless_collection_policy" {
+  count = var.open_search-service_type == "aoss" ? 1 : 0
+  name = "${var.open_search_props.collection_name}-collection-policy"
+  type = "network"
+    policy = jsonencode([
+    {
+      Description = "VPC access for collection endpoint",
+      Rules = [
+        {
+          ResourceType = "collection",
+          Resource = [
+            "collection/${var.open_search_props.collection_name}"
+          ]
+        }
+      ],
+      AllowFromPublic = false,
+      SourceVPCEs = [
+        var.open_search_props.open_search_vpc_endpoint_id
+      ]
+    },
+    {
+      Description = "Public access for dashboards",
+      Rules = [
+        {
+          ResourceType = "dashboard"
+          Resource = [
+            "collection/${var.open_search_props.collection_name}"
+          ]
+        }
+      ],
+      AllowFromPublic = false
+      SourceVPCEs = [
+        var.open_search_props.open_search_vpc_endpoint_id
+      ]
+    }
+  ])
+}
+
+# resource "aws_opensearchserverless_security_policy" "opensearch_serverless_collection_policy" {
+#   count = var.open_search-service_type == "aoss" ? 1 : 0
+#   name = "${var.open_search_props.collection_name}-collection-policy"
+#   type = "encryption"
+#   policy = jsonencode({
+#     "Rules" = [
+#       {
+#         Resource = [
+#           "collection/${var.open_search_props.collection_name}"
+#         ],
+#         ResourceType = "collection"
+#       },
+#       {
+#         Resource = [
+#           "collection/${var.open_search_props.collection_name}"
+#         ],
+#         ResourceType = "dashboard"
+#       }
+#     ],
+#     AllowFromPublic = false
+#     "AWSOwnedKey" = true
+#     SourceVPCEs = [
+#         var.open_search_props.open_search_vpc_endpoint_id
+#       ]
+#   })
+# }
 
 resource "aws_opensearchserverless_collection" "opensearch_serverless_collection" {
   count = var.open_search-service_type == "aoss" ? 1 : 0

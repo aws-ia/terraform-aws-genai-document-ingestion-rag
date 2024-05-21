@@ -1,5 +1,6 @@
 provider "aws" {
   region = "us-east-1"
+  profile = "gen-ai"
 }
 # tflint-ignore: terraform_unused_declarations
 data "aws_caller_identity" "current_account" {}
@@ -16,7 +17,7 @@ module "persistence_resources" {
   open_search-service_type = "aoss"
   open_search_props = {
     open_search_vpc_endpoint_id = module.networking_resources.opensearch_vpc_endpoint
-    collectionName = "doc-explorer"
+    collection_name = "doc-explorer"
   }
   public_subnet_id = module.networking_resources.public_subnet_id
   private_subnet_id = module.networking_resources.private_subnet_id

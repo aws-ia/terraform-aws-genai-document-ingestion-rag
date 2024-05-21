@@ -16,6 +16,7 @@ resource "aws_subnet" "public" {
   tags = {
     Name = "PublicSubnet-${var.stage}"
   }
+  depends_on = [aws_internet_gateway.gw]
 }
 
 resource "aws_subnet" "private" {
@@ -26,6 +27,10 @@ resource "aws_subnet" "private" {
   tags = {
     Name = "PrivateSubnet-${var.stage}"
   }
+  depends_on = [aws_internet_gateway.gw]
+}
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main_vpc.id
 }
 
 resource "aws_subnet" "isolated" {
@@ -36,10 +41,11 @@ resource "aws_subnet" "isolated" {
   tags = {
     Name = "IsolatedSubnet-${var.stage}"
   }
+  depends_on = [aws_internet_gateway.gw]
 }
 
 resource "aws_eip" "nat" {
-  vpc = true
+  domain = "vpc"
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -115,17 +121,22 @@ resource "aws_security_group" "security_group_primary" {
   vpc_id      = aws_vpc.main_vpc.id
 }
 
-resource "aws_vpc_endpoint" "opensearch" {
-  vpc_id            = aws_vpc.main_vpc.id
-  service_name      = "com.amazonaws.${data.aws_region.current}.es"
-  vpc_endpoint_type = "Interface"
-  subnet_ids        = [for subnet in aws_subnet.private : subnet.id]
-  security_group_ids = [aws_security_group.lambda_sg.id]
+# resource "aws_vpc_endpoint" "opensearch" {
+#   vpc_id            = aws_vpc.main_vpc.id
+#   service_name      = "com.amazonaws.${data.aws_region.current.name}.es"
+#   vpc_endpoint_type = "Interface"
+#   subnet_ids        = [aws_subnet.isolated.id, aws_subnet.private.id, aws_subnet.public.id]
+#   security_group_ids = [aws_security_group.lambda_sg.id]
+# }
+resource "aws_opensearchserverless_vpc_endpoint" "opensearch" {
+  name       = "opensearch-vpc-endpoint-${var.stage}"
+  subnet_ids = [aws_subnet.isolated.id, aws_subnet.private.id, aws_subnet.public.id]
+  vpc_id     = aws_vpc.main_vpc.id
 }
 
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.main_vpc.id
-  service_name = "com.amazonaws.$data.aws_region.current}.s3"
+  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_endpoint_type = "Gateway"
 
   route_table_ids = [aws_vpc.main_vpc.default_route_table_id]

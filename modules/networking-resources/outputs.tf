@@ -3,11 +3,7 @@ output "private_subnet_ids" {
 }
 
 output "opensearch_vpc_endpoint" {
-  value = aws_vpc_endpoint.opensearch.arn
-}
-
-output "security_group" {
-  value = aws_security_group.lambda_sg
+  value = aws_opensearchserverless_vpc_endpoint.opensearch.id
 }
 
 output "vpc_arn" {
@@ -19,21 +15,21 @@ output "vpc_id" {
 }
 
 output "public_subnet_id" {
-  value = aws_subnet.public
+  value = aws_subnet.public.id
 }
 
 output "private_subnet_id" {
-  value = aws_subnet.private
+  value = aws_subnet.private.id
 }
 
 output "isolated_subnet_id" {
-  value = aws_subnet.isolated
+  value = aws_subnet.isolated.id
 }
 
 output "primary_security_group_id" {
-  value = aws_security_group.security_group_primary
+  value = aws_security_group.security_group_primary.id
 }
 
 output "lambda_security_group_id" {
-  value = aws_security_group.lambda_sg
+  value = aws_security_group.lambda_sg.id
 }
