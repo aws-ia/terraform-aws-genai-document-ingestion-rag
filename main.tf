@@ -28,6 +28,24 @@ module "persistence_resources" {
   stage = var.stage
 }
 
+module "question-answering" {
+  source = "./modules/question-answering"
+  bucket_prefix = "gen-ai"
+  stage = "_dev"
+  cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+  input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
+  input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
+  existing_opensearch_domain_mame = module.persistence_resources.existing_opensearch_domain_mame
+  existing_open_search_domain_endpoint = module.persistence_resources.existing_open_search_domain_endpoint
+  existing_open_search_index_name = "doc-rag-search"
+  security_group_id = module.networking_resources.primary_security_group_id
+  private_subnet_id = module.networking_resources.private_subnet_id
+  open_search_secret = "NONE"
+  vpc_id = module.networking_resources.vpc_id
+  service_access_log_bucket_arn = module.persistence_resources.access_logs_bucket_arn
+  opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
+}
+
 # module "my_module" {
 #   source         = "./modules/aws-qa-appsync-opensearch"
 #   api_log_config = null
