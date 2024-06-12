@@ -1,11 +1,17 @@
 provider "aws" {
   region = "us-east-1"
-  profile = "gen-ai"
+  profile = "default"
 }
 # tflint-ignore: terraform_unused_declarations
 data "aws_caller_identity" "current_account" {}
 # tflint-ignore: terraform_unused_declarations
 data "aws_region" "current_region" {}
+
+resource "random_string" "app_prefix" {
+  length = 6
+  special = false
+  upper = false
+}
 
 module "networking_resources" {
   source = "./modules/networking-resources"
@@ -44,6 +50,7 @@ module "question-answering" {
   vpc_id = module.networking_resources.vpc_id
   service_access_log_bucket_arn = module.persistence_resources.access_logs_bucket_arn
   opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
+  app_prefix = random_string.app_prefix.result
 }
 
 # module "my_module" {

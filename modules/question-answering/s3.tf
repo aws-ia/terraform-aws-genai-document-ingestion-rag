@@ -108,7 +108,7 @@ resource "aws_s3_bucket_public_access_block" "waf_logs" {
 
 resource "aws_s3_bucket" "waf_logs" {
   #TODO change
-  bucket = "waf-logs-dev"
+  bucket = "${var.app_prefix}-waf-logs-dev"
 }
 resource "aws_s3_bucket_logging" "waf_logs" {
   bucket = aws_s3_bucket.waf_logs.id
@@ -132,7 +132,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs" {
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "s3_firehose_stream" {
-  name        = "firehose_delivery_stream_to_s3"
+  name        = "${var.app_prefix}firehose_delivery_stream_to_s3"
   destination = "extended_s3"
 
   extended_s3_configuration {
@@ -182,7 +182,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "waf_logs_stream" {
-  name        = "waf-logs-stream"
+  name        = "${var.app_prefix}waf-logs-stream"
   destination = "extended_s3"
 
   extended_s3_configuration {

@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "qa_construct_log_group" {
-  name = "${var.bucket_prefix}-qaConstructLogGroup"
+  name = "${var.app_prefix}-qaConstructLogGroup"
 }
 
 resource "aws_flow_log" "flow_log" {
@@ -11,11 +11,11 @@ resource "aws_flow_log" "flow_log" {
 }
 
 resource "aws_cloudwatch_event_bus" "question_answering_event_bus" {
-  name = "questionAnsweringEventBus${var.stage}"
+  name = "${var.app_prefix}questionAnsweringEventBus"
 }
 
 resource "aws_cloudwatch_event_rule" "question_answering_rule" {
-  name           = "QuestionAnsweringRule"
+  name           = "${var.app_prefix}QuestionAnsweringRule"
   description    = "Rule to trigger question answering function"
   event_bus_name = aws_cloudwatch_event_bus.question_answering_event_bus.name
 
