@@ -1,4 +1,73 @@
+resource "aws_s3_bucket" "server_access_log_bucket" {
+  bucket = "server-access-log-bucket-${var.stage}-${data.aws_caller_identity.current.account_id}"
+  acl    = "private"
+  versioning {
+    enabled = true
+  }
+  lifecycle_rule {
+    enabled = true
+    expiration {
+      days = 90
+    }
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
 # Bucket for storing server access logging
+resource "aws_s3_bucket" "input_assets_bucket" {
+  bucket = "input-assets-bucket-${var.stage}-${data.aws_caller_identity.current.account_id}"
+  acl    = "private"
+  versioning {
+    enabled = true
+  }
+  lifecycle_rule {
+    enabled = true
+    expiration {
+      days = 90
+    }
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+  logging {
+    target_bucket = aws_s3_bucket.server_access_log_bucket.bucket
+  }
+}
+
+resource "aws_s3_bucket" "processed_assets_bucket" {
+  bucket = "processed-assets-bucket-${var.stage}-${data.aws_caller_identity.current.account_id}"
+  acl    = "private"
+  versioning {
+    enabled = true
+  }
+  lifecycle_rule {
+    enabled = true
+    expiration {
+      days = 90
+    }
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+  logging {
+    target_bucket = aws_s3_bucket.server_access_log_bucket.bucket
+  }
+}
+
 resource "aws_kms_key" "customer_managed_kms_key" {
   enable_key_rotation = true
   policy = jsonencode({
