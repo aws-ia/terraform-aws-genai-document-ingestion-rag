@@ -1,5 +1,5 @@
 resource "aws_sfn_state_machine" "ingestion_state_machine" {
-  name     = "IngestionStateMachine-${var.stage}"
+  name     = "${var.app_prefix}IngestionStateMachine"
   role_arn = aws_iam_role.sfn_role.arn
   definition = jsonencode({
     StartAt = "Validate Ingestion Input"

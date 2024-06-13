@@ -1,6 +1,5 @@
 # Input Access Logs bucket
 resource "aws_s3_bucket" "access_logs_bucket" {
-#   bucket = "access_logs_bucket-${var.stage}"
   bucket_prefix = "${var.bucket_prefix}-access-logs-bucket"
   force_destroy = true
 }
@@ -33,7 +32,6 @@ resource "aws_s3_bucket_policy" "access_logs_bucket_policy" {
 
 # Input Assets bucket
 resource "aws_s3_bucket" "input_assets_bucket" {
-#   bucket = "input_assets_bucket-${var.stage}"
     bucket_prefix = "${var.bucket_prefix}-input-assets-bucket"
   force_destroy = true
 }
@@ -84,7 +82,6 @@ resource "aws_s3_bucket_policy" "input_assets_bucket_policy" {
 
 # Processed Assets bucket
 resource "aws_s3_bucket" "processed_assets_bucket" {
-#   bucket = "processed_assets_bucket-${var.stage}"
   bucket_prefix = "${var.bucket_prefix}-processed-assets-bucket"
   force_destroy = true
 }

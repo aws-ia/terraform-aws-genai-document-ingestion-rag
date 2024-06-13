@@ -1,11 +1,11 @@
 resource "aws_cloudwatch_log_group" "ingestion_construct_log_group" {
-  name              = "ingestionConstructLogGroup"
+  name = "${var.app_prefix}_ingestionConstructLogGroup"
   retention_in_days = 90
 }
 
 # Event Bus
 resource "aws_cloudwatch_event_bus" "ingestion_event_bus" {
-  name = "ingestionEventBus-${var.stage}"
+  name = "${var.app_prefix}_ingestionEventBus"
 }
 
 resource "aws_cloudwatch_event_target" "sfn_target" {

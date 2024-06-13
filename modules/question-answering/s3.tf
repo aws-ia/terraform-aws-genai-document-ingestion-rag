@@ -1,68 +1,3 @@
-resource "aws_s3_bucket" "server_access_log_bucket" {
-  bucket = "${var.bucket_prefix}-server-access-log-bucket"
-  tags = {
-    Name = "server-access-log-bucket-${var.stage}"
-  }
-}
-resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
-  bucket = aws_s3_bucket.server_access_log_bucket.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "DenyUnencryptedConnections"
-        Effect    = "Deny"
-        Principal = "*"
-        Action    = "s3:*"
-        Resource  = [
-          "arn:aws:s3:::${aws_s3_bucket.server_access_log_bucket.bucket}/*",
-          "arn:aws:s3:::${aws_s3_bucket.server_access_log_bucket.bucket}"
-        ]
-        Condition = {
-          Bool = {
-            "aws:SecureTransport" = "false"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_s3_bucket_public_access_block" "server_access_log_bucket_access_block" {
-  bucket = aws_s3_bucket.server_access_log_bucket.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "server_access_log_bucket" {
-  bucket = aws_s3_bucket.server_access_log_bucket.id
-  rule {
-    id      = "server_access_log_bucket"
-    status = "Enabled"
-    expiration {
-      days = 90
-    }
-  }
-}
-resource "aws_s3_bucket_server_side_encryption_configuration" "server_access_log_bucket" {
-  bucket = aws_s3_bucket.server_access_log_bucket.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm  = "AES256"
-    }
-  }
-}
-resource "aws_s3_bucket_versioning" "server_access_log_bucket" {
-  bucket = aws_s3_bucket.server_access_log_bucket.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-
 # logs
 resource "aws_kms_key" "customer_managed_kms_key" {
   enable_key_rotation = true
@@ -107,7 +42,6 @@ resource "aws_s3_bucket_public_access_block" "waf_logs" {
 }
 
 resource "aws_s3_bucket" "waf_logs" {
-  #TODO change
   bucket = "${var.app_prefix}-waf-logs-dev"
 }
 resource "aws_s3_bucket_logging" "waf_logs" {
@@ -137,7 +71,7 @@ resource "aws_kinesis_firehose_delivery_stream" "s3_firehose_stream" {
 
   extended_s3_configuration {
     role_arn   = aws_iam_role.firehose_role.arn
-    bucket_arn = aws_s3_bucket.server_access_log_bucket.arn
+    bucket_arn = var.access_logs_bucket_arn
     buffering_size = 10
     buffering_interval = 300
   }
@@ -151,7 +85,7 @@ resource "aws_kinesis_firehose_delivery_stream" "s3_firehose_stream" {
 resource "aws_s3_bucket_replication_configuration" "multi_region_replication" {
   depends_on = [aws_s3_bucket_versioning.waf_logs]
   role   = aws_iam_role.firehose_role.arn
-  bucket = aws_s3_bucket.server_access_log_bucket.bucket
+  bucket = var.access_logs_bucket_name
 
   rule {
     status = "Enabled"

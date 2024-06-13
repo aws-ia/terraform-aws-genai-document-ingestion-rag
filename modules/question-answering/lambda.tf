@@ -2,7 +2,7 @@
 resource "aws_ecr_repository" "question_answering_function" {
   name = "${var.app_prefix}question_answering_function"
 
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -10,7 +10,7 @@ resource "aws_ecr_repository" "question_answering_function" {
 
   encryption_configuration {
     encryption_type = "KMS"
-    kms_key = aws_kms_key.ecr_kms_key.arn  # Referencing the KMS key
+    kms_key = aws_kms_key.ecr_kms_key.arn
   }
 }
 
@@ -40,30 +40,7 @@ resource "aws_kms_key" "ecr_kms_key" {
   description             = "KMS key for encrypting ECR images"
   enable_key_rotation     = true
   deletion_window_in_days = 10
-  policy = jsonencode({
-    Version   = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = [
-            aws_iam_role.question_answering_function_role.arn,
-          ]
-        }
-        Action   = ["kms:*"]
-        Resource = "*"
-      },
-      {
-        Sid       = "Allow access for Key Administrators",
-        Effect    = "Allow",
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        Action   = "kms:*",
-        Resource = "*"
-      },
-    ]
-  })
+  policy = data.aws_iam_policy_document.ecr_kms_key.json
 }
 
 # Build and push Docker image to ECR
@@ -114,15 +91,11 @@ resource "aws_lambda_code_signing_config" "question_answering_function" {
 resource "aws_lambda_function" "question_answering_function" {
   function_name = "${var.app_prefix}question_answering_function"
   role          = aws_iam_role.question_answering_function_role.arn
-#   handler       = "not_required_for_containers"
-#   runtime       = "provided.al2"
-#   timeout       = 900
-#   memory_size   = 1024
   image_uri     = "${aws_ecr_repository.question_answering_function.repository_url}:latest"
   package_type  = "Image"
   vpc_config {
-    security_group_ids = [var.security_group_id]
-    subnet_ids         = [var.private_subnet_id]
+    security_group_ids = var.security_groups_ids
+    subnet_ids         = var.subnet_ids
   }
   tracing_config {
     mode = "Active"
@@ -141,7 +114,6 @@ resource "aws_lambda_function" "question_answering_function" {
   }
   reserved_concurrent_executions = 10
   depends_on = [null_resource.build_and_push_image]
-#   code_signing_config_arn = aws_lambda_code_signing_config.question_answering_function.arn
   kms_key_arn = aws_kms_key.customer_managed_kms_key.arn
 }
 
