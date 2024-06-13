@@ -17,6 +17,14 @@ resource "aws_iam_role_policy_attachment" "appsync_logging_assume_role_attachmen
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
   role       = aws_iam_role.appsync_logging_assume_role.name
 }
+resource "aws_iam_policy" "appsync_logging_publish_policy" {
+  name = "${var.app_prefix}appsync_logging_publish_policy"
+  policy = data.aws_iam_policy_document.appsync_logging_assume_role_publish_policy.json
+}
+resource "aws_iam_role_policy_attachment" "appsync_logging_assume_role_publish_attachment" {
+  policy_arn = aws_iam_policy.appsync_logging_publish_policy.arn
+  role       = aws_iam_role.appsync_logging_assume_role.name
+}
 
 
 resource "aws_iam_role" "job_status_data_source_role" {
@@ -93,6 +101,16 @@ resource "aws_iam_policy" "s3_read_policy" {
 
 resource "aws_iam_role_policy_attachment" "s3_read_attachment" {
   policy_arn = aws_iam_policy.s3_read_policy.arn
+  role       = aws_iam_role.question_answering_function_role.name
+}
+
+// SQS policis
+resource "aws_iam_policy" "sqs_send_message_policy" {
+  name = "${var.app_prefix}sqs_send_message_policy"
+  policy = data.aws_iam_policy_document.sqs_send_message_policy.json
+}
+resource "aws_iam_role_policy_attachment" "sqs_send_message_attachment" {
+  policy_arn = aws_iam_policy.sqs_send_message_policy.arn
   role       = aws_iam_role.question_answering_function_role.name
 }
 

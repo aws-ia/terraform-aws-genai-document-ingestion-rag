@@ -39,6 +39,13 @@ data "aws_iam_policy_document" "appsync_logging_assume_role" {
     actions = ["sts:AssumeRole"]
   }
 }
+data "aws_iam_policy_document" "appsync_logging_assume_role_publish_policy" {
+  statement {
+    effect = "Allow"
+    actions = ["events:PutEvents"]
+    resources = [aws_cloudwatch_event_bus.question_answering_event_bus.arn]
+  }
+}
 
 data "aws_iam_policy_document" "job_status_data_source_role" {
   statement {
@@ -106,14 +113,11 @@ data "aws_iam_policy_document" "question_answering_function_inline_policy" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
-
     resources = [
       "arn:aws:logs:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"
     ]
-
     effect = "Allow"
   }
-  statement {}
 }
 
 data "aws_iam_policy_document" "question_answering_function_policy" {
@@ -150,6 +154,14 @@ data "aws_iam_policy_document" "s3_read_policy" {
     resources = [
       var.input_assets_bucket_arn,
       "${var.input_assets_bucket_arn}/*",]
+  }
+}
+
+data "aws_iam_policy_document" "sqs_send_message_policy" {
+  statement {
+    effect = "Allow"
+    actions = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.dlq.arn]
   }
 }
 
