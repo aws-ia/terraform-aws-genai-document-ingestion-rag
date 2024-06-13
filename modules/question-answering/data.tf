@@ -113,6 +113,7 @@ data "aws_iam_policy_document" "question_answering_function_inline_policy" {
 
     effect = "Allow"
   }
+  statement {}
 }
 
 data "aws_iam_policy_document" "question_answering_function_policy" {

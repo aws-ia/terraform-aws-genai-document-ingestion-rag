@@ -1,6 +1,6 @@
 # Create an ECR repository
 resource "aws_ecr_repository" "question_answering_function" {
-  name = "question_answering_function${var.stage}"
+  name = "${var.app_prefix}question_answering_function"
 
   image_tag_mutability = "IMMUTABLE"
 
@@ -73,30 +73,21 @@ resource "null_resource" "build_and_push_image" {
   }
 
   provisioner "local-exec" {
-#     command = <<-EOT
-#       # Build Docker image
-#       docker build -t ${aws_ecr_repository.question_answering_function.repository_url}:latest .
-#       # Authenticate Docker with ECR
-#       aws ecr get-login-password --region ${data.aws_region.current_region.name} | docker login --username AWS --password-stdin ${aws_ecr_repository.question_answering_function.registry_id}.dkr.ecr.your-region.amazonaws.com
-#       # Push Docker image to ECR
-#       docker push ${aws_ecr_repository.question_answering_function.repository_url}:latest
-#     EOT
     environment = {
       REPOSITORY_URL = aws_ecr_repository.question_answering_function.repository_url
       AWS_REGION     = data.aws_region.current_region.name
     }
-    command = "${path.module}/../../lambda/aws-qa-appsync-opensearch/question_answering/src/scripts/build_push_docker.sh"
-#     command = "../lambda/aws-qa-appsync-opensearch/question_answering/src/scripts/build_push_docker.sh"
+    command = "${abspath(path.module)}/../../lambda/aws-qa-appsync-opensearch/question_answering/src/build_push_docker.sh"
   }
 }
 
 resource "aws_sqs_queue" "dlq" {
-  name = "question_answering_function_dlq"
+  name = "${var.app_prefix}question_answering_function_dlq"
   sqs_managed_sse_enabled = true
 }
 
 resource "aws_signer_signing_profile" "question_answering_profile" {
-  name            = "qa_sign_profile"
+  name            = "${var.app_prefix}qa_sign_profile"
   platform_id     = "AWSLambda-SHA384-ECDSA"
 
   signature_validity_period {
@@ -121,13 +112,14 @@ resource "aws_lambda_code_signing_config" "question_answering_function" {
 
 # Create Lambda function using Docker image from ECR
 resource "aws_lambda_function" "question_answering_function" {
-  function_name = "question_answering_function"
+  function_name = "${var.app_prefix}question_answering_function"
   role          = aws_iam_role.question_answering_function_role.arn
-  handler       = "not_required_for_containers"
-  runtime       = "provided.al2"
-  timeout       = 900
-  memory_size   = 1024
+#   handler       = "not_required_for_containers"
+#   runtime       = "provided.al2"
+#   timeout       = 900
+#   memory_size   = 1024
   image_uri     = "${aws_ecr_repository.question_answering_function.repository_url}:latest"
+  package_type  = "Image"
   vpc_config {
     security_group_ids = [var.security_group_id]
     subnet_ids         = [var.private_subnet_id]
@@ -149,7 +141,7 @@ resource "aws_lambda_function" "question_answering_function" {
   }
   reserved_concurrent_executions = 10
   depends_on = [null_resource.build_and_push_image]
-  code_signing_config_arn = aws_lambda_code_signing_config.question_answering_function.arn
+#   code_signing_config_arn = aws_lambda_code_signing_config.question_answering_function.arn
   kms_key_arn = aws_kms_key.customer_managed_kms_key.arn
 }
 

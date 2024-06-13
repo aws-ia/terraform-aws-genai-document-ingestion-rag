@@ -15,3 +15,4 @@ variable "opensearch_serverless_collection_endpoint" {}
 variable "existing_open_search_index_name" {}
 variable "security_group_id" {}
 variable "private_subnet_id" {}
+variable "app_prefix" {}

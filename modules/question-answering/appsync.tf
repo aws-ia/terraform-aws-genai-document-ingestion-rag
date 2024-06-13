@@ -1,5 +1,5 @@
 resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
-  name         = "questionAnsweringGraphqlApi${var.stage}"
+  name         = "${var.app_prefix}-questionAnsweringGraphqlApi"
   schema       = file("${path.module}/schema.graphql")
   xray_enabled = true
   log_config {
@@ -19,7 +19,7 @@ resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
 
 resource "aws_appsync_datasource" "job_status_data_source" {
   api_id           = aws_appsync_graphql_api.question_answering_graphql_api.id
-  name             = "${var.bucket_prefix}_job_status_data_source"
+  name             = "${var.app_prefix}_job_status_data_source"
   service_role_arn = aws_iam_role.job_status_data_source_role.arn
   type             = "NONE"
 }
@@ -55,7 +55,7 @@ EOF
 
 resource "aws_appsync_datasource" "event_bridge_datasource" {
   api_id = aws_appsync_graphql_api.question_answering_graphql_api.id
-  name   = "question_answering_event_bridge_data_source${var.stage}"
+  name   = "${var.app_prefix}-question_answering_event_bridge_data_source$"
   type   = "AMAZON_EVENTBRIDGE"
   service_role_arn = aws_iam_role.qa_construct_role.arn
 
