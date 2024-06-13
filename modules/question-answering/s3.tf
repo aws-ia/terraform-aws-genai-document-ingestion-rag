@@ -151,7 +151,7 @@ resource "aws_kinesis_firehose_delivery_stream" "s3_firehose_stream" {
 resource "aws_s3_bucket_replication_configuration" "multi_region_replication" {
   depends_on = [aws_s3_bucket_versioning.waf_logs]
   role   = aws_iam_role.firehose_role.arn
-  bucket = aws_s3_bucket.waf_logs.arn
+  bucket = aws_s3_bucket.server_access_log_bucket.bucket
 
   rule {
     status = "Enabled"

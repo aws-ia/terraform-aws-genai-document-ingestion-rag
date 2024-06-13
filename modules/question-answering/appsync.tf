@@ -55,7 +55,7 @@ EOF
 
 resource "aws_appsync_datasource" "event_bridge_datasource" {
   api_id = aws_appsync_graphql_api.question_answering_graphql_api.id
-  name   = "${var.app_prefix}-question_answering_event_bridge_data_source$"
+  name   = "${var.app_prefix}_question_answering_event_bridge_data_source"
   type   = "AMAZON_EVENTBRIDGE"
   service_role_arn = aws_iam_role.qa_construct_role.arn
 
