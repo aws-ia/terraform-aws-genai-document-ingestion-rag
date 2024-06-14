@@ -52,7 +52,10 @@ resource "null_resource" "build_and_push_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = aws_ecr_repository.question_answering_function.repository_url
+      REPOSITORY_NAME = aws_ecr_repository.question_answering_function.name
       AWS_REGION     = data.aws_region.current_region.name
+      IMAGE_NAME = "latest"
+      ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/aws-qa-appsync-opensearch/question_answering/src/build_push_docker.sh"
   }

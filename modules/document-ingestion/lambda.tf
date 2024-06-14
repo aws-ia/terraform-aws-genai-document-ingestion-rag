@@ -8,7 +8,10 @@ resource "null_resource" "build_and_push_input_validation_lambda_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = aws_ecr_repository.input_validation_lambda.repository_url
+      REPOSITORY_NAME = aws_ecr_repository.input_validation_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
+      IMAGE_NAME = "latest"
+      ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/input_validation/src/build_push_docker.sh"
   }
@@ -28,6 +31,7 @@ resource "aws_lambda_function" "input_validation_lambda" {
     subnet_ids = var.subnet_ids
     security_group_ids = var.security_groups_ids
   }
+  depends_on = [null_resource.build_and_push_input_validation_lambda_image]
 }
 
 # Lambda Function for File Transformation
@@ -39,7 +43,10 @@ resource "null_resource" "build_and_push_file_transformer_lambda_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = aws_ecr_repository.file_transformer_lambda.repository_url
+      REPOSITORY_NAME = aws_ecr_repository.file_transformer_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
+      IMAGE_NAME = "latest"
+      ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/s3_file_transformer/src/build_push_docker.sh"
   }
@@ -61,6 +68,7 @@ resource "aws_lambda_function" "file_transformer_lambda" {
     subnet_ids = var.subnet_ids
     security_group_ids = var.security_groups_ids
   }
+  depends_on = [null_resource.build_and_push_file_transformer_lambda_image]
 }
 
 # Lambda Function for Embeddings Job
@@ -72,7 +80,10 @@ resource "null_resource" "build_and_push_embeddings_job_lambda_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = aws_ecr_repository.embeddings_job_lambda.repository_url
+      REPOSITORY_NAME = aws_ecr_repository.embeddings_job_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
+      IMAGE_NAME = "latest"
+      ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/embeddings_job/src/build_push_docker.sh"
   }
@@ -97,4 +108,5 @@ resource "aws_lambda_function" "embeddings_job_lambda" {
     subnet_ids = var.subnet_ids
     security_group_ids = var.security_groups_ids
   }
+  depends_on = [null_resource.build_and_push_embeddings_job_lambda_image]
 }
