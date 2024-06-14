@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_event_rule" "ingestion_rule" {
-  name        = "ingestionRule-${var.stage}"
+  name        = "${var.app_prefix}ingestionRule"
   description = "Rule to trigger ingestion function"
   event_pattern = jsonencode({
     source = ["ingestion"]

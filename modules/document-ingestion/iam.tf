@@ -101,10 +101,10 @@ resource "aws_iam_role" "lambda_exec_role" {
           ]
           Effect   = "Allow"
           Resource = [
-            "arn:aws:s3:::${aws_s3_bucket.input_assets_bucket.bucket}",
-            "arn:aws:s3:::${aws_s3_bucket.input_assets_bucket.bucket}/*",
-            "arn:aws:s3:::${aws_s3_bucket.processed_assets_bucket.bucket}",
-            "arn:aws:s3:::${aws_s3_bucket.processed_assets_bucket.bucket}/*"
+            var.input_assets_bucket_arn,
+            "${var.input_assets_bucket_arn}/*",
+            var.processed_assets_bucket_arn,
+            "${var.processed_assets_bucket_arn}/*"
           ]
         },
         {
@@ -112,7 +112,7 @@ resource "aws_iam_role" "lambda_exec_role" {
             "appsync:GraphQL"
           ]
           Effect   = "Allow"
-          Resource = "arn:aws:appsync:${var.region}:${data.aws_caller_identity.current.account_id}:apis/${aws_appsync_graphql_api.ingestion_graphql_api.id}/*"
+          Resource = "arn:aws:appsync:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:apis/${aws_appsync_graphql_api.ingestion_graphql_api.id}/*"
         }
       ]
     })

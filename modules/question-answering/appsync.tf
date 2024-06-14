@@ -12,9 +12,6 @@ resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
     default_action = "DENY"
     user_pool_id   = var.cognito_user_pool_id
   }
-#   additional_authentication_provider {
-#     authentication_type = "AWS_IAM"
-#   }
 }
 
 resource "aws_appsync_datasource" "job_status_data_source" {
@@ -23,7 +20,7 @@ resource "aws_appsync_datasource" "job_status_data_source" {
   service_role_arn = aws_iam_role.job_status_data_source_role.arn
   type             = "NONE"
 }
-resource "aws_appsync_resolver" "test" {
+resource "aws_appsync_resolver" "job_status_resolver" {
   api_id      = aws_appsync_graphql_api.question_answering_graphql_api.id
   field       = "updateQAJobStatus"
   type        = "Mutation"

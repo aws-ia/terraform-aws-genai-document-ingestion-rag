@@ -218,3 +218,23 @@ data "aws_iam_policy_document" "qa_construct_role" {
     effect = "Allow"
   }
 }
+
+data "aws_iam_policy_document" "ecr_kms_key" {
+  statement {
+    actions = ["kms:*"]
+    resources = ["*"]
+    principals {
+      identifiers = [aws_iam_role.question_answering_function_role.arn]
+      type = "AWS"
+    }
+  }
+  statement {
+    sid = "Allow access for Key Administrators"
+    actions = ["kms:*"]
+    resources = ["*"]
+    principals {
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      type = "AWS"
+    }
+  }
+}
