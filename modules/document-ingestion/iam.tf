@@ -113,7 +113,16 @@ resource "aws_iam_role" "lambda_exec_role" {
           ]
           Effect   = "Allow"
           Resource = "arn:aws:appsync:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:apis/${aws_appsync_graphql_api.ingestion_graphql_api.id}/*"
-        }
+        },
+        {
+          Effect = "Allow"
+          Action = [
+            "ecr:GetDownloadUrlForLayer",
+            "ecr:BatchGetImage",
+            "ecr:BatchCheckLayerAvailability"
+          ]
+          Resource = "*"
+        },
       ]
     })
   }

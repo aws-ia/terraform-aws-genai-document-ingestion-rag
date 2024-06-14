@@ -118,6 +118,15 @@ data "aws_iam_policy_document" "question_answering_function_inline_policy" {
     ]
     effect = "Allow"
   }
+  statement {
+    actions = [
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability"
+    ]
+    effect = "Allow"
+    resources = ["*"]
+  }
 }
 
 data "aws_iam_policy_document" "question_answering_function_policy" {
