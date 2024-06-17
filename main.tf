@@ -32,6 +32,9 @@ module "persistence_resources" {
   lambda_security_group_id = module.networking_resources.lambda_security_group_id
   bucket_prefix = var.bucket_prefix
   stage = var.stage
+  app_prefix = random_string.app_prefix.result
+
+  depends_on = [module.networking_resources]
 }
 
 module "question-answering" {
@@ -53,6 +56,9 @@ module "question-answering" {
   app_prefix = random_string.app_prefix.result
   access_logs_bucket_arn = module.persistence_resources.access_logs_bucket_arn
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
+  ecr_repository_url = module.persistence_resources.ecr_repository_url
+
+  depends_on = [module.networking_resources, module.persistence_resources]
 }
 
 module "document-ingestion" {
@@ -71,4 +77,7 @@ module "document-ingestion" {
   processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
   stage = "dev"
+  ecr_repository_url = module.persistence_resources.ecr_repository_url
+
+  depends_on = [module.networking_resources, module.persistence_resources]
 }

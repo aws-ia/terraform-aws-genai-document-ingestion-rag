@@ -7,11 +7,11 @@ resource "null_resource" "build_and_push_input_validation_lambda_image" {
 
   provisioner "local-exec" {
     environment = {
-      REPOSITORY_URL = aws_ecr_repository.input_validation_lambda.repository_url
-      REPOSITORY_NAME = aws_ecr_repository.input_validation_lambda.name
+      REPOSITORY_URL = var.ecr_repository_url
+#       REPOSITORY_NAME = aws_ecr_repository.input_validation_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
-      IMAGE_NAME = "latest"
-      ACCOUNT_ID = data.aws_caller_identity.current.account_id
+      IMAGE_NAME = local.ingestion_input_validation_lambda_image_name
+#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/input_validation/src/build_push_docker.sh"
   }
@@ -20,7 +20,7 @@ resource "null_resource" "build_and_push_input_validation_lambda_image" {
 resource "aws_lambda_function" "input_validation_lambda" {
   function_name    = "${var.app_prefix}ingestion_input_validation"
   role             = aws_iam_role.lambda_exec_role.arn
-  image_uri     = "${aws_ecr_repository.input_validation_lambda.repository_url}:latest"
+  image_uri     = "${var.ecr_repository_url}:${local.ingestion_input_validation_lambda_image_name}"
   package_type  = "Image"
   environment {
     variables = {
@@ -42,11 +42,11 @@ resource "null_resource" "build_and_push_file_transformer_lambda_image" {
 
   provisioner "local-exec" {
     environment = {
-      REPOSITORY_URL = aws_ecr_repository.file_transformer_lambda.repository_url
-      REPOSITORY_NAME = aws_ecr_repository.file_transformer_lambda.name
+      REPOSITORY_URL = var.ecr_repository_url
+#       REPOSITORY_NAME = aws_ecr_repository.file_transformer_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
-      IMAGE_NAME = "latest"
-      ACCOUNT_ID = data.aws_caller_identity.current.account_id
+      IMAGE_NAME = local.s3_file_transformer_lambda_image_name
+#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/s3_file_transformer/src/build_push_docker.sh"
   }
@@ -55,7 +55,7 @@ resource "null_resource" "build_and_push_file_transformer_lambda_image" {
 resource "aws_lambda_function" "file_transformer_lambda" {
   function_name    = "${var.app_prefix}_s3_file_transformer_docker"
   role             = aws_iam_role.lambda_exec_role.arn
-  image_uri     = "${aws_ecr_repository.file_transformer_lambda.repository_url}:latest"
+  image_uri     = "${var.ecr_repository_url}:${local.s3_file_transformer_lambda_image_name}"
   package_type  = "Image"
   environment {
     variables = {
@@ -79,11 +79,11 @@ resource "null_resource" "build_and_push_embeddings_job_lambda_image" {
 
   provisioner "local-exec" {
     environment = {
-      REPOSITORY_URL = aws_ecr_repository.embeddings_job_lambda.repository_url
-      REPOSITORY_NAME = aws_ecr_repository.embeddings_job_lambda.name
+      REPOSITORY_URL = var.ecr_repository_url
+#       REPOSITORY_NAME = aws_ecr_repository.embeddings_job_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
-      IMAGE_NAME = "latest"
-      ACCOUNT_ID = data.aws_caller_identity.current.account_id
+      IMAGE_NAME = local.embeddings_job_lambda_image_name
+#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/embeddings_job/src/build_push_docker.sh"
   }
@@ -92,7 +92,7 @@ resource "null_resource" "build_and_push_embeddings_job_lambda_image" {
 resource "aws_lambda_function" "embeddings_job_lambda" {
   function_name    = "${var.app_prefix}_embeddings_job_docker"
   role             = aws_iam_role.lambda_exec_role.arn
-  image_uri     = "${aws_ecr_repository.embeddings_job_lambda.repository_url}:latest"
+  image_uri     = "${var.ecr_repository_url}:${local.embeddings_job_lambda_image_name}"
   package_type  = "Image"
   environment {
     variables = {

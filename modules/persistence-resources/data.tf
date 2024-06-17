@@ -81,3 +81,34 @@ data "aws_iam_policy_document" "opensearch_domain_policy" {
 #     resources = ["${aws_opensearch_domain.opensearch_domain[0].arn}/*"]
   }
 }
+
+data "aws_iam_policy_document" "ecr_kms_key" {
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
+    ]
+
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecr.amazonaws.com"]
+    }
+  }
+  statement {
+    sid       = "AllowRootUserAccess"
+    actions   = [
+      "kms:*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+}

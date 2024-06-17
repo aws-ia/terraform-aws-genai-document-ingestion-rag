@@ -29,4 +29,5 @@ resource "aws_cloudwatch_event_target" "question_answering_target" {
   rule      = aws_cloudwatch_event_rule.question_answering_rule.name
   target_id = "QuestionAnsweringFunctionTarget"
   arn       = aws_lambda_function.question_answering_function.arn
+  depends_on = [null_resource.build_and_push_image, aws_lambda_function.question_answering_function]
 }
