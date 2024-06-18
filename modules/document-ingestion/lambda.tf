@@ -1,4 +1,3 @@
-# Lambda Function for Input Validation
 # Build and push Docker image to ECR
 resource "null_resource" "build_and_push_input_validation_lambda_image" {
   triggers = {
@@ -8,10 +7,8 @@ resource "null_resource" "build_and_push_input_validation_lambda_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = var.ecr_repository_url
-#       REPOSITORY_NAME = aws_ecr_repository.input_validation_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
       IMAGE_NAME = local.ingestion_input_validation_lambda_image_name
-#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/input_validation/src/build_push_docker.sh"
   }
@@ -80,10 +77,8 @@ resource "null_resource" "build_and_push_embeddings_job_lambda_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = var.ecr_repository_url
-#       REPOSITORY_NAME = aws_ecr_repository.embeddings_job_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
       IMAGE_NAME = local.embeddings_job_lambda_image_name
-#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/embeddings_job/src/build_push_docker.sh"
   }

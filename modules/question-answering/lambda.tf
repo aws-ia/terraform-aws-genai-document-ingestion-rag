@@ -1,48 +1,3 @@
-# Create an ECR repository
-# resource "aws_ecr_repository" "question_answering_function" {
-#   name = "${var.app_prefix}question_answering_function"
-#
-#   image_tag_mutability = "MUTABLE"
-#
-#   image_scanning_configuration {
-#     scan_on_push = true
-#   }
-#
-#   encryption_configuration {
-#     encryption_type = "KMS"
-#     kms_key = aws_kms_key.ecr_kms_key.arn
-#   }
-# }
-
-# Manage ECR image versions
-# resource "aws_ecr_lifecycle_policy" "question_answering_function_policy" {
-#   repository = aws_ecr_repository.question_answering_function.name
-#
-#   policy = jsonencode({
-#     rules = [
-#       {
-#         rulePriority = 1
-#         description  = "Keep last 10 images"
-#         selection = {
-#           tagStatus   = "untagged"
-#           countType   = "imageCountMoreThan"
-#           countNumber = 10
-#         }
-#         action = {
-#           type = "expire"
-#         }
-#       }
-#     ]
-#   })
-# }
-
-# resource "aws_kms_key" "ecr_kms_key" {
-#   description             = "KMS key for encrypting ECR images"
-#   enable_key_rotation     = true
-#   deletion_window_in_days = 10
-#   policy = data.aws_iam_policy_document.ecr_kms_key.json
-# }
-
 # Build and push Docker image to ECR
 resource "null_resource" "build_and_push_image" {
   triggers = {
@@ -52,10 +7,8 @@ resource "null_resource" "build_and_push_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = var.ecr_repository_url
-#       REPOSITORY_NAME = aws_ecr_repository.question_answering_function.name
       AWS_REGION     = data.aws_region.current_region.name
       IMAGE_NAME = local.question_answering_lambda_image_name
-#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/aws-qa-appsync-opensearch/question_answering/src/build_push_docker.sh"
   }

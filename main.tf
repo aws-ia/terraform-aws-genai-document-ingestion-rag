@@ -37,6 +37,28 @@ module "persistence_resources" {
   depends_on = [module.networking_resources]
 }
 
+resource "null_resource" "ecr_login" {
+  provisioner "local-exec" {
+    command = <<EOT
+      docker logout ${module.persistence_resources.ecr_repository_url} || true
+      echo "Attempting to remove existing credentials from keychain..."
+
+      # Explicitly remove the Docker credentials if they exist
+      EXISTING_CREDS=$(security find-generic-password -s "docker-credential-osxkeychain" -a "${module.persistence_resources.ecr_repository_url}" 2>&1)
+      if [[ $EXISTING_CREDS == *"attributes"* ]]; then
+        security delete-generic-password -s "docker-credential-osxkeychain" -a "${module.persistence_resources.ecr_repository_url}"
+      fi
+
+      # Authenticate Docker with ECR
+      aws ecr get-login-password --region ${data.aws_region.current_region.name} | docker login --username AWS --password-stdin ${module.persistence_resources.ecr_repository_url}
+    EOT
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
 module "question-answering" {
   source = "./modules/question-answering"
   bucket_prefix = "gen-ai"
@@ -58,7 +80,7 @@ module "question-answering" {
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
   ecr_repository_url = module.persistence_resources.ecr_repository_url
 
-  depends_on = [module.networking_resources, module.persistence_resources]
+  depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
 
 module "document-ingestion" {
@@ -79,5 +101,5 @@ module "document-ingestion" {
   stage = "dev"
   ecr_repository_url = module.persistence_resources.ecr_repository_url
 
-  depends_on = [module.networking_resources, module.persistence_resources]
+  depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
