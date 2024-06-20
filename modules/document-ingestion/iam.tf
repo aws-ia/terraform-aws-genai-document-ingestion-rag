@@ -128,6 +128,52 @@ resource "aws_iam_role" "lambda_exec_role" {
   }
 }
 
+# resource "aws_iam_role" "sfn_role" {
+#   name = "sfn-role"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Action    = "sts:AssumeRole"
+#       Effect    = "Allow"
+#       Principal = {
+#         Service = "states.amazonaws.com"
+#       }
+#     }]
+#   })
+#
+#   inline_policy {
+#     name = "sfn-policy"
+#     policy = jsonencode({
+#       Version = "2012-10-17"
+#       Statement = [
+#         {
+#           Action = [
+#             "lambda:InvokeFunction"
+#           ]
+#           Effect   = "Allow"
+#           Resource = [
+#             aws_lambda_function.input_validation_lambda.arn,
+#             aws_lambda_function.file_transformer_lambda.arn,
+#             aws_lambda_function.embeddings_job_lambda.arn
+#           ]
+#         },
+#         {
+#           Action = [
+#             "logs:CreateLogGroup",
+#             "logs:CreateLogStream",
+#             "logs:PutLogEvents"
+#           ]
+#           Effect = "Allow"
+#           Resource = [
+#             aws_cloudwatch_log_group.ingestion_step_function_log_group.arn,
+#             "${aws_cloudwatch_log_group.ingestion_step_function_log_group.arn}:*"
+#           ]
+#         }
+#       ]
+#     })
+#   }
+# }
+
 resource "aws_iam_role" "sfn_role" {
   name = "sfn-role"
   assume_role_policy = jsonencode({
@@ -145,16 +191,64 @@ resource "aws_iam_role" "sfn_role" {
     name = "sfn-policy"
     policy = jsonencode({
       Version = "2012-10-17"
+      Statement = [
+        {
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Effect   = "Allow"
+          Resource = [
+            aws_lambda_function.input_validation_lambda.arn,
+            aws_lambda_function.file_transformer_lambda.arn,
+            aws_lambda_function.embeddings_job_lambda.arn
+          ]
+        },
+        {
+          Action = [
+            "logs:CreateLogDelivery",
+            "logs:CreateLogStream",
+            "logs:GetLogDelivery",
+            "logs:UpdateLogDelivery",
+            "logs:DeleteLogDelivery",
+            "logs:ListLogDeliveries",
+            "logs:PutLogEvents",
+            "logs:PutResourcePolicy",
+            "logs:DescribeResourcePolicies",
+            "logs:DescribeLogGroups",
+            "xray:PutTraceSegments",
+            "xray:PutTelemetryRecords",
+            "xray:GetSamplingRules",
+            "xray:GetSamplingTargets"
+          ],
+          Effect = "Allow"
+          Resource = ["${aws_cloudwatch_log_group.ingestion_step_function_log_group.arn}:*"]
+        }
+      ]
+    })
+  }
+}
+
+resource "aws_iam_role" "eventbridge_sfn_role" {
+  name = "eventbridge-sfn-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "events.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name = "eventbridge-sfn-policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
       Statement = [{
-        Action = [
-          "lambda:InvokeFunction"
-        ]
-        Effect   = "Allow"
-        Resource = [
-          aws_lambda_function.input_validation_lambda.arn,
-          aws_lambda_function.file_transformer_lambda.arn,
-          aws_lambda_function.embeddings_job_lambda.arn
-        ]
+        Effect = "Allow"
+        Action = "states:StartExecution"
+        Resource = aws_sfn_state_machine.ingestion_state_machine.arn
       }]
     })
   }
