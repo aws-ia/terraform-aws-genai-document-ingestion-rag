@@ -32,6 +32,31 @@ module "persistence_resources" {
   lambda_security_group_id = module.networking_resources.lambda_security_group_id
   bucket_prefix = var.bucket_prefix
   stage = var.stage
+  app_prefix = random_string.app_prefix.result
+
+  depends_on = [module.networking_resources]
+}
+
+resource "null_resource" "ecr_login" {
+  provisioner "local-exec" {
+    command = <<EOT
+      docker logout ${module.persistence_resources.ecr_repository_url} || true
+      echo "Attempting to remove existing credentials from keychain..."
+
+      # Explicitly remove the Docker credentials if they exist
+      EXISTING_CREDS=$(security find-generic-password -s "docker-credential-osxkeychain" -a "${module.persistence_resources.ecr_repository_url}" 2>&1)
+      if [[ $EXISTING_CREDS == *"attributes"* ]]; then
+        security delete-generic-password -s "docker-credential-osxkeychain" -a "${module.persistence_resources.ecr_repository_url}"
+      fi
+
+      # Authenticate Docker with ECR
+      aws ecr get-login-password --region ${data.aws_region.current_region.name} | docker login --username AWS --password-stdin ${module.persistence_resources.ecr_repository_url}
+    EOT
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
 
 module "question-answering" {
@@ -53,6 +78,9 @@ module "question-answering" {
   app_prefix = random_string.app_prefix.result
   access_logs_bucket_arn = module.persistence_resources.access_logs_bucket_arn
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
+  ecr_repository_url = module.persistence_resources.ecr_repository_url
+
+  depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
 
 module "document-ingestion" {
@@ -71,4 +99,7 @@ module "document-ingestion" {
   processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
   stage = "dev"
+  ecr_repository_url = module.persistence_resources.ecr_repository_url
+
+  depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }

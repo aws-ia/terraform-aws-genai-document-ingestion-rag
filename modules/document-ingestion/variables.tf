@@ -15,3 +15,4 @@ variable "processed_assets_bucket_arn" {}
 variable "security_groups_ids" {type = list(string)}
 variable "subnet_ids" {type = list(string)}
 variable "cognito_user_pool_id" {}
+variable "ecr_repository_url" {}

@@ -18,3 +18,4 @@ variable "existing_open_search_index_name" {}
 variable "app_prefix" {}
 variable "security_groups_ids" {type = list(string)}
 variable "subnet_ids" {type = list(string)}
+variable "ecr_repository_url" {}

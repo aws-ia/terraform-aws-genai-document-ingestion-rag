@@ -13,9 +13,9 @@ resource "aws_sfn_state_machine" "ingestion_state_machine" {
         Type = "Choice"
         Choices = [
           {
-            Variable  = "$.validation_result.Payload.isValid"
+            Variable      = "$.validation_result.Payload.isValid"
             BooleanEquals = false
-            Next      = "Job Failed"
+            Next          = "Job Failed"
           }
         ]
         Default = "Map State"
@@ -32,6 +32,7 @@ resource "aws_sfn_state_machine" "ingestion_state_machine" {
             }
           }
         }
+        End = true
       }
       "Job Failed" = {
         Type = "Fail"
@@ -43,6 +44,6 @@ resource "aws_sfn_state_machine" "ingestion_state_machine" {
   logging_configuration {
     level = "ALL"
     include_execution_data = true
-    log_destination = aws_cloudwatch_log_group.ingestion_step_function_log_group.arn
+    log_destination = "${aws_cloudwatch_log_group.ingestion_step_function_log_group.arn}:*"
   }
 }

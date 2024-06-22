@@ -32,3 +32,7 @@ output "existing_open_search_domain_endpoint" {
 output "opensearch_serverless_collection_endpoint" {
   value = aws_opensearchserverless_collection.opensearch_serverless_collection[*].collection_endpoint
 }
+
+output "ecr_repository_url" {
+  value = aws_ecr_repository.app_ecr_repository.repository_url
+}
