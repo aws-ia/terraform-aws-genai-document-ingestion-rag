@@ -55,7 +55,7 @@ resource "null_resource" "ecr_login" {
   }
 
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }
 
@@ -100,6 +100,25 @@ module "document-ingestion" {
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
   stage = "dev"
   ecr_repository_url = module.persistence_resources.ecr_repository_url
+
+  depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
+}
+
+module "summarization" {
+  source = "./modules/summarization"
+  app_prefix = random_string.app_prefix.result
+  ecr_repository_url = module.persistence_resources.ecr_repository_url
+  input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
+  input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
+  processed_assets_bucket_arn = module.persistence_resources.processed_assets_bucket_arn
+  processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
+  security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
+  subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
+  vpc_id = module.networking_resources.vpc_id
+  access_logs_bucket_arn  = module.persistence_resources.access_logs_bucket_arn
+  access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
+  cognito_user_pool_id    = module.persistence_resources.cognito_user_pool_id
+  stage                   = var.stage
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
