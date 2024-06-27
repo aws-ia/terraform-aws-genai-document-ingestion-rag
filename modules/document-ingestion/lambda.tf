@@ -40,10 +40,8 @@ resource "null_resource" "build_and_push_file_transformer_lambda_image" {
   provisioner "local-exec" {
     environment = {
       REPOSITORY_URL = var.ecr_repository_url
-#       REPOSITORY_NAME = aws_ecr_repository.file_transformer_lambda.name
       AWS_REGION     = data.aws_region.current_region.name
       IMAGE_NAME = local.s3_file_transformer_lambda_image_name
-#       ACCOUNT_ID = data.aws_caller_identity.current.account_id
     }
     command = "${abspath(path.module)}/../../lambda/document-ingestion/s3_file_transformer/src/build_push_docker.sh"
   }
