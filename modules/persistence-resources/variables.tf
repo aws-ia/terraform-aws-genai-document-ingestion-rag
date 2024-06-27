@@ -48,3 +48,4 @@ variable "lambda_security_group_id" {
 variable "bucket_prefix" {}
 variable "stage" {}
 variable "app_prefix" {}
+variable "merged_api_name" {}

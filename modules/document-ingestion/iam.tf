@@ -6,10 +6,28 @@ resource "aws_iam_role" "ingestion_construct_role" {
       Action    = "sts:AssumeRole"
       Effect    = "Allow"
       Principal = {
-        Service = "vpc-flow-logs.amazonaws.com"
+        Service = "appsync.amazonaws.com"
       }
     }]
   })
+}
+
+resource "aws_iam_policy" "eventbridge_put_events_policy" {
+  name = "eventbridgePutEventsPolicy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = "events:PutEvents",
+      Resource = "*"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_eventbridge_policy" {
+  role       = aws_iam_role.ingestion_construct_role.name
+  policy_arn = aws_iam_policy.eventbridge_put_events_policy.arn
 }
 
 # IAM Role for AppSync Logs

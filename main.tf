@@ -2,9 +2,12 @@ provider "aws" {
   region = "us-east-1"
   profile = "default"
 }
-# tflint-ignore: terraform_unused_declarations
+
+provider "awscc" {
+  region = "us-east-1"
+  profile = "default"
+}
 data "aws_caller_identity" "current_account" {}
-# tflint-ignore: terraform_unused_declarations
 data "aws_region" "current_region" {}
 
 resource "random_string" "app_prefix" {
@@ -33,8 +36,19 @@ module "persistence_resources" {
   bucket_prefix = var.bucket_prefix
   stage = var.stage
   app_prefix = random_string.app_prefix.result
+  merged_api_name = var.merged_api_name
 
   depends_on = [module.networking_resources]
+}
+
+data "local_file" "merged_api_id" {
+  filename = "merged_api_id.txt"
+  depends_on = [module.persistence_resources]
+}
+
+data "local_file" "merged_api_url" {
+  filename = "merged_api_url.txt"
+  depends_on = [module.persistence_resources]
 }
 
 resource "null_resource" "ecr_login" {
@@ -79,6 +93,7 @@ module "question-answering" {
   access_logs_bucket_arn = module.persistence_resources.access_logs_bucket_arn
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
   ecr_repository_url = module.persistence_resources.ecr_repository_url
+  merged_api_url = local.merged_api_url
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
@@ -100,6 +115,7 @@ module "document-ingestion" {
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
   stage = "dev"
   ecr_repository_url = module.persistence_resources.ecr_repository_url
+  merged_api_url = local.merged_api_url
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
@@ -119,6 +135,41 @@ module "summarization" {
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
   cognito_user_pool_id    = module.persistence_resources.cognito_user_pool_id
   stage                   = var.stage
+  merged_api_url = local.merged_api_url
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
+}
+
+# APIs association
+resource "awscc_appsync_source_api_association" "question-answering_association" {
+  description             = "Association for question-answering"
+  merged_api_identifier   = local.merged_api_id
+  source_api_identifier   = module.question-answering.question_answering_graphql_api_id
+
+  source_api_association_config = {
+    merge_type = "AUTO_MERGE"
+  }
+  depends_on = [module.persistence_resources, module.question-answering]
+}
+resource "awscc_appsync_source_api_association" "document_ingestion_association" {
+  description             = "Association for document ingestion"
+  merged_api_identifier   = local.merged_api_id
+  source_api_identifier   = module.document-ingestion.ingestion_graphql_api_id
+
+  source_api_association_config = {
+    merge_type = "AUTO_MERGE"
+  }
+
+  depends_on = [module.persistence_resources, module.document-ingestion]
+}
+resource "awscc_appsync_source_api_association" "summarization_association" {
+  description             = "Association for summarization"
+  merged_api_identifier   = local.merged_api_id
+  source_api_identifier   = module.summarization.summarization_graphql_api_id
+
+  source_api_association_config = {
+    merge_type = "AUTO_MERGE"
+  }
+
+  depends_on = [module.persistence_resources, module.summarization]
 }

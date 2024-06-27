@@ -4,4 +4,6 @@ locals {
   document_reader_lambda_image_name = "summary_document_reader"
   generate_summary_lambda_image_name = "summary_generator_lambda"
   summary_chain_type = var.summary_chain_type == "" ? "stuff" : var.summary_chain_type
+
+  graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.summarization_graphql_api.uris["GRAPHQL"] : var.merged_api_url
 }

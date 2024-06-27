@@ -7,9 +7,12 @@ resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
     field_log_level          = "ERROR"
   }
   authentication_type = "AMAZON_COGNITO_USER_POOLS"
+  additional_authentication_provider {
+    authentication_type = "AWS_IAM"
+  }
   user_pool_config {
     aws_region = data.aws_region.current_region.name
-    default_action = "DENY"
+    default_action = "ALLOW"
     user_pool_id   = var.cognito_user_pool_id
   }
 }
