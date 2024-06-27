@@ -19,3 +19,8 @@ variable "app_prefix" {}
 variable "security_groups_ids" {type = list(string)}
 variable "subnet_ids" {type = list(string)}
 variable "ecr_repository_url" {}
+
+variable "merged_api_url" {
+  type = string
+  default = ""
+}

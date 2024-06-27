@@ -11,6 +11,10 @@ variable "observability" {
   type = bool
   default = true
 }
+variable "merged_api_name" {
+  default = "MergedGraphqlApi"
+  type = string
+}
 
 # VPC variables
 # tflint-ignore: terraform_unused_declarations

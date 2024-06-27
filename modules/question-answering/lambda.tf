@@ -49,16 +49,17 @@ resource "aws_lambda_function" "question_answering_function" {
   role          = aws_iam_role.question_answering_function_role.arn
   image_uri     = "${var.ecr_repository_url}:${local.question_answering_lambda_image_name}"
   package_type  = "Image"
-  vpc_config {
-    security_group_ids = var.security_groups_ids
-    subnet_ids         = var.subnet_ids
-  }
+  timeout = 300
+#   vpc_config {
+#     security_group_ids = var.security_groups_ids
+#     subnet_ids         = var.subnet_ids
+#   }
   tracing_config {
     mode = "Active"
   }
   environment {
     variables = {
-      GRAPHQL_URL                = aws_appsync_graphql_api.question_answering_graphql_api.uris["GRAPHQL"]
+      GRAPHQL_URL                = local.graph_ql_url
       INPUT_BUCKET               = var.input_assets_bucket_name
       OPENSEARCH_DOMAIN_ENDPOINT = local.selected_open_search_endpoint
       OPENSEARCH_INDEX           = var.existing_open_search_index_name

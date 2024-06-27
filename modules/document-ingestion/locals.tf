@@ -5,4 +5,6 @@ locals {
   ingestion_input_validation_lambda_image_name = "ingestion_input_validation"
   s3_file_transformer_lambda_image_name = "s3_file_transformer"
   embeddings_job_lambda_image_name = "embeddings_job"
+
+  graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.ingestion_graphql_api.uris["GRAPHQL"] : var.merged_api_url
 }

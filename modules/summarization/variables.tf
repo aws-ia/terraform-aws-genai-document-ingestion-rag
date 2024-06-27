@@ -31,3 +31,8 @@ variable "cognito_user_pool_id" {type = string}
 variable "stage" {type = string}
 variable "access_logs_bucket_name" {type = string}
 variable "access_logs_bucket_arn" {type = string}
+
+variable "merged_api_url" {
+  type = string
+  default = ""
+}

@@ -3,7 +3,7 @@ enum ModelProvider {
     Bedrock
 }
 
-type FileStatus @aws_iam @aws_cognito_user_pools {
+type FileStatus @aws_cognito_user_pools @aws_iam {
     name: String
     status: String
     imageurl: String
@@ -34,16 +34,16 @@ input IngestionDocsInput {
     ignore_existing: Boolean
 }
 
-type Mutation @aws_iam @aws_cognito_user_pools {
+type Mutation @aws_cognito_user_pools @aws_iam {
     ingestDocuments(ingestioninput: IngestionDocsInput!): IngestionDocs
     updateIngestionJobStatus(ingestionjobid: ID, files: [FileStatusInput]): IngestionDocs
 }
 
-type Query @aws_iam @aws_cognito_user_pools {
+type Query @aws_cognito_user_pools @aws_iam {
     ingest: IngestionDocs
 }
 
-type Subscription @aws_iam @aws_cognito_user_pools {
+type Subscription @aws_cognito_user_pools @aws_iam {
     ingestDocuments(ingestionjobid: ID!): IngestionDocs
     @aws_subscribe(mutations: ["ingestDocuments"])
     updateIngestionJobStatus(ingestionjobid: ID!): IngestionDocs

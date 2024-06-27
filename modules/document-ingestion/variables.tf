@@ -26,3 +26,8 @@ variable "security_groups_ids" {type = list(string)}
 variable "subnet_ids" {type = list(string)}
 variable "cognito_user_pool_id" {type = string}
 variable "ecr_repository_url" {type = string}
+
+variable "merged_api_url" {
+  type = string
+  default = ""
+}

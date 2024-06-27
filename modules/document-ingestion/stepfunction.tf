@@ -13,7 +13,8 @@ resource "aws_sfn_state_machine" "ingestion_state_machine" {
         Type = "Choice"
         Choices = [
           {
-            Variable      = "$.validation_result.Payload.isValid"
+            Variable      = "$.isValid"
+#             Variable      = "$.validation_result.Payload.isValid"
             BooleanEquals = false
             Next          = "Job Failed"
           }
@@ -22,6 +23,7 @@ resource "aws_sfn_state_machine" "ingestion_state_machine" {
       }
       "Map State" = {
         Type     = "Map"
+        ItemsPath = "$.files"
         Iterator = {
           StartAt = "Download and transform document to raw text"
           States = {

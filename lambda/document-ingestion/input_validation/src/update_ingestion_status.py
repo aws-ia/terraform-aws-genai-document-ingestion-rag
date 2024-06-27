@@ -34,11 +34,11 @@ aws_auth = AWS4Auth(
 
 @tracer.capture_method
 def get_credentials(secret_id: str, region_name: str) -> str:
-    
+
     client = boto3.client('secretsmanager', region_name=region_name)
     response = client.get_secret_value(SecretId=secret_id)
-    secrets_value = response['SecretString']    
-    
+    secrets_value = response['SecretString']
+
     return secrets_value
 
 @tracer.capture_method
@@ -71,12 +71,25 @@ def updateIngestionJobStatus(variables):
     HEADERS={
         "Content-Type": "application/json",
     }
+    try:
+        responseJobstatus = requests.post(
+            json=request,
+            url=GRAPHQL_URL,
+            headers=HEADERS,
+            auth=aws_auth,
+            timeout=10
+        )
+        responseJobstatus.raise_for_status()  # Raises an HTTPError for bad responses
+        logger.info({'res :: ': responseJobstatus.json()})
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
 
-    responseJobstatus = requests.post(
-        json=request,
-        url=GRAPHQL_URL,
-        headers=HEADERS,
-        auth=aws_auth,
-        timeout=10
-    )
-    logger.info({'res :: ': responseJobstatus})
+    # responseJobstatus = requests.post(
+    #     json=request,
+    #     url=GRAPHQL_URL,
+    #     headers=HEADERS,
+    #     auth=aws_auth,
+    #     timeout=10
+    # )
+    # responseJobstatus.raise_for_status()
+    # logger.info({'res :: ': responseJobstatus})
