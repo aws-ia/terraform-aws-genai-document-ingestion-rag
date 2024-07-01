@@ -8,12 +8,12 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
       ValidateInputTask = {
         Type       = "Task",
         Resource   = aws_lambda_function.input_validation_lambda.arn,
-        ResultPath = "$.validation_result",
+#        ResultPath = "$.validation_result",
         Next       = "ValidateInputChoice"
       },
       ValidateInputChoice = {
         Type       = "Choice",
-        OutputPath = "$.validation_result.Payload.files",
+#        OutputPath = "$.validation_result.Payload.files",
         Choices = [
           {
             Variable  = "$.validation_result.Payload.isValid",
@@ -38,7 +38,7 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
             },
             FileStatusForSummarization = {
               Type       = "Choice",
-              OutputPath = "$.document_result.Payload",
+#              OutputPath = "$.document_result.Payload",
               Choices = [
                 {
                   Variable  = "$.document_result.Payload.status",

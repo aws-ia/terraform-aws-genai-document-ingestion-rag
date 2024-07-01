@@ -1,6 +1,10 @@
 resource "aws_iam_role" "summarization_construct_role" {
   name = "${var.app_prefix}-summarization_construct_role"
   assume_role_policy = data.aws_iam_policy_document.summarization_construct_role.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
+  ]
 }
 
 resource "aws_iam_role" "summarization_appsync_logs_role" {
