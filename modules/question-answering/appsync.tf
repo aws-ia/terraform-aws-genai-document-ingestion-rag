@@ -36,7 +36,11 @@ resource "aws_appsync_resolver" "job_status_resolver" {
   request_template = <<EOF
     {
       "version": "2017-02-28",
-      "payload": $util.toJson($context.args)
+      "operation": "PutEvents",
+      "events": [{
+        "source": "questionanswering",
+        "detailType": "genAIdemo"
+      }]
     }
   EOF
   response_template = <<EOF

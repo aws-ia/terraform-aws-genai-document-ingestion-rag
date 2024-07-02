@@ -37,5 +37,5 @@ def handler(event,  context: LambdaContext) -> dict:
 
     llm_response = run_question_answering(arguments)
 
-    print("llm_response is {llm_response}")
+    print(f"llm_response is {llm_response}")
     return llm_response
