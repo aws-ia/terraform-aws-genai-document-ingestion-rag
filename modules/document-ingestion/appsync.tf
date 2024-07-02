@@ -43,7 +43,6 @@ resource "aws_appsync_resolver" "ingest_document_resolver" {
       "operation": "PutEvents",
       "events": [{
         "source": "ingestion",
-        "detail": $util.toJson($context.arguments),
         "detailType": "genAIdemo"
       }]
     }

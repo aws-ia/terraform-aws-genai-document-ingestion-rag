@@ -127,9 +127,7 @@ resource "aws_iam_role" "sfn_role" {
         {
           Effect = "Allow",
           Action = [
-            "lambda:InvokeFunction",
-            "sqs:SendMessage",
-            "logs:*"
+            "states:StartExecution"
           ],
           Resource = "*"
         }
@@ -143,3 +141,7 @@ resource "aws_iam_role" "firehose_role" {
 
   assume_role_policy = data.aws_iam_policy_document.firehose_role.json
 }
+
+
+
+

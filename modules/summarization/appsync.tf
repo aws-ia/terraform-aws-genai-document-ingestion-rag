@@ -67,7 +67,6 @@ resource "aws_appsync_resolver" "generate_summary" {
       "operation": "PutEvents",
       "events": [{
         "source": "summary",
-        "detail": $util.toJson($context.arguments),
         "detailType": "genAIdemo"
       }]
     }

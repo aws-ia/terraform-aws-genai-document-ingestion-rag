@@ -202,26 +202,33 @@ resource "aws_iam_role" "sfn_role" {
 
 resource "aws_iam_role" "eventbridge_sfn_role" {
   name = "eventbridge-sfn-role"
+
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "events.amazonaws.com"
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "states.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
       }
-      Action = "sts:AssumeRole"
-    }]
+    ]
   })
 
   inline_policy {
-    name = "eventbridge-sfn-policy"
+    name = "sfn_policy"
     policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [{
-        Effect = "Allow"
-        Action = "states:StartExecution"
-        Resource = aws_sfn_state_machine.ingestion_state_machine.arn
-      }]
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Action = [
+            "states:StartExecution"
+          ],
+          Resource = "*"
+        }
+      ]
     })
   }
 }
