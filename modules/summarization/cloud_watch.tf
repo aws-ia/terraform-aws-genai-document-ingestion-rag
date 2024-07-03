@@ -28,7 +28,7 @@ resource "aws_cloudwatch_event_rule" "summary_mutation_rule" {
   event_pattern = <<PATTERN
     {
       "source": ["summary"],
-      "detailType": ["genAIdemo"]
+      "detail-type": ["genAIdemo"]
     }
   PATTERN
 }

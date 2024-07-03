@@ -16,7 +16,7 @@ resource "aws_cloudwatch_event_rule" "ingestion_rule" {
   event_pattern = <<PATTERN
     {
       "source": ["ingestion"],
-      "detailType": ["genAIdemo"]
+      "detail-type": ["genAIdemo"]
     }
   PATTERN
 }

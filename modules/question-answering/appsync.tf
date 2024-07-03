@@ -92,6 +92,16 @@ resource "aws_appsync_resolver" "question_answering_resolver" {
       "operation": "PutEvents",
       "events": [{
           "source": "questionanswering",
+          "detail": {
+            "filename": $util.toJson($ctx.arguments.filename),
+            "jobid": $util.toJson($ctx.arguments.jobid),
+            "jobstatus": $util.toJson($ctx.arguments.jobid),
+            "max_docs": $util.toJson($ctx.arguments.jobid),
+            "question": $util.toJson($ctx.arguments.jobid),
+            "responseGenerationMethod": $util.toJson($ctx.arguments.jobid),
+            "streaming": $util.toJson($ctx.arguments.jobid),
+            "verbose": $util.toJson($ctx.arguments.jobid)
+          },
           "detailType": "genAIdemo"
       }]
   }
