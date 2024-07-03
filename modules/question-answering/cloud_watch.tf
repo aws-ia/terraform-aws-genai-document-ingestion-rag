@@ -23,7 +23,7 @@ resource "aws_cloudwatch_event_rule" "question_answering_rule" {
   event_pattern = <<PATTERN
     {
       "source": ["questionanswering"],
-      "detail-type": ["genAIdemo"]
+      "detailType": ["genAIdemo"]
     }
   PATTERN
 }
