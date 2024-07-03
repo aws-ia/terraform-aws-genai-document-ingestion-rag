@@ -32,24 +32,33 @@ resource "aws_appsync_resolver" "job_status_resolver" {
   type        = "Mutation"
   field       = "updateQAJobStatus"
   data_source = aws_appsync_datasource.job_status_data_source.name
-
   request_template = <<EOF
-    {
-      "version": "2017-02-28",
-      "operation": "PutEvents",
-      "events": [{
-        "source": "questionanswering",
-        "detailType": "genAIdemo"
-      }]
-    }
-  EOF
+                          {
+                              "version": "2017-02-28",
+                              "payload": $util.toJson($context.args)
+                          }
+EOF
+
+#   request_template = <<EOF
+#     {
+#       "version": "2017-02-28",
+#       "operation": "PutEvents",
+#       "events": [{
+#         "source": "questionanswering",
+#         "detailType": "genAIdemo"
+#       }]
+#     }
+#   EOF
+#   response_template = <<EOF
+#     #if($ctx.result.statusCode == 200)
+#       $util.toJson($context.result)
+#     #else
+#       $utils.appendError($ctx.result.body, $ctx.result.statusCode)
+#     #end
+#   EOF
   response_template = <<EOF
-    #if($ctx.result.statusCode == 200)
-      $util.toJson($context.result)
-    #else
-      $utils.appendError($ctx.result.body, $ctx.result.statusCode)
-    #end
-  EOF
+ $util.toJson($context.result)
+EOF
 
   caching_config {
     caching_keys = [
@@ -69,4 +78,29 @@ resource "aws_appsync_datasource" "event_bridge_datasource" {
   event_bridge_config {
     event_bus_arn = aws_cloudwatch_event_bus.question_answering_event_bus.arn
   }
+}
+
+resource "aws_appsync_resolver" "question_answering_resolver" {
+  api_id      = aws_appsync_graphql_api.question_answering_graphql_api.id
+  type        = "Mutation"
+  field       = "postQuestion"
+  data_source = aws_appsync_datasource.event_bridge_datasource.name
+
+  request_template = <<EOF
+  {
+      "version": "2018-05-29",
+      "operation": "PutEvents",
+      "events": [{
+          "source": "questionanswering",
+          "detailType": "genAIdemo"
+      }]
+  }
+  EOF
+
+  response_template = <<EOF
+  #if($ctx.error)
+      $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
+  #end
+  $util.toJson($ctx.result)
+  EOF
 }

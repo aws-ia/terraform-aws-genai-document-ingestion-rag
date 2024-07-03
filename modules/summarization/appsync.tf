@@ -22,7 +22,7 @@ resource "aws_appsync_graphql_api" "summarization_graphql_api" {
 
 resource "aws_appsync_datasource" "summary_status_datasource" {
   api_id           = aws_appsync_graphql_api.summarization_graphql_api.id
-  name             = "${var.app_prefix}_summmary_status_data_source"
+  name             = "_${var.app_prefix}_summmary_status_data_source"
   type             = "NONE"
   service_role_arn = aws_iam_role.summarization_construct_role.arn
 }

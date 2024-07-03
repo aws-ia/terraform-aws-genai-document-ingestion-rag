@@ -43,12 +43,12 @@ resource "aws_s3_bucket_ownership_controls" "input_assets_bucket_ownership_contr
   }
 }
 
-resource "aws_s3_bucket_acl" "input_assets_bucket_acl" {
-  depends_on = [aws_s3_bucket_ownership_controls.input_assets_bucket_ownership_controls]
-
-  bucket = aws_s3_bucket.access_logs_bucket.id
-  acl    = "private"
-}
+# resource "aws_s3_bucket_acl" "input_assets_bucket_acl" {
+#   depends_on = [aws_s3_bucket_ownership_controls.input_assets_bucket_ownership_controls]
+#
+#   bucket = aws_s3_bucket.access_logs_bucket.id
+#   acl    = "private"
+# }
 
 resource "aws_s3_bucket_versioning" "input_assets_bucket_versioning" {
   bucket = aws_s3_bucket.input_assets_bucket.id

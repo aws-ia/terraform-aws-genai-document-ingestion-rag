@@ -130,7 +130,25 @@ resource "aws_iam_role" "sfn_role" {
             "states:StartExecution"
           ],
           Resource = "*"
-        }
+        },
+        {
+          Action = [
+            "logs:*",
+          ]
+          Effect = "Allow"
+          Resource = "*"
+        },
+        {
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Effect   = "Allow"
+          Resource = [
+            aws_lambda_function.input_validation_lambda.arn,
+            aws_lambda_function.document_reader_lambda.arn,
+            aws_lambda_function.generate_summary_lambda.arn
+          ]
+        },
       ]
     })
   }

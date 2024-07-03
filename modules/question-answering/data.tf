@@ -23,6 +23,7 @@ data "aws_iam_policy_document" "qa_construct_log_group_policy" {
       "logs:PutLogEvents",
       "logs:DescribeLogGroups",
       "logs:DescribeLogStreams",
+      "events:PutEvents"
     ]
     resources = ["*"]
   }

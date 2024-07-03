@@ -29,6 +29,12 @@ resource "aws_appsync_datasource" "ingestion_event_bridge_datasource" {
   event_bridge_config {
     event_bus_arn  = aws_cloudwatch_event_bus.ingestion_event_bus.arn
   }
+
+  depends_on = [
+    aws_cloudwatch_event_bus.ingestion_event_bus,
+    aws_iam_role.ingestion_construct_role,
+    aws_appsync_graphql_api.ingestion_graphql_api
+  ]
 }
 
 resource "aws_appsync_resolver" "ingest_document_resolver" {
