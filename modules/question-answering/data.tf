@@ -7,12 +7,13 @@ data "aws_iam_policy_document" "qa_construct_log_group_assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["vpc-flow-logs.amazonaws.com"]
+      identifiers = ["appsync.amazonaws.com"]
     }
 
     actions = ["sts:AssumeRole"]
   }
 }
+
 data "aws_iam_policy_document" "qa_construct_log_group_policy" {
   statement {
     effect = "Allow"
