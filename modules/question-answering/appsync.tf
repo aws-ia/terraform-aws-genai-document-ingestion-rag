@@ -78,6 +78,9 @@ resource "aws_appsync_datasource" "event_bridge_datasource" {
   event_bridge_config {
     event_bus_arn = aws_cloudwatch_event_bus.question_answering_event_bus.arn
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_appsync_resolver" "question_answering_resolver" {

@@ -39,7 +39,7 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
             },
             FileStatusForSummarization = {
               Type       = "Choice",
-             OutputPath = "$.document_result.Payload",
+             OutputPath = "$.document_result",
               Choices = [
                 {
                   Variable  = "$.status",

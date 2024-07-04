@@ -37,6 +37,6 @@ resource "aws_cloudwatch_event_target" "summary_mutation_target" {
   rule      = aws_cloudwatch_event_rule.summary_mutation_rule.name
   target_id = "${var.app_prefix}_summarisation_event_target"
   arn       = aws_sfn_state_machine.summarization_step_function.arn
-  role_arn  = aws_iam_role.sfn_role.arn
+  role_arn  = aws_iam_role.eventbridge_sfn_role.arn
   event_bus_name = aws_cloudwatch_event_bus.ingestion_event_bus.name
 }
