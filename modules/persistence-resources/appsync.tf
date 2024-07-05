@@ -1,40 +1,3 @@
-# resource "aws_appsync_graphql_api" "merged_api" {
-#   name                = "MergedGraphqlApi"
-#   authentication_type = "AMAZON_COGNITO_USER_POOLS"
-#   user_pool_config {
-#     aws_region = data.aws_region.current.name
-#     default_action = "DENY"
-#     user_pool_id   = aws_cognito_user_pool.user_pool.id
-#   }
-#   xray_enabled = true
-#   log_config {
-#     field_log_level = "ALL"
-#     cloudwatch_logs_role_arn = aws_iam_role.appsync_logs_role.arn
-#   }
-# #
-# #   schema = <<GRAPHQL
-# #   type Query {
-# #     _empty: String
-# #   }
-# #   GRAPHQL
-# }
-# resource "null_resource" "create_merged_api" {
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       aws appsync create-graphql-api \
-#       --name "MergedGraphqlApi" \
-#       --authentication-type "AMAZON_COGNITO_USER_POOLS" \
-#       --user-pool-config "awsRegion=${data.aws_region.current.name},defaultAction=DENY,userPoolId=${aws_cognito_user_pool.user_pool.id}" \
-#       --xray-enabled \
-#       --log-config "fieldLogLevel=ALL,cloudWatchLogsRoleArn=${aws_iam_role.appsync_logs_role.arn}" \
-#       --region ${data.aws_region.current.name}
-#     EOT
-#   }
-#
-#   triggers = {
-#     always_run = timestamp()
-#   }
-# }
 resource "null_resource" "create_merged_api" {
   provisioner "local-exec" {
     command = <<EOT
@@ -43,6 +6,7 @@ resource "null_resource" "create_merged_api" {
           --name ${var.merged_api_name} \
           --authentication-type AMAZON_COGNITO_USER_POOLS \
           --user-pool-config awsRegion=${data.aws_region.current.name},defaultAction=ALLOW,userPoolId=${aws_cognito_user_pool.user_pool.id} \
+          --additional-authentication-providers authenticationType=AWS_IAM \
           --xray-enabled \
           --log-config fieldLogLevel=ALL,cloudWatchLogsRoleArn=${aws_iam_role.appsync_execution_role.arn} \
           --region ${data.aws_region.current.name} \

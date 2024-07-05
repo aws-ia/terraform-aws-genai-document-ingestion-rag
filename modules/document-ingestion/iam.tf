@@ -10,6 +10,26 @@ resource "aws_iam_role" "ingestion_construct_role" {
       }
     }]
   })
+  inline_policy {
+    name = "ingestionConstructRole_inline"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [{
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Effect = "Allow"
+        Resource = "*"
+      }]
+    })
+  }
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
+  ]
 }
 
 resource "aws_iam_policy" "eventbridge_put_events_policy" {
@@ -194,7 +214,14 @@ resource "aws_iam_role" "sfn_role" {
           ],
           Effect = "Allow"
           Resource = ["*"]
-        }
+        },
+        {
+          Effect = "Allow",
+          Action = [
+            "states:StartExecution"
+          ],
+          Resource = "*"
+        },
       ]
     })
   }
@@ -202,26 +229,19 @@ resource "aws_iam_role" "sfn_role" {
 
 resource "aws_iam_role" "eventbridge_sfn_role" {
   name = "eventbridge-sfn-role"
+
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "events.amazonaws.com"
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "events.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
       }
-      Action = "sts:AssumeRole"
-    }]
+    ]
   })
 
-  inline_policy {
-    name = "eventbridge-sfn-policy"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [{
-        Effect = "Allow"
-        Action = "states:StartExecution"
-        Resource = aws_sfn_state_machine.ingestion_state_machine.arn
-      }]
-    })
-  }
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]
 }

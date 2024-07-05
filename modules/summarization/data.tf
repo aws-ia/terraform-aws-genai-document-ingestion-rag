@@ -8,12 +8,14 @@ data "aws_iam_policy_document" "summarization_construct_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["vpc-flow-logs.amazonaws.com"]
+#       identifiers = ["events.amazonaws.com"]
+      identifiers = ["appsync.amazonaws.com"]
     }
 
     actions = ["sts:AssumeRole"]
   }
 }
+
 data "aws_iam_policy_document" "summarization_construct_policy" {
   statement {
     effect = "Allow"

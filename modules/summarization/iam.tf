@@ -1,6 +1,10 @@
 resource "aws_iam_role" "summarization_construct_role" {
   name = "${var.app_prefix}-summarization_construct_role"
   assume_role_policy = data.aws_iam_policy_document.summarization_construct_role.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
+  ]
 }
 
 resource "aws_iam_role" "summarization_appsync_logs_role" {
@@ -123,12 +127,28 @@ resource "aws_iam_role" "sfn_role" {
         {
           Effect = "Allow",
           Action = [
-            "lambda:InvokeFunction",
-            "sqs:SendMessage",
-            "logs:*"
+            "states:StartExecution"
           ],
           Resource = "*"
-        }
+        },
+        {
+          Action = [
+            "logs:*",
+          ]
+          Effect = "Allow"
+          Resource = "*"
+        },
+        {
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Effect   = "Allow"
+          Resource = [
+            aws_lambda_function.input_validation_lambda.arn,
+            aws_lambda_function.document_reader_lambda.arn,
+            aws_lambda_function.generate_summary_lambda.arn
+          ]
+        },
       ]
     })
   }
@@ -138,4 +158,23 @@ resource "aws_iam_role" "firehose_role" {
   name = "${var.app_prefix}-summarization_firehose_delivery_role"
 
   assume_role_policy = data.aws_iam_policy_document.firehose_role.json
+}
+
+resource "aws_iam_role" "eventbridge_sfn_role" {
+  name = "summarization-eventbridge-sfn-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "events.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
+
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]
 }

@@ -8,15 +8,16 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
       ValidateInputTask = {
         Type       = "Task",
         Resource   = aws_lambda_function.input_validation_lambda.arn,
-        ResultPath = "$.validation_result",
+#        ResultPath = "$.validation_result",
         Next       = "ValidateInputChoice"
       },
       ValidateInputChoice = {
         Type       = "Choice",
-        OutputPath = "$.validation_result.Payload.files",
+#        OutputPath = "$.validation_result.Payload.files",
         Choices = [
           {
-            Variable  = "$.validation_result.Payload.isValid",
+#             Variable  = "$.validation_result.Payload.isValid",
+            Variable  = "$.isValid",
             BooleanEquals = false,
             Next      = "JobFailed"
           }
@@ -38,10 +39,10 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
             },
             FileStatusForSummarization = {
               Type       = "Choice",
-              OutputPath = "$.document_result.Payload",
+             OutputPath = "$.document_result",
               Choices = [
                 {
-                  Variable  = "$.document_result.Payload.status",
+                  Variable  = "$.status",
                   StringEquals = "Error",
                   Next      = "IteratorJobFailed"
                 }
@@ -51,7 +52,9 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
             GenerateSummaryTask = {
               Type       = "Task",
               Resource   = aws_lambda_function.generate_summary_lambda.arn,
-              ResultPath = "$.summary_result",
+#               InputPath = "$.document_result"
+
+#               ResultPath = "$.summary_result",
               End        = true
             },
             IteratorJobFailed = {
