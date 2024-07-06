@@ -1,38 +1,40 @@
-# General variables
+###### General variables ######
 variable "stage" {
   description = "The stage for the deployment, default is '-dev'"
-  default = "-dev"
-  type = string
+  default     = "-dev"
+  type        = string
 }
 
-# tflint-ignore: terraform_unused_declarations
-variable "observability" {
-  description = "Enable or disable observability, default is true"
-  type = bool
-  default = true
-}
-variable "merged_api_name" {
-  default = "MergedGraphqlApi"
-  type = string
+variable "solution_prefix" {
+  description = "Prefix to be included in all resources deployed by this solution"
+  type        = string
+  default     = "aws-ia"
 }
 
-# VPC variables
-# tflint-ignore: terraform_unused_declarations
-# variable "deploy_vpc" {
-#   description = "Specify if a VPC should be deployed, default is null"
-#   default = null
-#   type = bool
-# }
+###### VPC variables ######
+variable "vpc_props" {
+  description = "Properties for the VPC to be deployed. Error if both this and 'deploy_vpc' are provided"
+  type        = any
+  default = {
+    cidr_block : "10.0.0.0/20"
+    az_count = 2
+    subnets = {
+      public = {
+        netmask                   = 24
+        nat_gateway_configuration = "all_azs"
+      }
+      private = {
+        netmask                 = 24
+        connect_to_public_natgw = true
+      }
+    }
+    vpc_flow_logs = {
+      log_destination_type = "cloud-watch-logs"
+      retention_in_days    = 180
+    }
+  }
+}
 
-# tflint-ignore: terraform_unused_declarations
-# variable "vpc_props" {
-#   description = "Properties for the VPC to be deployed. Error if both this and 'deploy_vpc' are provided"
-#   type = object({
-#     name: string
-#     cidr_block: string
-#   })
-#   default = null
-# }
 
 # tflint-ignore: terraform_unused_declarations
 # variable "existing_vpc" {
@@ -42,6 +44,19 @@ variable "merged_api_name" {
 #   })
 #   default = null
 # }
+
+
+
+# variable "observability" {
+#   description = "Enable or disable observability, default is true"
+#   type = bool
+#   default = true
+# }
+# variable "merged_api_name" {
+#   default = "MergedGraphqlApi"
+#   type = string
+# }
+
 
 # Bucket variables
 # tflint-ignore: terraform_unused_declarations
@@ -192,8 +207,8 @@ variable "merged_api_name" {
 #   type = string
 # }
 
-variable "bucket_prefix" {
-  description = "Prefix for usage with s3 bucketnames"
-  type = string
-  default = "gen-ai"
-}
+# variable "bucket_prefix" {
+#   description = "Prefix for usage with s3 bucketnames"
+#   type = string
+#   default = "gen-ai"
+# }
