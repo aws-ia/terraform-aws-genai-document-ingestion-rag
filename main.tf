@@ -11,6 +11,26 @@ module "networking_resources" {
   vpc_props       = var.vpc_props
 }
 
+module "persistence_resources" {
+  source = "./modules/persistence-resources"
+
+  solution_prefix          = local.solution_prefix
+  open_search_service_type = "aoss"
+
+  open_search_props = merge(
+    var.open_search_props,
+    {
+      "subnet_ids" = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    },
+    {
+      "master_user_arn" = data.aws_caller_identity.current.arn
+    },
+    {
+      "open_search_vpc_endpoint_id" = module.networking_resources.open_search_vpc_endpoint_id
+    }
+  )
+}
+
 # module "persistence_resources" {
 #   source = "./modules/persistence-resources"
 

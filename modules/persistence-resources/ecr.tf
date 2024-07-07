@@ -1,6 +1,5 @@
-# Create an ECR repository
 resource "aws_ecr_repository" "app_ecr_repository" {
-  name = "${var.app_prefix}_app_ecr_repository"
+  name = local.ecr.repository_name
 
   image_tag_mutability = "MUTABLE"
 
@@ -10,12 +9,11 @@ resource "aws_ecr_repository" "app_ecr_repository" {
 
   encryption_configuration {
     encryption_type = "KMS"
-    kms_key = aws_kms_key.ecr_kms_key.arn
+    kms_key         = aws_kms_key.app_kms_key.arn
   }
 }
 
-# Manage ECR image versions
-resource "aws_ecr_lifecycle_policy" "_app_ecr_repository" {
+resource "aws_ecr_lifecycle_policy" "app_ecr_repository" {
   repository = aws_ecr_repository.app_ecr_repository.name
 
   policy = jsonencode({
@@ -34,11 +32,4 @@ resource "aws_ecr_lifecycle_policy" "_app_ecr_repository" {
       }
     ]
   })
-}
-
-resource "aws_kms_key" "ecr_kms_key" {
-  description             = "KMS key for encrypting ECR images"
-  enable_key_rotation     = true
-  deletion_window_in_days = 10
-  policy = data.aws_iam_policy_document.ecr_kms_key.json
 }

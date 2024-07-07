@@ -1,6 +1,6 @@
 resource "aws_cognito_user_pool" "user_pool" {
-  name = "${var.bucket_prefix}-cognito_user_pool"
-  alias_attributes = ["email", "preferred_username"]
+  name                     = local.cognito.user_pool_name
+  alias_attributes         = ["email", "preferred_username"]
   auto_verified_attributes = ["email"]
   password_policy {
     minimum_length    = 6
@@ -21,7 +21,6 @@ resource "aws_cognito_user_pool" "user_pool" {
   user_pool_add_ons {
     advanced_security_mode = "ENFORCED"
   }
-
   lifecycle {
     ignore_changes = [
       password_policy,

@@ -8,3 +8,9 @@ variable "solution_prefix" {
   type        = string
   default     = "aws-ia"
 }
+
+variable "tags" {
+  description = "Map of tags to apply to resources deployed by this solution."
+  type        = map(any)
+  default     = null
+}

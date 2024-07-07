@@ -11,6 +11,12 @@ variable "solution_prefix" {
   default     = "aws-ia"
 }
 
+variable "tags" {
+  description = "Map of tags to apply to resources deployed by this solution."
+  type        = map(any)
+  default     = null
+}
+
 ###### VPC variables ######
 variable "vpc_props" {
   description = "Properties for the VPC to be deployed. Error if both this and 'deploy_vpc' are provided"
@@ -31,6 +37,40 @@ variable "vpc_props" {
     vpc_flow_logs = {
       log_destination_type = "cloud-watch-logs"
       retention_in_days    = 180
+    }
+  }
+}
+
+###### Open Search variables ######
+variable "open_search_props" {
+  description = "Properties for the OpenSearch configuration"
+  type        = any
+  default = {
+    domain_name    = "opensearch"
+    engine_version = "OpenSearch_1.0"
+
+    collection_name  = "rag-collection"
+    standby_replicas = 2
+
+    ebs_options = {
+      ebs_enabled = true
+      volume_type = "gp3"
+      volume_size = 10
+    }
+
+    cluster_config = {
+      instance_count = 4
+      instance_type  = "r6g.large.search"
+
+      dedicated_master_count   = 4
+      dedicated_master_enabled = true
+      dedicated_master_type    = "c6g.large.search"
+
+      zone_awareness_config = {
+        availability_zone_count = 2
+      }
+
+      zone_awareness_enabled = true
     }
   }
 }

@@ -1,76 +1,84 @@
-resource "aws_opensearch_domain" "opensearch_domain" {
-  count          = var.open_search-service_type == "es" ? 1 : 0
-  domain_name    = var.open_search_domain_name
-  engine_version = "OpenSearch_1.0"
-  cluster_config {
-    instance_type            = var.open_search_props["master_node_instance_type"]
-    instance_count           = var.open_search_props["master_nodes"]
-    dedicated_master_enabled = true
-    dedicated_master_type    = var.open_search_props["master_node_instance_type"]
-    dedicated_master_count   = var.open_search_props["master_nodes"]
-  }
+# TODO: use CME KMS
+module "opensearch" {
+  count = var.open_search_service_type == "es" ? 1 : 0
 
-  ebs_options {
-    ebs_enabled = true
-    volume_type = "gp3"
-    volume_size = var.open_search_props["volume_size"]
-  }
+  source  = "terraform-aws-modules/opensearch/aws"
+  version = "1.3.1"
 
-  vpc_options {
-    subnet_ids = [
-      var.isolated_subnet_id,
-      var.private_subnet_id,
-      var.public_subnet_id
-    ]
-    security_group_ids = [var.primary_security_group_id, var.lambda_security_group_id]
-  }
   advanced_options = {
     "rest.action.multi.allow_explicit_index" = "true"
   }
-  node_to_node_encryption {
-    enabled = true
+
+  advanced_security_options = {
+    enabled                = true
+    anonymous_auth_enabled = true
+
+    master_user_options = {
+      master_user_arn = var.open_search_props.master_user_arn
+    }
   }
-  encrypt_at_rest {
-    enabled = true
-  }
-  domain_endpoint_options {
+
+  cluster_config = var.open_search_props.cluster_config
+
+  domain_endpoint_options = {
     enforce_https       = true
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
   }
 
-  access_policies = data.aws_iam_policy_document.opensearch_domain_policy
+  domain_name = local.opensearch.domain_name
+
+  ebs_options = var.open_search_props.ebs_options
+
+  encrypt_at_rest = {
+    enabled = true
+  }
+
+  engine_version = var.open_search_props.engine_version
+
+  node_to_node_encryption = {
+    enabled = true
+  }
+
+  vpc_options = {
+    subnet_ids = var.open_search_props.subnet_ids
+  }
+
+  access_policy_statements = data.aws_iam_policy_document.opensearch_domain_policy[count.index].statement
+
+  tags = local.combined_tags
 }
 
 resource "aws_opensearchserverless_security_policy" "encryption_policy" {
-  name        = "${var.open_search_props.collection_name}-encryption-policy"
+  count       = var.open_search_service_type == "aoss" ? 1 : 0
+  name        = local.opensearch_serverless.collection_name
   type        = "encryption"
-  description = "encryption policy for ${var.open_search_props.collection_name}"
+  description = "encryption policy for ${local.opensearch_serverless.collection_name}"
   policy = jsonencode({
     Rules = [
       {
         Resource = [
-          "collection/${var.open_search_props.collection_name}"
+          "collection/${local.opensearch_serverless.collection_name}"
         ],
         ResourceType = "collection"
       }
     ],
-    AWSOwnedKey = true
+    AWSOwnedKey = false
+    KmsARN = aws_kms_key.app_kms_key.arn
   })
 }
 
-
-resource "aws_opensearchserverless_security_policy" "opensearch_serverless_collection_policy" {
-  count = var.open_search-service_type == "aoss" ? 1 : 0
-  name = "${var.open_search_props.collection_name}-collection-policy"
-  type = "network"
-    policy = jsonencode([
+resource "aws_opensearchserverless_security_policy" "collection_policy" {
+  count = var.open_search_service_type == "aoss" ? 1 : 0
+  name  = local.opensearch_serverless.collection_name
+  type  = "network"
+  policy = jsonencode([
     {
       Description = "VPC access for collection endpoint",
       Rules = [
         {
           ResourceType = "collection",
           Resource = [
-            "collection/${var.open_search_props.collection_name}"
+            "collection/${local.opensearch_serverless.collection_name}"
           ]
         }
       ],
@@ -85,7 +93,7 @@ resource "aws_opensearchserverless_security_policy" "opensearch_serverless_colle
         {
           ResourceType = "dashboard"
           Resource = [
-            "collection/${var.open_search_props.collection_name}"
+            "collection/${local.opensearch_serverless.collection_name}"
           ]
         }
       ],
@@ -97,37 +105,15 @@ resource "aws_opensearchserverless_security_policy" "opensearch_serverless_colle
   ])
 }
 
-# resource "aws_opensearchserverless_security_policy" "opensearch_serverless_collection_policy" {
-#   count = var.open_search-service_type == "aoss" ? 1 : 0
-#   name = "${var.open_search_props.collection_name}-collection-policy"
-#   type = "encryption"
-#   policy = jsonencode({
-#     "Rules" = [
-#       {
-#         Resource = [
-#           "collection/${var.open_search_props.collection_name}"
-#         ],
-#         ResourceType = "collection"
-#       },
-#       {
-#         Resource = [
-#           "collection/${var.open_search_props.collection_name}"
-#         ],
-#         ResourceType = "dashboard"
-#       }
-#     ],
-#     AllowFromPublic = false
-#     "AWSOwnedKey" = true
-#     SourceVPCEs = [
-#         var.open_search_props.open_search_vpc_endpoint_id
-#       ]
-#   })
-# }
-
 resource "aws_opensearchserverless_collection" "opensearch_serverless_collection" {
-  count = var.open_search-service_type == "aoss" ? 1 : 0
-  name = var.open_search_props.collection_name
-  type = "VECTORSEARCH"
+  count = var.open_search_service_type == "aoss" ? 1 : 0
+  name  = local.opensearch_serverless.collection_name
+  type  = "VECTORSEARCH"
 
-  depends_on = [aws_opensearchserverless_security_policy.opensearch_serverless_collection_policy]
+  depends_on = [
+    aws_opensearchserverless_security_policy.collection_policy,
+    aws_opensearchserverless_security_policy.encryption_policy
+  ]
+
+  tags = local.combined_tags
 }
