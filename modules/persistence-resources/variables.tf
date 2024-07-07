@@ -27,8 +27,8 @@ variable "tags" {
 
 variable "force_destroy" {
   description = "Set to true if you want to force delete resources created by this module"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 # variable "subnets" {

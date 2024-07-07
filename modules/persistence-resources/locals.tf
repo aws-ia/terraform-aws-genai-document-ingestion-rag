@@ -24,15 +24,30 @@ locals {
 
   s3 = {
     access_logs = {
-      bucket = substr("${var.solution_prefix}-access-logs", 0, 62) # limit bucket name to 63 chars
+      bucket                          = substr("${var.solution_prefix}-access-logs", 0, 62) # limit bucket name to 63 chars
       versioning_configuration_status = "Enabled"
-      sse_algorithm = "AES256" # access log use only AES256
-
+      sse_algorithm                   = "AES256" # access log use only AES256
+      expiration_days                 = 365
     }
-    
-    assets_name = {
-      bucket = substr("${var.solution_prefix}-assets", 0, 62)
+
+    input_assets = {
+      bucket                          = substr("${var.solution_prefix}-input-assets", 0, 62)
       versioning_configuration_status = "Enabled"
+      sse_algorithm                   = "aws:kms"
+    }
+
+    processed_assets = {
+      bucket                          = substr("${var.solution_prefix}-processed-assets", 0, 62)
+      versioning_configuration_status = "Enabled"
+      sse_algorithm                   = "aws:kms"
+    }
+  }
+
+  graphql = {
+    merged_api = {
+      name = "${var.solution_prefix}-merged-api"
+      export_id = "${var.solution_prefix}-merged-api-export-id"
+      export_url = "${var.solution_prefix}-merged-api-export-url"
     }
   }
 }

@@ -1,5 +1,6 @@
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 data "aws_iam_policy_document" "access_logs_bucket_policy" {
   statement {
@@ -42,49 +43,51 @@ data "aws_iam_policy_document" "access_logs_bucket_policy" {
   }
 }
 
-# data "aws_iam_policy_document" "input_assets_bucket_policy" {
-#   statement {
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
+#TODO: tidy up this policy
+data "aws_iam_policy_document" "input_assets_bucket_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
 
-#     actions = ["s3:*"]
-#     effect  = "Deny"
+    actions = ["s3:*"]
+    effect  = "Deny"
 
-#     resources = [
-#       aws_s3_bucket.input_assets_bucket.arn,
-#       "${aws_s3_bucket.input_assets_bucket.arn}/*",
-#     ]
-#     condition {
-#       test     = "Bool"
-#       variable = "aws:SecureTransport"
-#       values   = ["false"]
-#     }
-#   }
-# }
+    resources = [
+      aws_s3_bucket.input_assets.arn,
+      "${aws_s3_bucket.input_assets.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
 
-# data "aws_iam_policy_document" "processed_assets_bucket_policy" {
-#   statement {
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
+#TODO: tidy up this policy
+data "aws_iam_policy_document" "processed_assets_bucket_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
 
-#     actions = ["s3:*"]
-#     effect  = "Deny"
+    actions = ["s3:*"]
+    effect  = "Deny"
 
-#     resources = [
-#       aws_s3_bucket.processed_assets_bucket.arn,
-#       "${aws_s3_bucket.processed_assets_bucket.arn}/*",
-#     ]
-#     condition {
-#       test     = "Bool"
-#       variable = "aws:SecureTransport"
-#       values   = ["false"]
-#     }
-#   }
-# }
+    resources = [
+      aws_s3_bucket.processed_assets.arn,
+      "${aws_s3_bucket.processed_assets.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
 
 data "aws_iam_policy_document" "opensearch_domain_policy" {
   #checkov:skip=CKV2_AWS_40:scope by domain name
@@ -105,7 +108,7 @@ data "aws_iam_policy_document" "opensearch_domain_policy" {
       "es:ESHttpPost",
       "es:ESHttpPut"
     ]
-    resources = ["arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/${var.open_search_props.domain_name}/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/${var.open_search_props.domain_name}/*"]
   }
 }
 
@@ -131,11 +134,16 @@ data "aws_iam_policy_document" "app_kms_key" {
   statement {
     sid = "AllowOpenSearchServerless"
     actions = [
-        "kms:DescribeKey",
-        "kms:CreateGrant"
+      "kms:DescribeKey",
+      "kms:CreateGrant"
     ]
 
     resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
 
     condition {
       test     = "StringEquals"
@@ -149,9 +157,29 @@ data "aws_iam_policy_document" "app_kms_key" {
       values   = ["true"]
     }
 
+  }
+
+  statement {
+    sid = "AllowS3Logging"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
+    ]
+
+    resources = ["*"]
+
     principals {
-      type        = "AWS"
-      identifiers = ["*"]
+      type        = "Service"
+      identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values   = ["arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
     }
   }
 
@@ -164,7 +192,17 @@ data "aws_iam_policy_document" "app_kms_key" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
+}
+
+data "aws_cloudformation_export" "merged_api_id" {
+  name       = local.graphql.merged_api.export_id
+  depends_on = [aws_cloudformation_stack.merged_api]
+}
+
+data "aws_cloudformation_export" "merged_api_url" {
+  name       = local.graphql.merged_api.export_url
+  depends_on = [aws_cloudformation_stack.merged_api]
 }

@@ -9,7 +9,7 @@ resource "aws_ecr_repository" "app_ecr_repository" {
 
   encryption_configuration {
     encryption_type = "KMS"
-    kms_key         = aws_kms_key.app_kms_key.arn
+    kms_key         = aws_kms_alias.app_kms_key.target_key_arn
   }
 }
 

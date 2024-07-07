@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to deploy AppSync Merged API
+Parameters:
+  graphQlApiName:
+    Type: String
+  userPoolId:
+    Type: String
+  userPoolAwsRegion:
+    Type: String
+  cloudwatchLogsRoleArn:
+    Type: String
+  mergedApiExecutionRoleArn:
+    Type: String
+Resources:
+  MergedGraphQLApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Ref graphQlApiName
+      ApiType: "MERGED"
+      AuthenticationType: "AMAZON_COGNITO_USER_POOLS"
+      AdditionalAuthenticationProviders: 
+        - AuthenticationType: "AWS_IAM"
+      UserPoolConfig:
+        UserPoolId: !Ref userPoolId
+        AwsRegion: !Ref userPoolAwsRegion
+        DefaultAction: ALLOW
+      LogConfig:
+        CloudWatchLogsRoleArn: !Ref cloudwatchLogsRoleArn
+        FieldLogLevel: ALL
+      MergedApiExecutionRoleArn: !Ref mergedApiExecutionRoleArn
+      XrayEnabled: true
+Outputs:
+  APIId:
+    Description: MergedGraphQLApi id
+    Value: !GetAtt MergedGraphQLApi.ApiId
+    Export:
+      Name: "${local_graphql_merged_api_export_id}"
+  APIURL:
+    Description: MergedGraphQLApi URL
+    Value: !GetAtt MergedGraphQLApi.GraphQLUrl
+    Export:
+      Name: "${local_graphql_merged_api_export_url}"
