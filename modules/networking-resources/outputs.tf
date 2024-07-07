@@ -1,35 +1,19 @@
-output "private_subnet_ids" {
-  value = [aws_subnet.private.id]
+output "vpc_attributes" {
+  description = "All VPC module attributes"
+  value       = module.vpc.vpc_attributes
 }
 
-output "opensearch_vpc_endpoint" {
-  value = aws_opensearchserverless_vpc_endpoint.opensearch.id
+output "private_subnet_attributes" {
+  description = "Public subnet attributes"
+  value       = module.vpc.private_subnet_attributes_by_az
 }
 
-output "vpc_arn" {
-  value = aws_vpc.main_vpc.arn
+output "lambda_sg" {
+  description = "Lambda SG"
+  value       = aws_security_group.lambda.id
 }
 
-output "vpc_id" {
-  value = aws_vpc.main_vpc.id
-}
-
-output "public_subnet_id" {
-  value = aws_subnet.public.id
-}
-
-output "private_subnet_id" {
-  value = aws_subnet.private.id
-}
-
-output "isolated_subnet_id" {
-  value = aws_subnet.isolated.id
-}
-
-output "primary_security_group_id" {
-  value = aws_security_group.security_group_primary.id
-}
-
-output "lambda_security_group_id" {
-  value = aws_security_group.lambda_sg.id
+output "primary_sg" {
+  description = "Primary SG"
+  value       = aws_security_group.primary.id
 }

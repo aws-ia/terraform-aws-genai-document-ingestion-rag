@@ -5,30 +5,23 @@ resource "random_string" "solution_prefix" {
 }
 
 module "networking_resources" {
-  source  = "aws-ia/vpc/aws"
-  version = "4.4.2"
+  source = "./modules/networking-resources"
 
-  name          = local.solution_prefix
-  cidr_block    = var.vpc_props.cidr_block
-  az_count      = var.vpc_props.az_count
-  subnets       = var.vpc_props.subnets
-  vpc_flow_logs = var.vpc_props.vpc_flow_logs
-
-  tags = {
-    Solution = local.solution_prefix
-  }
+  solution_prefix = local.solution_prefix
+  vpc_props       = var.vpc_props
 }
 
 # module "persistence_resources" {
 #   source = "./modules/persistence-resources"
-#   open_search-service_type = "aoss"
+
+#   open_search_service_type = "aoss"
 #   open_search_props = {
 #     open_search_vpc_endpoint_id = module.networking_resources.opensearch_vpc_endpoint
 #     collection_name = "doc-explorer"
 #   }
-#   public_subnet_id = module.networking_resources.public_subnet_id
-#   private_subnet_id = module.networking_resources.private_subnet_id
-#   isolated_subnet_id = module.networking_resources.isolated_subnet_id
+
+#   subnets = [ for _, value in module.networking_resources.private_subnet_attributes_by_az: value.id]
+
 #   primary_security_group_id = module.networking_resources.primary_security_group_id
 #   lambda_security_group_id = module.networking_resources.lambda_security_group_id
 #   bucket_prefix = var.bucket_prefix
@@ -36,7 +29,6 @@ module "networking_resources" {
 #   app_prefix = random_string.app_prefix.result
 #   merged_api_name = var.merged_api_name
 
-#   depends_on = [module.networking_resources]
 # }
 
 # data "local_file" "merged_api_id" {
