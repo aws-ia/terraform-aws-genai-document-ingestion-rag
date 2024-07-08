@@ -1,10 +1,12 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "us-east-2"
+#   region = "us-east-1"
   profile = "default"
 }
 
 provider "awscc" {
-  region = "us-east-1"
+  region = "us-east-2"
+#   region = "us-east-1"
   profile = "default"
 }
 data "aws_caller_identity" "current_account" {}

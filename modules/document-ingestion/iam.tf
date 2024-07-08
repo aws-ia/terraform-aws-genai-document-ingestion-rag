@@ -83,7 +83,7 @@ resource "aws_iam_role" "appsync_logs_role" {
 
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda-exec-role"
+  name = "${var.app_prefix}-lambda-exec-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
