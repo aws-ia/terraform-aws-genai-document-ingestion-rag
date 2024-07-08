@@ -6,12 +6,14 @@ resource "aws_cloudformation_stack" "merged_api" {
     graphQlApiName            = local.graphql.merged_api.name
     userPoolId                = aws_cognito_user_pool.user_pool.id
     userPoolAwsRegion         = data.aws_region.current.name
-    cloudwatchLogsRoleArn     = aws_iam_role.appsync_execution_role.arn
-    mergedApiExecutionRoleArn = aws_iam_role.appsync_execution_role.arn
+    cloudwatchLogsRoleArn     = aws_iam_role.merged_api.arn
+    mergedApiExecutionRoleArn = aws_iam_role.merged_api.arn
   }
 
   template_body = templatefile("${path.module}/templates/appsync.yaml.tftpl", {
     local_graphql_merged_api_export_id  = local.graphql.merged_api.export_id
     local_graphql_merged_api_export_url = local.graphql.merged_api.export_url
   })
+
+  tags = local.combined_tags
 }

@@ -30,21 +30,3 @@ variable "force_destroy" {
   type        = bool
   default     = false
 }
-
-# variable "subnets" {
-#   type        = list(string)
-#   description = "List of subnets for OpenSearch and Lambda"
-# }
-
-# variable "primary_security_group_id" {
-#   type = string
-# }
-
-# variable "lambda_security_group_id" {
-#   type = string
-# }
-
-# variable "bucket_prefix" {}
-# variable "stage" {}
-# variable "app_prefix" {}
-# variable "merged_api_name" {}

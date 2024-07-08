@@ -1,4 +1,4 @@
-# TODO: use CME KMS
+# TODO: use CME KMS, maybe to remove it
 module "opensearch" {
   count = var.open_search_service_type == "es" ? 1 : 0
 

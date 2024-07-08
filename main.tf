@@ -16,7 +16,6 @@ module "persistence_resources" {
 
   solution_prefix          = local.solution_prefix
   open_search_service_type = "aoss"
-
   open_search_props = merge(
     var.open_search_props,
     {
@@ -31,35 +30,37 @@ module "persistence_resources" {
   )
 }
 
-# module "persistence_resources" {
-#   source = "./modules/persistence-resources"
+module "document-ingestion" {
+  source = "./modules/document-ingestion"
 
-#   open_search_service_type = "aoss"
-#   open_search_props = {
-#     open_search_vpc_endpoint_id = module.networking_resources.opensearch_vpc_endpoint
-#     collection_name = "doc-explorer"
-#   }
+  solution_prefix      = local.solution_prefix
+  cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+  ecr_repository_id    = module.persistence_resources.ecr_repository_id
 
-#   subnets = [ for _, value in module.networking_resources.private_subnet_attributes_by_az: value.id]
+  lambda_doc_ingestion_prop = {
+    image_tag = "ingestion_input_validation"
+    src_path =  "${path.module}/lambda/document-ingestion/input_validation/src"
+  }
 
-#   primary_security_group_id = module.networking_resources.primary_security_group_id
-#   lambda_security_group_id = module.networking_resources.lambda_security_group_id
-#   bucket_prefix = var.bucket_prefix
-#   stage = var.stage
-#   app_prefix = random_string.app_prefix.result
-#   merged_api_name = var.merged_api_name
+  # app_prefix = random_string.app_prefix.result
+  # existing_opensearch_domain_mame = module.persistence_resources.opensearch_domain_mame
+  # existing_open_search_domain_endpoint = module.persistence_resources.open_search_domain_endpoint
+  # existing_open_search_index_name = "doc-rag-search"
+  # subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
+  # security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
+  # input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
+  # input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
+  # opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
+  # open_search_secret = "NONE"
+  # processed_assets_bucket_arn = module.persistence_resources.processed_assets_bucket_arn
+  # processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
+  # cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+  # stage = "dev"
+  # ecr_repository_url = module.persistence_resources.ecr_repository_url
+  # merged_api_url = local.merged_api_url
 
-# }
-
-# data "local_file" "merged_api_id" {
-#   filename = "merged_api_id.txt"
-#   depends_on = [module.persistence_resources]
-# }
-
-# data "local_file" "merged_api_url" {
-#   filename = "merged_api_url.txt"
-#   depends_on = [module.persistence_resources]
-# }
+  # depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
+}
 
 # resource "null_resource" "ecr_login" {
 #   provisioner "local-exec" {

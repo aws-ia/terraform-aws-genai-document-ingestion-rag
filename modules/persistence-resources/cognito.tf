@@ -27,4 +27,5 @@ resource "aws_cognito_user_pool" "user_pool" {
       schema
     ]
   }
+  tags = local.combined_tags
 }

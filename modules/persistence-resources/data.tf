@@ -197,6 +197,27 @@ data "aws_iam_policy_document" "app_kms_key" {
   }
 }
 
+# TODO: tidy up the permissions
+data "aws_iam_policy_document" "merged_api" {
+  statement {
+    sid = "MergeApiPermissions"
+
+    actions = [
+        "appsync:*",
+        "logs:*",
+        "cloudwatch:*",
+        "dynamodb:*",
+        "lambda:*"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_cloudformation_export" "merged_api_id" {
   name       = local.graphql.merged_api.export_id
   depends_on = [aws_cloudformation_stack.merged_api]

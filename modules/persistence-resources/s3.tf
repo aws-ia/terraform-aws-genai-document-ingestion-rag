@@ -128,6 +128,7 @@ resource "aws_s3_bucket_cors_configuration" "input_assets" {
 resource "aws_s3_bucket" "processed_assets" {
   bucket_prefix = local.s3.processed_assets.bucket
   force_destroy = var.force_destroy
+  tags          = local.combined_tags
 }
 
 resource "aws_s3_bucket_policy" "processed_assets" {

@@ -1,5 +1,8 @@
-resource "aws_iam_role" "appsync_execution_role" {
-  name = "appsync_execution_role"
+############################################################################################################
+# IAM Role for AppSync Merged API
+############################################################################################################
+resource "aws_iam_role" "merged_api" {
+  name = local.graphql.merged_api.name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -13,26 +16,12 @@ resource "aws_iam_role" "appsync_execution_role" {
       }
     ]
   })
+
+  tags = local.combined_tags
 }
 
-resource "aws_iam_role_policy" "appsync_execution_policy" {
-  name = "appsync_execution_policy"
-  role = aws_iam_role.appsync_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "appsync:*",
-          "logs:*",
-          "cloudwatch:*",
-          "dynamodb:*",
-          "lambda:*"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy" "merged_api" {
+  name = local.graphql.merged_api.name
+  role = aws_iam_role.merged_api.id
+  policy = data.aws_iam_policy_document.merged_api.json
 }

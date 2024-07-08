@@ -3,6 +3,7 @@ resource "aws_kms_key" "app_kms_key" {
   enable_key_rotation     = true
   deletion_window_in_days = 10
   policy                  = data.aws_iam_policy_document.app_kms_key.json
+  tags                    = local.combined_tags
 }
 
 resource "aws_kms_alias" "app_kms_key" {

@@ -11,6 +11,8 @@ resource "aws_ecr_repository" "app_ecr_repository" {
     encryption_type = "KMS"
     kms_key         = aws_kms_alias.app_kms_key.target_key_arn
   }
+
+  tags = local.combined_tags
 }
 
 resource "aws_ecr_lifecycle_policy" "app_ecr_repository" {

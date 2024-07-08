@@ -45,8 +45,8 @@ locals {
 
   graphql = {
     merged_api = {
-      name = "${var.solution_prefix}-merged-api"
-      export_id = "${var.solution_prefix}-merged-api-export-id"
+      name       = "${var.solution_prefix}-merged-api"
+      export_id  = "${var.solution_prefix}-merged-api-export-id"
       export_url = "${var.solution_prefix}-merged-api-export-url"
     }
   }
