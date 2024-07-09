@@ -25,10 +25,6 @@ resource "aws_lambda_function" "input_validation_lambda" {
       GRAPHQL_URL = local.graph_ql_url
     }
   }
-#   vpc_config {
-#     subnet_ids = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
   depends_on = [null_resource.build_and_push_input_validation_lambda_image]
 }
 
@@ -61,10 +57,6 @@ resource "aws_lambda_function" "file_transformer_lambda" {
       GRAPHQL_URL   = local.graph_ql_url
     }
   }
-#   vpc_config {
-#     subnet_ids = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
   depends_on = [null_resource.build_and_push_file_transformer_lambda_image]
 }
 
@@ -98,11 +90,8 @@ resource "aws_lambda_function" "embeddings_job_lambda" {
       OPENSEARCH_DOMAIN_ENDPOINT = local.selected_open_search_endpoint
       OPENSEARCH_INDEX           = var.existing_open_search_index_name
       OPENSEARCH_SECRET_ID       = var.open_search_secret
+      OPENSEARCH_API_NAME = local.open_search_api_name
     }
   }
-#   vpc_config {
-#     subnet_ids = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
   depends_on = [null_resource.build_and_push_embeddings_job_lambda_image]
 }

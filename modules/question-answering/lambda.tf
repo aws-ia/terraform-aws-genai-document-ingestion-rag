@@ -50,10 +50,6 @@ resource "aws_lambda_function" "question_answering_function" {
   image_uri     = "${var.ecr_repository_url}:${local.question_answering_lambda_image_name}"
   package_type  = "Image"
   timeout = 300
-#   vpc_config {
-#     security_group_ids = var.security_groups_ids
-#     subnet_ids         = var.subnet_ids
-#   }
   tracing_config {
     mode = "Active"
   }
@@ -64,6 +60,7 @@ resource "aws_lambda_function" "question_answering_function" {
       OPENSEARCH_DOMAIN_ENDPOINT = local.selected_open_search_endpoint
       OPENSEARCH_INDEX           = var.existing_open_search_index_name
       OPENSEARCH_SECRET_ID       = var.open_search_secret
+      OPENSEARCH_API_NAME = local.open_search_api_name
     }
   }
   dead_letter_config {

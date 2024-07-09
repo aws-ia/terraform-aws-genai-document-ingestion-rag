@@ -32,11 +32,6 @@ resource "aws_lambda_function" "input_validation_lambda" {
     }
   }
 
-#   vpc_config {
-#     subnet_ids         = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
-
   memory_size = 1769
   timeout     = 300
 
@@ -124,11 +119,6 @@ resource "aws_lambda_function" "generate_summary_lambda" {
       SUMMARY_LLM_CHAIN_TYPE  = local.summary_chain_type
     }
   }
-#
-#   vpc_config {
-#     subnet_ids         = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
 
   memory_size = 1769
   timeout     = 600
