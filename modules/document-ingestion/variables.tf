@@ -51,15 +51,9 @@ variable "processed_assets_bucket_prop" {
   type        = map(any)
 }
 
-variable "opensearch_serverless_prop" {
-  description = "Properties for Opensearch serverless"
-  type        = map(any)
-  default     = null
-}
-
 variable "opensearch_prop" {
   description = "Properties for Opensearch cluster"
-  type        = map(any)
+  type        = any
   default     = null
 }
 

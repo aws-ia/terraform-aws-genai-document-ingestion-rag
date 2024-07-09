@@ -107,6 +107,31 @@ resource "aws_iam_role_policy" "file_transformer" {
   policy = data.aws_iam_policy_document.file_transformer.json
 }
 
+############################################################################################################
+# IAM Role for Embeddings Job Lambda
+############################################################################################################
+
+resource "aws_iam_role" "embeddings_job" {
+  name = local.lambda.embeddings_job.name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "embeddings_job" {
+  name   = local.lambda.embeddings_job.name
+  role   = aws_iam_role.embeddings_job.id
+  policy = data.aws_iam_policy_document.embeddings_job.json
+}
 
 # resource "aws_iam_policy" "eventbridge_put_events_policy" {
 #   name = "eventbridgePutEventsPolicy"

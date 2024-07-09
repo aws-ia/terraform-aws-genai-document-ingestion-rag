@@ -62,15 +62,7 @@ module "document-ingestion" {
     bucket_name = module.persistence_resources.processed_assets_bucket_name
   }
 
-  opensearch_serverless_prop = use_serverless_opensearch ? {
-    name = module.persistence_resources.opensearch_serverless_collection_name
-    endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
-  } : null
-
-  opensearch_prop = use_opensearch ? {
-    name = module.persistence_resources.opensearch_domain_mame
-    endpoint = module.persistence_resources.open_search_domain_endpoint
-  } : null
+  opensearch_prop = local.final_opensearch_prop
 
   # app_prefix = random_string.app_prefix.result
   # existing_opensearch_domain_mame = module.persistence_resources.opensearch_domain_mame

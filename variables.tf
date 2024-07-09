@@ -47,9 +47,12 @@ variable "open_search_props" {
   type        = any
   default = {
     open_search_service_type = "aoss"
-    
+
     domain_name    = "opensearch"
     engine_version = "OpenSearch_1.0"
+
+    index_name = "doc-rag-search"
+    secret     = "NONE"
 
     collection_name  = "rag-collection"
     standby_replicas = 2
