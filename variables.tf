@@ -46,6 +46,8 @@ variable "open_search_props" {
   description = "Properties for the OpenSearch configuration"
   type        = any
   default = {
+    open_search_service_type = "aoss"
+    
     domain_name    = "opensearch"
     engine_version = "OpenSearch_1.0"
 

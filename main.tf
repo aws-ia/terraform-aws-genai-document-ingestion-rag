@@ -37,10 +37,40 @@ module "document-ingestion" {
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
   ecr_repository_id    = module.persistence_resources.ecr_repository_id
 
-  lambda_doc_ingestion_prop = {
+  lambda_ingestion_input_validation_prop = {
     image_tag = "ingestion_input_validation"
-    src_path =  "${path.module}/lambda/document-ingestion/input_validation/src"
+    src_path  = "${path.module}/lambda/document-ingestion/input_validation/src"
   }
+
+  lambda_file_transformer_prop = {
+    image_tag = "file_transformer"
+    src_path  = "${path.module}/lambda/document-ingestion/s3_file_transformer/src"
+  }
+
+  lambda_embeddings_job_prop = {
+    image_tag = "embeddings_job"
+    src_path  = "${path.module}/lambda/document-ingestion/embeddings_job/src"
+  }
+
+  input_assets_bucket_prop = {
+    bucket_arn  = module.persistence_resources.input_assets_bucket_arn
+    bucket_name = module.persistence_resources.input_assets_bucket_name
+  }
+
+  processed_assets_bucket_prop = {
+    bucket_arn  = module.persistence_resources.processed_assets_bucket_arn
+    bucket_name = module.persistence_resources.processed_assets_bucket_name
+  }
+
+  opensearch_serverless_prop = use_serverless_opensearch ? {
+    name = module.persistence_resources.opensearch_serverless_collection_name
+    endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
+  } : null
+
+  opensearch_prop = use_opensearch ? {
+    name = module.persistence_resources.opensearch_domain_mame
+    endpoint = module.persistence_resources.open_search_domain_endpoint
+  } : null
 
   # app_prefix = random_string.app_prefix.result
   # existing_opensearch_domain_mame = module.persistence_resources.opensearch_domain_mame

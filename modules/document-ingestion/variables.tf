@@ -20,9 +20,47 @@ variable "ecr_repository_id" {
   type        = string
 }
 
-variable "lambda_doc_ingestion_prop" {
+variable "lambda_ingestion_input_validation_prop" {
   description = "Properties for Lambda document ingestion"
   type        = map(any)
+}
+
+variable "lambda_file_transformer_prop" {
+  description = "Properties for Lambda file transformer"
+  type        = map(any)
+}
+
+variable "lambda_embeddings_job_prop" {
+  description = "Properties for Lambda embeddings job"
+  type        = map(any)
+}
+
+variable "merged_api_url" {
+  description = "AppSync Merged API URL"
+  type        = string
+  default     = ""
+}
+
+variable "input_assets_bucket_prop" {
+  description = "Properties for input assets S3 bucket"
+  type        = map(any)
+}
+
+variable "processed_assets_bucket_prop" {
+  description = "Properties for processed assets S3 bucket"
+  type        = map(any)
+}
+
+variable "opensearch_serverless_prop" {
+  description = "Properties for Opensearch serverless"
+  type        = map(any)
+  default     = null
+}
+
+variable "opensearch_prop" {
+  description = "Properties for Opensearch cluster"
+  type        = map(any)
+  default     = null
 }
 
 # variable "app_prefix" {
@@ -54,7 +92,4 @@ variable "lambda_doc_ingestion_prop" {
 
 # variable "ecr_repository_url" {type = string}
 
-# variable "merged_api_url" {
-#   type = string
-#   default = ""
-# }
+

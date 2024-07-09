@@ -55,6 +55,58 @@ resource "aws_iam_role_policy" "ingestion_api_datasource" {
   policy = data.aws_iam_policy_document.ingestion_api_datasource.json
 }
 
+############################################################################################################
+# IAM Role for Ingestion Input Validation Lambda
+############################################################################################################
+
+resource "aws_iam_role" "ingestion_input_validation" {
+  name = local.lambda.ingestion_input_validation.name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "ingestion_input_validation" {
+  name   = local.lambda.ingestion_input_validation.name
+  role   = aws_iam_role.ingestion_input_validation.id
+  policy = data.aws_iam_policy_document.ingestion_input_validation.json
+}
+
+############################################################################################################
+# IAM Role for File Transformer Lambda
+############################################################################################################
+
+resource "aws_iam_role" "file_transformer" {
+  name = local.lambda.file_transformer.name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "file_transformer" {
+  name   = local.lambda.file_transformer.name
+  role   = aws_iam_role.file_transformer.id
+  policy = data.aws_iam_policy_document.file_transformer.json
+}
+
 
 # resource "aws_iam_policy" "eventbridge_put_events_policy" {
 #   name = "eventbridgePutEventsPolicy"
@@ -74,92 +126,6 @@ resource "aws_iam_role_policy" "ingestion_api_datasource" {
 #   policy_arn = aws_iam_policy.eventbridge_put_events_policy.arn
 # }
 
-
-
-# # IAM Role for Lambda
-# resource "aws_iam_role" "lambda_exec_role" {
-#   name = "lambda-exec-role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Action    = "sts:AssumeRole"
-#       Effect    = "Allow"
-#       Principal = {
-#         Service = "lambda.amazonaws.com"
-#       }
-#     }]
-#   })
-
-#   inline_policy {
-#     name = "lambda-policy"
-#     policy = jsonencode({
-#       Version = "2012-10-17"
-#       Statement = [
-#         {
-#           Action = [
-#             "logs:CreateLogGroup",
-#             "logs:CreateLogStream",
-#             "logs:PutLogEvents"
-#           ]
-#           Effect   = "Allow"
-#           Resource = "*"
-#         },
-#         {
-#           Action = [
-#             "ec2:CreateNetworkInterface",
-#             "ec2:DeleteNetworkInterface",
-#             "ec2:AssignPrivateIpAddresses",
-#             "ec2:UnassignPrivateIpAddresses",
-#             "ec2:DescribeNetworkInterfaces"
-#           ]
-#           Effect   = "Allow"
-#           Resource = "*"
-#         },
-#         {
-#           Action = [
-#             "s3:GetObject",
-#             "s3:GetObject*",
-#             "s3:GetBucket*",
-#             "s3:List*",
-#             "s3:PutObjectRetention",
-#             "s3:List*",
-#             "s3:GetBucket*",
-#             "s3:Abort*",
-#             "s3:DeleteObject*",
-#             "s3:PutObjectLegalHold",
-#             "s3:PutObjectTagging",
-#             "s3:PutObjectVersionTagging",
-#             "s3:PutObject",
-#             "s3:GetObject*"
-#           ]
-#           Effect   = "Allow"
-#           Resource = [
-#             var.input_assets_bucket_arn,
-#             "${var.input_assets_bucket_arn}/*",
-#             var.processed_assets_bucket_arn,
-#             "${var.processed_assets_bucket_arn}/*"
-#           ]
-#         },
-#         {
-#           Action = [
-#             "appsync:GraphQL"
-#           ]
-#           Effect   = "Allow"
-#           Resource = "arn:aws:appsync:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:apis/${aws_appsync_graphql_api.ingestion_graphql_api.id}/*"
-#         },
-#         {
-#           Effect = "Allow"
-#           Action = [
-#             "ecr:GetDownloadUrlForLayer",
-#             "ecr:BatchGetImage",
-#             "ecr:BatchCheckLayerAvailability"
-#           ]
-#           Resource = "*"
-#         },
-#       ]
-#     })
-#   }
-# }
 
 # resource "aws_iam_role" "sfn_role" {
 #   name = "sfn-role"

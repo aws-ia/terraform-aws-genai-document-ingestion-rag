@@ -29,6 +29,10 @@ output "open_search_domain_endpoint" {
   value = module.opensearch[*].domain_endpoint
 }
 
+output "opensearch_serverless_collection_name" {
+  value = local.opensearch_serverless.collection_name
+}
+
 output "opensearch_serverless_collection_endpoint" {
   value = aws_opensearchserverless_collection.opensearch_serverless_collection[*].collection_endpoint
 }
