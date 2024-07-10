@@ -133,101 +133,51 @@ resource "aws_iam_role_policy" "embeddings_job" {
   policy = data.aws_iam_policy_document.embeddings_job.json
 }
 
-# resource "aws_iam_policy" "eventbridge_put_events_policy" {
-#   name = "eventbridgePutEventsPolicy"
+############################################################################################################
+# IAM Role for Ingestion State Machine
+############################################################################################################
 
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [{
-#       Effect = "Allow",
-#       Action = "events:PutEvents",
-#       Resource = "*"
-#     }]
-#   })
-# }
+resource "aws_iam_role" "ingestion_sm" {
+  name = local.statemachine.ingestion.name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "states.amazonaws.com"
+      }
+    }]
+  })
 
-# resource "aws_iam_role_policy_attachment" "attach_eventbridge_policy" {
-#   role       = aws_iam_role.ingestion_construct_role.name
-#   policy_arn = aws_iam_policy.eventbridge_put_events_policy.arn
-# }
+  tags = local.combined_tags
+}
 
+resource "aws_iam_role_policy" "ingestion_sm" {
+  name   = local.statemachine.ingestion.name
+  role   = aws_iam_role.ingestion_sm.id
+  policy = data.aws_iam_policy_document.ingestion_sm.json
+}
 
-# resource "aws_iam_role" "sfn_role" {
-#   name = "sfn-role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Action    = "sts:AssumeRole"
-#       Effect    = "Allow"
-#       Principal = {
-#         Service = "states.amazonaws.com"
-#       }
-#     }]
-#   })
+############################################################################################################
+# IAM Role for Event Bridge target - Ingestion State Machine
+############################################################################################################
 
-#   inline_policy {
-#     name = "sfn-policy"
-#     policy = jsonencode({
-#       Version = "2012-10-17"
-#       Statement = [
-#         {
-#           Action = [
-#             "lambda:InvokeFunction"
-#           ]
-#           Effect   = "Allow"
-#           Resource = [
-#             aws_lambda_function.input_validation_lambda.arn,
-#             aws_lambda_function.file_transformer_lambda.arn,
-#             aws_lambda_function.embeddings_job_lambda.arn
-#           ]
-#         },
-#         {
-#           Action = [
-#             "logs:CreateLogDelivery",
-#             "logs:CreateLogStream",
-#             "logs:GetLogDelivery",
-#             "logs:UpdateLogDelivery",
-#             "logs:DeleteLogDelivery",
-#             "logs:ListLogDeliveries",
-#             "logs:PutLogEvents",
-#             "logs:PutResourcePolicy",
-#             "logs:DescribeResourcePolicies",
-#             "logs:DescribeLogGroups",
-#             "xray:PutTraceSegments",
-#             "xray:PutTelemetryRecords",
-#             "xray:GetSamplingRules",
-#             "xray:GetSamplingTargets"
-#           ],
-#           Effect = "Allow"
-#           Resource = ["*"]
-#         },
-#         {
-#           Effect = "Allow",
-#           Action = [
-#             "states:StartExecution"
-#           ],
-#           Resource = "*"
-#         },
-#       ]
-#     })
-#   }
-# }
+resource "aws_iam_role" "ingestion_sm_eventbridge" {
+  name = "eventbridge-sfn-role"
 
-# resource "aws_iam_role" "eventbridge_sfn_role" {
-#   name = "eventbridge-sfn-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "events.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         "Effect": "Allow",
-#         "Principal": {
-#           "Service": "events.amazonaws.com"
-#         },
-#         "Action": "sts:AssumeRole"
-#       }
-#     ]
-#   })
-
-#   managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]
-# }
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]
+}

@@ -328,6 +328,67 @@ data "aws_iam_policy_document" "embeddings_job" {
   }
 }
 
+data "aws_iam_policy_document" "ingestion_sm" {
+
+  statement {
+    sid = "InvokeLambda"
+
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      aws_lambda_function.ingestion_input_validation.arn,
+      aws_lambda_function.file_transformer.arn,
+      aws_lambda_function.embeddings_job.arn
+    ]
+  }
+
+  statement {
+    sid = "LogAndTelemetry"
+
+    actions = [
+      "logs:CreateLogDelivery",
+      "logs:CreateLogStream",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups",
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    sid = "StateMachine"
+
+    actions = [
+      "states:StartExecution"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
+# TODO : figure out what actually require this data source?
 # data "aws_iam_policy_document" "ecr_kms_key" {
 #   statement {
 #     actions = ["kms:*"]

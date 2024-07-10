@@ -14,11 +14,18 @@ locals {
     }
   }
 
+  #TODO: finalize log group namespace
   cloudwatch = {
     ingestion = {
       event_bus_name = "${var.solution_prefix}-ingestion-event-bus"
-      log_group_name = "${var.solution_prefix}-ingestion-log-group"
+      log_group_name = "/${var.solution_prefix}/${var.solution_prefix}-ingestion-log-group"
       log_retention  = 90
+    }
+    ingestion_sm = {
+      event_bridge_target_id = "${var.solution_prefix}-ingestion-sm-target"
+      log_group_name         = "/${var.solution_prefix}/${var.solution_prefix}-ingestion-sm"
+      log_retention          = 90
+
     }
   }
 
@@ -66,6 +73,16 @@ locals {
           OPENSEARCH_INDEX           = var.opensearch_prop.index_name
           OPENSEARCH_SECRET_ID       = var.opensearch_prop.secret
         }
+      }
+    }
+  }
+
+  statemachine = {
+    ingestion = {
+      name = "${var.solution_prefix}-ingestion-sm"
+      logging_configuration = {
+        level                  = "ALL"
+        include_execution_data = true
       }
     }
   }
