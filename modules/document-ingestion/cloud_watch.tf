@@ -35,7 +35,8 @@ resource "aws_cloudwatch_event_target" "ingestion" {
 
 }
 
-# # Log Group for Step Functions
+# Log Group for Step Functions
+# TODO: add KMS key
 resource "aws_cloudwatch_log_group" "ingestion_sm" {
   name              = local.cloudwatch.ingestion_sm.log_group_name
   retention_in_days = local.cloudwatch.ingestion_sm.log_retention

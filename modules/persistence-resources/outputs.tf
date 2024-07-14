@@ -19,7 +19,7 @@ output "processed_assets_bucket_arn" {
   value = aws_s3_bucket.processed_assets.arn
 }
 output "cognito_user_pool_id" {
-  value = aws_cognito_user_pool.user_pool.id
+  value = aws_cognito_user_pool.merged_api.id
 }
 
 output "opensearch_domain_mame" {

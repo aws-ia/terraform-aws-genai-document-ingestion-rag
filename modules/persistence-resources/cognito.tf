@@ -1,4 +1,4 @@
-resource "aws_cognito_user_pool" "user_pool" {
+resource "aws_cognito_user_pool" "merged_api" {
   name                     = local.cognito.user_pool_name
   alias_attributes         = ["email", "preferred_username"]
   auto_verified_attributes = ["email"]
@@ -26,6 +26,33 @@ resource "aws_cognito_user_pool" "user_pool" {
       password_policy,
       schema
     ]
+  }
+  tags = local.combined_tags
+}
+
+# create cognito user pool client 
+resource "aws_cognito_user_pool_client" "merged_api" {
+  name                 = local.cognito.user_pool_client_name
+  user_pool_id         = aws_cognito_user_pool.merged_api.id
+  generate_secret      = false
+
+  explicit_auth_flows  = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH"]
+  enable_token_revocation = true
+  callback_urls        = [local.cognito.callback_url]
+  logout_urls = [local.cognito.logout_url]
+  allowed_oauth_flows  = ["code", "implicit"]
+  allowed_oauth_scopes = ["email", "phone", "openid", "profile", "aws.cognito.signin.user.admin"]
+
+}
+
+# create cognito identity provider using user pool above
+resource "aws_cognito_identity_pool" "merged_api" {
+  identity_pool_name               = local.cognito.identity_pool_name
+  allow_unauthenticated_identities = false
+
+  cognito_identity_providers {
+    client_id     = aws_cognito_user_pool_client.merged_api.id
+    provider_name = aws_cognito_user_pool.merged_api.endpoint
   }
   tags = local.combined_tags
 }

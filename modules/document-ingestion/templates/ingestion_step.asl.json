@@ -1,0 +1,106 @@
+{
+  "Comment": "Ingestion State Machine",
+  "StartAt": "Validate Ingestion Input",
+  "States": {
+    "Validate Ingestion Input": {
+      "Next": "Is Valid Ingestion Parameters?",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ClientExecutionTimeoutException",
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Type": "Task",
+      "ResultPath": "$.validation_result",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "{lambda_ingestion_input_validation}}",
+        "Payload.$": "$"
+      }
+    },
+    "Is Valid Ingestion Parameters?": {
+      "Type": "Choice",
+      "OutputPath": "$.validation_result.Payload.files",
+      "Choices": [
+        {
+          "Variable": "$.validation_result.Payload.isValid",
+          "BooleanEquals": false,
+          "Next": "Job Failed"
+        }
+      ],
+      "Default": "Map State"
+    },
+    "Map State": {
+      "Type": "Map",
+      "Next": "Generate embeddings from processed documents and store them",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "Download and transform document to raw text",
+        "States": {
+          "Download and transform document to raw text": {
+            "End": true,
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ClientExecutionTimeoutException",
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "Type": "Task",
+            "ResultPath": "$.s3_transformer_result",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "{lambda_file_transformer}}",
+              "Payload.$": "$"
+            }
+          }
+        }
+      },
+      "MaxConcurrency": 100
+    },
+    "Generate embeddings from processed documents and store them": {
+      "End": true,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ClientExecutionTimeoutException",
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Type": "Task",
+      "ResultPath": "$",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "{lambda_embeddings_job}",
+        "Payload.$": "$"
+      }
+    },
+    "Job Failed": {
+      "Type": "Fail",
+      "Error": "DescribeJob returned FAILED",
+      "Cause": "Validation job failed"
+    }
+  },
+  "TimeoutSeconds": 1800
+}

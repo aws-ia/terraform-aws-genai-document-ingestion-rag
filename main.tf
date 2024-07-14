@@ -28,6 +28,7 @@ module "persistence_resources" {
       "open_search_vpc_endpoint_id" = module.networking_resources.open_search_vpc_endpoint_id
     }
   )
+  force_destroy = true
 }
 
 module "document-ingestion" {

@@ -1,3 +1,4 @@
+# TODO: need to connect to a function
 resource "aws_appsync_graphql_api" "ingestion_api" {
   name                = local.graphql.ingestion_api.name
   schema              = file("${path.module}/templates/schema.graphql")

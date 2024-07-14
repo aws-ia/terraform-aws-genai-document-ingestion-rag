@@ -4,7 +4,7 @@ resource "aws_cloudformation_stack" "merged_api" {
 
   parameters = {
     graphQlApiName            = local.graphql.merged_api.name
-    userPoolId                = aws_cognito_user_pool.user_pool.id
+    userPoolId                = aws_cognito_user_pool.merged_api.id
     userPoolAwsRegion         = data.aws_region.current.name
     cloudwatchLogsRoleArn     = aws_iam_role.merged_api.arn
     mergedApiExecutionRoleArn = aws_iam_role.merged_api.arn

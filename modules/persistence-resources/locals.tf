@@ -16,6 +16,10 @@ locals {
 
   cognito = {
     user_pool_name = "${var.solution_prefix}"
+    user_pool_client_name = "${var.solution_prefix}"
+    identity_pool_name = "${var.solution_prefix}"
+    callback_url = "http://localhost:8501/"
+    logout_url = "http://localhost:8501/"
   }
 
   ecr = {
