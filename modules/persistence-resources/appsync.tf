@@ -12,8 +12,15 @@ resource "aws_cloudformation_stack" "merged_api" {
 
   template_body = templatefile("${path.module}/templates/appsync.yaml.tftpl", {
     local_graphql_merged_api_export_id  = local.graphql.merged_api.export_id
+    local_graphql_merged_api_export_arn = local.graphql.merged_api.export_arn
     local_graphql_merged_api_export_url = local.graphql.merged_api.export_url
   })
 
   tags = local.combined_tags
+}
+
+resource "time_sleep" "wait_merge_api" {
+  depends_on = [aws_cloudformation_stack.merged_api]
+
+  create_duration = "30s"
 }

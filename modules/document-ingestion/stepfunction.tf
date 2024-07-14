@@ -1,4 +1,3 @@
-# TODO: add the embeddings state
 resource "aws_sfn_state_machine" "ingestion_sm" {
   name     = local.statemachine.ingestion.name
   role_arn = aws_iam_role.ingestion_sm.arn

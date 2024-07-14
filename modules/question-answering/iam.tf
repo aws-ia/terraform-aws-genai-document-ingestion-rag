@@ -1,5 +1,5 @@
 resource "aws_iam_role" "qa_construct_role" {
-  name = "${var.app_prefix}-qa_construct_role"
+  name               = "${var.app_prefix}-qa_construct_role"
   assume_role_policy = data.aws_iam_policy_document.qa_construct_log_group_assume_role.json
 }
 
@@ -10,7 +10,7 @@ resource "aws_iam_role_policy" "qa_construct_role_policy" {
 }
 
 resource "aws_iam_role" "appsync_logging_assume_role" {
-  name = "${var.app_prefix}-appsync_logging_assume_role"
+  name               = "${var.app_prefix}-appsync_logging_assume_role"
   assume_role_policy = data.aws_iam_policy_document.appsync_logging_assume_role.json
 }
 resource "aws_iam_role_policy_attachment" "appsync_logging_assume_role_attachment" {
@@ -18,7 +18,7 @@ resource "aws_iam_role_policy_attachment" "appsync_logging_assume_role_attachmen
   role       = aws_iam_role.appsync_logging_assume_role.name
 }
 resource "aws_iam_policy" "appsync_logging_publish_policy" {
-  name = "${var.app_prefix}appsync_logging_publish_policy"
+  name   = "${var.app_prefix}appsync_logging_publish_policy"
   policy = data.aws_iam_policy_document.appsync_logging_assume_role_publish_policy.json
 }
 resource "aws_iam_role_policy_attachment" "appsync_logging_assume_role_publish_attachment" {
@@ -28,11 +28,11 @@ resource "aws_iam_role_policy_attachment" "appsync_logging_assume_role_publish_a
 
 
 resource "aws_iam_role" "job_status_data_source_role" {
-  name = "${var.app_prefix}-appsync_none_data_datasource_role"
+  name               = "${var.app_prefix}-appsync_none_data_datasource_role"
   assume_role_policy = data.aws_iam_policy_document.job_status_data_source_role.json
 }
 resource "aws_iam_role_policy" "appsync_none_data_datasource_role_policy" {
-  role = aws_iam_role.job_status_data_source_role.id
+  role   = aws_iam_role.job_status_data_source_role.id
   policy = data.aws_iam_policy_document.job_status_data_source_role_policy.json
 }
 
@@ -83,12 +83,12 @@ resource "aws_iam_role_policy_attachment" "describe_network_interfaces_attachmen
 }
 
 resource "aws_iam_policy" "open_search_secret_policy" {
-  count = var.open_search_secret == "NONE" ? 0 : 1
+  count  = var.open_search_secret == "NONE" ? 0 : 1
   name   = "${var.app_prefix}open_search_secret_policy"
   policy = data.aws_iam_policy_document.open_search_secret_policy_document.json
 }
 resource "aws_iam_role_policy_attachment" "open_search_secret_attachment" {
-  count = var.open_search_secret == "NONE" ? 0 : 1
+  count      = var.open_search_secret == "NONE" ? 0 : 1
   policy_arn = aws_iam_policy.open_search_secret_policy[0].arn
   role       = aws_iam_role.question_answering_function_role.name
 }
@@ -106,7 +106,7 @@ resource "aws_iam_role_policy_attachment" "s3_read_attachment" {
 
 // SQS policis
 resource "aws_iam_policy" "sqs_send_message_policy" {
-  name = "${var.app_prefix}sqs_send_message_policy"
+  name   = "${var.app_prefix}sqs_send_message_policy"
   policy = data.aws_iam_policy_document.sqs_send_message_policy.json
 }
 resource "aws_iam_role_policy_attachment" "sqs_send_message_attachment" {

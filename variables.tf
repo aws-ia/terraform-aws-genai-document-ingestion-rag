@@ -80,7 +80,6 @@ variable "open_search_props" {
   }
 }
 
-
 # tflint-ignore: terraform_unused_declarations
 # variable "existing_vpc" {
 #   description = "Existing VPC to be used. If not provided, a new one will be created"

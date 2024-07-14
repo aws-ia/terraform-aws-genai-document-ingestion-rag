@@ -11,6 +11,6 @@ variable "solution_prefix" {
 
 variable "tags" {
   description = "Map of tags to apply to resources deployed by this solution."
-  type        = map(any)
+  type        = any
   default     = null
 }

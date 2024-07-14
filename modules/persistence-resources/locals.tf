@@ -2,7 +2,7 @@ locals {
   combined_tags = merge(
     var.tags,
     {
-      Solution = var.solution_prefix
+      Submodule = "persistent-resources"
     }
   )
 
@@ -15,11 +15,11 @@ locals {
   }
 
   cognito = {
-    user_pool_name = "${var.solution_prefix}"
+    user_pool_name        = "${var.solution_prefix}"
     user_pool_client_name = "${var.solution_prefix}"
-    identity_pool_name = "${var.solution_prefix}"
-    callback_url = "http://localhost:8501/"
-    logout_url = "http://localhost:8501/"
+    identity_pool_name    = "${var.solution_prefix}"
+    callback_url          = "http://localhost:8501/"
+    logout_url            = "http://localhost:8501/"
   }
 
   ecr = {
@@ -51,6 +51,7 @@ locals {
     merged_api = {
       name       = "${var.solution_prefix}-merged-api"
       export_id  = "${var.solution_prefix}-merged-api-export-id"
+      export_arn = "${var.solution_prefix}-merged-api-export-arn"
       export_url = "${var.solution_prefix}-merged-api-export-url"
     }
   }

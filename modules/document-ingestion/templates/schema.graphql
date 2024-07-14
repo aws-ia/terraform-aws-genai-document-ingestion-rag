@@ -1,57 +1,62 @@
-enum ModelProvider {
-    Sagemaker
-    Bedrock
-}
-
-type FileStatus @aws_cognito_user_pools @aws_iam {
-    name: String
-    status: String
-    imageurl: String
-}
-
-input ModelConfiguration {
-    provider: ModelProvider
-    modelId: String
-    streaming: Boolean
-    model_kwargs: AWSJSON
+type FileStatus @aws_iam
+@aws_cognito_user_pools {
+	name: String
+	status: String
+	imageurl: String
 }
 
 input FileStatusInput {
-    name: String
-    status: String
-    imageurl: String
+	name: String
+	status: String
+	imageurl: String
 }
 
-type IngestionDocs @aws_iam @aws_cognito_user_pools {
-    ingestionjobid: ID
-    files: [FileStatus]
+type IngestionDocs @aws_iam
+@aws_cognito_user_pools {
+	ingestionjobid: ID
+	files: [FileStatus]
 }
 
 input IngestionDocsInput {
-    ingestionjobid: ID
-    embeddings_model: ModelConfiguration
-    files: [FileStatusInput]
-    ignore_existing: Boolean
+	ingestionjobid: ID
+	embeddings_model: ModelConfiguration
+	files: [FileStatusInput]
+	ignore_existing: Boolean
 }
 
-type Mutation @aws_cognito_user_pools @aws_iam {
-    ingestDocuments(ingestioninput: IngestionDocsInput!): IngestionDocs
-    updateIngestionJobStatus(ingestionjobid: ID, files: [FileStatusInput]): IngestionDocs
+input ModelConfiguration {
+	provider: ModelProvider
+	modelId: String
+	streaming: Boolean
+	model_kwargs: AWSJSON
 }
 
-type Query @aws_cognito_user_pools @aws_iam {
-    ingest: IngestionDocs
+enum ModelProvider {
+	Sagemaker
+	Bedrock
 }
 
-type Subscription @aws_cognito_user_pools @aws_iam {
-    ingestDocuments(ingestionjobid: ID!): IngestionDocs
-    @aws_subscribe(mutations: ["ingestDocuments"])
-    updateIngestionJobStatus(ingestionjobid: ID!): IngestionDocs
-    @aws_subscribe(mutations: ["updateIngestionJobStatus"])
+type Mutation @aws_iam
+@aws_cognito_user_pools {
+	ingestDocuments(ingestioninput: IngestionDocsInput!): IngestionDocs
+	updateIngestionJobStatus(ingestionjobid: ID, files: [FileStatusInput]): IngestionDocs
+}
+
+type Query @aws_iam
+@aws_cognito_user_pools {
+	ingest: IngestionDocs
+}
+
+type Subscription @aws_iam
+@aws_cognito_user_pools {
+	ingestDocuments(ingestionjobid: ID!): IngestionDocs
+		@aws_subscribe(mutations: ["ingestDocuments"])
+	updateIngestionJobStatus(ingestionjobid: ID!): IngestionDocs
+		@aws_subscribe(mutations: ["updateIngestionJobStatus"])
 }
 
 schema {
-    query: Query
-    mutation: Mutation
-    subscription: Subscription
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
 }

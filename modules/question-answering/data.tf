@@ -43,27 +43,27 @@ data "aws_iam_policy_document" "appsync_logging_assume_role" {
 }
 data "aws_iam_policy_document" "appsync_logging_assume_role_publish_policy" {
   statement {
-    effect = "Allow"
-    actions = ["events:PutEvents"]
+    effect    = "Allow"
+    actions   = ["events:PutEvents"]
     resources = [aws_cloudwatch_event_bus.question_answering_event_bus.arn]
   }
 }
 
 data "aws_iam_policy_document" "job_status_data_source_role" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
     principals {
       identifiers = ["appsync.amazonaws.com"]
-      type = "Service"
+      type        = "Service"
     }
   }
 }
 
-data aws_iam_policy_document "job_status_data_source_role_policy" {
+data "aws_iam_policy_document" "job_status_data_source_role_policy" {
   statement {
-    effect = "Allow"
-    actions = ["dynamodb:*", "lambda:*"]
+    effect    = "Allow"
+    actions   = ["dynamodb:*", "lambda:*"]
     resources = ["*"]
   }
 }
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "firehose_role" {
     effect = "Allow"
     principals {
       identifiers = ["firehose.amazonaws.com"]
-      type = "Service"
+      type        = "Service"
     }
     actions = ["sts:AssumeRole"]
   }
@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "question_answering_function_inline_policy" {
       "ecr:BatchGetImage",
       "ecr:BatchCheckLayerAvailability"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["*"]
   }
 }
@@ -140,38 +140,38 @@ data "aws_iam_policy_document" "question_answering_function_policy" {
       "ec2:UnassignPrivateIpAddresses",
     ]
     resources = ["arn:aws:ec2:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:*/*"]
-    effect = "Allow"
+    effect    = "Allow"
   }
 }
 data "aws_iam_policy_document" "describe_network_interfaces_policy" {
   statement {
-    actions = ["ec2:DescribeNetworkInterfaces"]
+    actions   = ["ec2:DescribeNetworkInterfaces"]
     resources = ["*"]
-    effect = "Allow"
+    effect    = "Allow"
   }
 }
 data "aws_iam_policy_document" "open_search_secret_policy_document" {
   statement {
-    actions = ["secretsmanager:GetSecretValue"]
-    effect = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    effect    = "Allow"
     resources = [var.open_search_secret]
   }
 }
 
 data "aws_iam_policy_document" "s3_read_policy" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["s3:GetObject", "s3:GetBucket", "s3:ListBucket"]
     resources = [
       var.input_assets_bucket_arn,
-      "${var.input_assets_bucket_arn}/*",]
+    "${var.input_assets_bucket_arn}/*", ]
   }
 }
 
 data "aws_iam_policy_document" "sqs_send_message_policy" {
   statement {
-    effect = "Allow"
-    actions = ["sqs:SendMessage"]
+    effect    = "Allow"
+    actions   = ["sqs:SendMessage"]
     resources = [aws_sqs_queue.dlq.arn]
   }
 }
@@ -182,7 +182,7 @@ data "aws_iam_policy_document" "opensearch_access_policy" {
     resources = [
       "arn:aws:es:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:domain/*",
       # TODO() validate  issue
- # "arn:aws:es:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:domain/${var.existing_opensearch_domain_mame}/*",
+      # "arn:aws:es:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:domain/${var.existing_opensearch_domain_mame}/*",
     ]
     actions = ["es:ESHttpGet", "es:ESHttpPut", "es:ESHttpPost", "es:ESHttpDelete", "es:ESHttpHead"]
   }
@@ -203,7 +203,7 @@ data "aws_iam_policy_document" "bedrock_invoke_model_policy" {
 }
 data "aws_iam_policy_document" "suppression_policy" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["ssm:AddExcludedTargets"]
     resources = [
       "arn:aws:ssm:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:maintenancewindow-target/your-specific-target-id"
@@ -213,9 +213,9 @@ data "aws_iam_policy_document" "suppression_policy" {
 
 data "aws_iam_policy_document" "appsync_policy" {
   statement {
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["arn:aws:appsync:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:apis/${aws_appsync_graphql_api.question_answering_graphql_api.id}/*"]
-    actions = ["appsync:GraphQL"]
+    actions   = ["appsync:GraphQL"]
   }
 }
 
@@ -232,20 +232,20 @@ data "aws_iam_policy_document" "qa_construct_role" {
 
 data "aws_iam_policy_document" "ecr_kms_key" {
   statement {
-    actions = ["kms:*"]
+    actions   = ["kms:*"]
     resources = ["*"]
     principals {
       identifiers = [aws_iam_role.question_answering_function_role.arn]
-      type = "AWS"
+      type        = "AWS"
     }
   }
   statement {
-    sid = "Allow access for Key Administrators"
-    actions = ["kms:*"]
+    sid       = "Allow access for Key Administrators"
+    actions   = ["kms:*"]
     resources = ["*"]
     principals {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-      type = "AWS"
+      type        = "AWS"
     }
   }
 }

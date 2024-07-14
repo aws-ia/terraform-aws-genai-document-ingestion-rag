@@ -1,6 +1,13 @@
 locals {
   solution_prefix = "${var.solution_prefix}-${random_string.solution_prefix.result}"
 
+  root_combined_tags = merge(
+    var.tags,
+    {
+      Solution = var.solution_prefix
+    }
+  )
+
   # determine if using opensearch serverless (aoss) or standard opensearch (es)
   opensearch = {
     use_serverless_opensearch = var.open_search_props.open_search_service_type == "aoss" ? true : false

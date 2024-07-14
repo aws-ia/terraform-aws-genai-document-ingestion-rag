@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to merge AppSync API
+Parameters:
+  mergedGraphQlApiName:
+    Type: String
+  sourceGraphQlApiName:
+    Type: String
+Resources:
+  AssociateAPI:
+    Type: AWS::AppSync::SourceApiAssociation
+    Properties:
+      Description: String
+      MergedApiIdentifier: !Ref mergedGraphQlApiName
+      SourceApiAssociationConfig: 
+        MergeType: "AUTO_MERGE"
+      SourceApiIdentifier: !Ref sourceGraphQlApiName

@@ -7,8 +7,8 @@ data "aws_iam_policy_document" "summarization_construct_role" {
     effect = "Allow"
 
     principals {
-      type        = "Service"
-#       identifiers = ["events.amazonaws.com"]
+      type = "Service"
+      #       identifiers = ["events.amazonaws.com"]
       identifiers = ["appsync.amazonaws.com"]
     }
 
@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "firehose_role" {
     effect = "Allow"
     principals {
       identifiers = ["firehose.amazonaws.com"]
-      type = "Service"
+      type        = "Service"
     }
     actions = ["sts:AssumeRole"]
   }

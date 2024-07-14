@@ -1,5 +1,5 @@
 resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
-  name = "${var.app_prefix}-questionAnsweringGraphqlApi"
+  name   = "${var.app_prefix}-questionAnsweringGraphqlApi"
   schema = file("${path.module}/schema.graphql")
 
   xray_enabled = true
@@ -9,7 +9,7 @@ resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
     authentication_type = "AWS_IAM"
   }
   user_pool_config {
-    aws_region = data.aws_region.current_region.name
+    aws_region     = data.aws_region.current_region.name
     default_action = "ALLOW"
     user_pool_id   = var.cognito_user_pool_id
   }
@@ -28,10 +28,10 @@ resource "aws_appsync_datasource" "job_status_data_source" {
 }
 
 resource "aws_appsync_resolver" "job_status_resolver" {
-  api_id      = aws_appsync_graphql_api.question_answering_graphql_api.id
-  type        = "Mutation"
-  field       = "updateQAJobStatus"
-  data_source = aws_appsync_datasource.job_status_data_source.name
+  api_id           = aws_appsync_graphql_api.question_answering_graphql_api.id
+  type             = "Mutation"
+  field            = "updateQAJobStatus"
+  data_source      = aws_appsync_datasource.job_status_data_source.name
   request_template = <<EOF
                           {
                               "version": "2017-02-28",
@@ -39,23 +39,23 @@ resource "aws_appsync_resolver" "job_status_resolver" {
                           }
 EOF
 
-#   request_template = <<EOF
-#     {
-#       "version": "2017-02-28",
-#       "operation": "PutEvents",
-#       "events": [{
-#         "source": "questionanswering",
-#         "detailType": "genAIdemo"
-#       }]
-#     }
-#   EOF
-#   response_template = <<EOF
-#     #if($ctx.result.statusCode == 200)
-#       $util.toJson($context.result)
-#     #else
-#       $utils.appendError($ctx.result.body, $ctx.result.statusCode)
-#     #end
-#   EOF
+  #   request_template = <<EOF
+  #     {
+  #       "version": "2017-02-28",
+  #       "operation": "PutEvents",
+  #       "events": [{
+  #         "source": "questionanswering",
+  #         "detailType": "genAIdemo"
+  #       }]
+  #     }
+  #   EOF
+  #   response_template = <<EOF
+  #     #if($ctx.result.statusCode == 200)
+  #       $util.toJson($context.result)
+  #     #else
+  #       $utils.appendError($ctx.result.body, $ctx.result.statusCode)
+  #     #end
+  #   EOF
   response_template = <<EOF
  $util.toJson($context.result)
 EOF
@@ -70,9 +70,9 @@ EOF
 }
 
 resource "aws_appsync_datasource" "event_bridge_datasource" {
-  api_id = aws_appsync_graphql_api.question_answering_graphql_api.id
-  name   = "_${var.app_prefix}_question_answering_event_bridge_data_source"
-  type   = "AMAZON_EVENTBRIDGE"
+  api_id           = aws_appsync_graphql_api.question_answering_graphql_api.id
+  name             = "_${var.app_prefix}_question_answering_event_bridge_data_source"
+  type             = "AMAZON_EVENTBRIDGE"
   service_role_arn = aws_iam_role.qa_construct_role.arn
 
   event_bridge_config {

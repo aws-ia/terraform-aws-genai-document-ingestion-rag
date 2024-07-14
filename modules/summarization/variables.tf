@@ -17,22 +17,22 @@ variable "ecr_repository_url" {
   type = string
 }
 
-variable "security_groups_ids" {type = list(string)}
-variable "subnet_ids" {type = list(string)}
+variable "security_groups_ids" { type = list(string) }
+variable "subnet_ids" { type = list(string) }
 variable "is_file_transformation_required" {
-  type = bool
+  type    = bool
   default = true
 }
 variable "summary_chain_type" {
-  type = string
+  type    = string
   default = ""
 }
-variable "cognito_user_pool_id" {type = string}
-variable "stage" {type = string}
-variable "access_logs_bucket_name" {type = string}
-variable "access_logs_bucket_arn" {type = string}
+variable "cognito_user_pool_id" { type = string }
+variable "stage" { type = string }
+variable "access_logs_bucket_name" { type = string }
+variable "access_logs_bucket_arn" { type = string }
 
 variable "merged_api_url" {
-  type = string
+  type    = string
   default = ""
 }

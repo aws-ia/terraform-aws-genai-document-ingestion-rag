@@ -44,3 +44,11 @@ output "ecr_repository_url" {
 output "ecr_repository_id" {
   value = aws_ecr_repository.app_ecr_repository.id
 }
+
+output "merged_api_arn" {
+  value = data.aws_cloudformation_export.merged_api_id.value
+}
+
+output "merged_api_url" {
+  value = data.aws_cloudformation_export.merged_api_url.value
+}

@@ -1,10 +1,3 @@
-# resource "aws_cloudwatch_log_group" "ingestion" {
-#   name              = local.cloudwatch.ingestion.log_group_name
-#   retention_in_days = local.cloudwatch.ingestion.log_retention
-
-#   tags = local.combined_tags
-# }
-
 # TODO: setup encryption with CME, setup resource policy
 resource "aws_cloudwatch_event_bus" "ingestion" {
   name = local.cloudwatch.ingestion.event_bus_name
@@ -43,3 +36,5 @@ resource "aws_cloudwatch_log_group" "ingestion_sm" {
 
   tags = local.combined_tags
 }
+
+# TODO: create log groups for each Lambdas

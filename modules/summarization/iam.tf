@@ -1,5 +1,5 @@
 resource "aws_iam_role" "summarization_construct_role" {
-  name = "${var.app_prefix}-summarization_construct_role"
+  name               = "${var.app_prefix}-summarization_construct_role"
   assume_role_policy = data.aws_iam_policy_document.summarization_construct_role.json
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -12,8 +12,8 @@ resource "aws_iam_role" "summarization_appsync_logs_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "appsync.amazonaws.com"
       }
@@ -30,7 +30,7 @@ resource "aws_iam_role" "summarization_appsync_logs_role" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "*"
       }]
     })
@@ -66,7 +66,7 @@ resource "aws_iam_role_policy" "shared_lambda_function_service_role_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"
       },
       {
@@ -135,14 +135,14 @@ resource "aws_iam_role" "sfn_role" {
           Action = [
             "logs:*",
           ]
-          Effect = "Allow"
+          Effect   = "Allow"
           Resource = "*"
         },
         {
           Action = [
             "lambda:InvokeFunction"
           ]
-          Effect   = "Allow"
+          Effect = "Allow"
           Resource = [
             aws_lambda_function.input_validation_lambda.arn,
             aws_lambda_function.document_reader_lambda.arn,
@@ -167,11 +167,11 @@ resource "aws_iam_role" "eventbridge_sfn_role" {
     Version = "2012-10-17",
     Statement = [
       {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "events.amazonaws.com"
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "events.amazonaws.com"
         },
-        "Action": "sts:AssumeRole"
+        "Action" : "sts:AssumeRole"
       }
     ]
   })

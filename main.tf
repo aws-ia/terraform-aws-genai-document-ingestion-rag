@@ -9,6 +9,7 @@ module "networking_resources" {
 
   solution_prefix = local.solution_prefix
   vpc_props       = var.vpc_props
+  tags            = local.root_combined_tags
 }
 
 module "persistence_resources" {
@@ -29,6 +30,7 @@ module "persistence_resources" {
     }
   )
   force_destroy = true
+  tags          = local.root_combined_tags
 }
 
 module "document-ingestion" {
@@ -39,18 +41,24 @@ module "document-ingestion" {
   ecr_repository_id    = module.persistence_resources.ecr_repository_id
 
   lambda_ingestion_input_validation_prop = {
-    image_tag = "ingestion_input_validation"
-    src_path  = "${path.module}/lambda/document-ingestion/input_validation/src"
+    image_tag          = "ingestion_input_validation"
+    src_path           = "${path.module}/lambda/document-ingestion/input_validation/src"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
   }
 
   lambda_file_transformer_prop = {
-    image_tag = "file_transformer"
-    src_path  = "${path.module}/lambda/document-ingestion/s3_file_transformer/src"
+    image_tag          = "file_transformer"
+    src_path           = "${path.module}/lambda/document-ingestion/s3_file_transformer/src"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
   }
 
   lambda_embeddings_job_prop = {
-    image_tag = "embeddings_job"
-    src_path  = "${path.module}/lambda/document-ingestion/embeddings_job/src"
+    image_tag          = "embeddings_job"
+    src_path           = "${path.module}/lambda/document-ingestion/embeddings_job/src"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
   }
 
   input_assets_bucket_prop = {
@@ -64,6 +72,11 @@ module "document-ingestion" {
   }
 
   opensearch_prop = local.final_opensearch_prop
+
+  merged_api_arn = module.persistence_resources.merged_api_arn
+  merged_api_url = module.persistence_resources.merged_api_url
+
+  tags = local.root_combined_tags
 
   # app_prefix = random_string.app_prefix.result
   # existing_opensearch_domain_mame = module.persistence_resources.opensearch_domain_mame

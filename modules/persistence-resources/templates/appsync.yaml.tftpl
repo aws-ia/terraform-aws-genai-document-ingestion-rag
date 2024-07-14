@@ -1,3 +1,4 @@
+
 AWSTemplateFormatVersion: 2010-09-09
 Description: Template to deploy AppSync Merged API
 Parameters:
@@ -35,6 +36,11 @@ Outputs:
     Value: !GetAtt MergedGraphQLApi.ApiId
     Export:
       Name: "${local_graphql_merged_api_export_id}"
+  APIARN:
+    Description: MergedGraphQLApi ARN
+    Value: !GetAtt MergedGraphQLApi.Arn
+    Export:
+      Name: "${local_graphql_merged_api_export_arn}"
   APIURL:
     Description: MergedGraphQLApi URL
     Value: !GetAtt MergedGraphQLApi.GraphQLUrl

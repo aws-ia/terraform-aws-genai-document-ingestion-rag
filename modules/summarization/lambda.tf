@@ -1,5 +1,5 @@
 resource "aws_sqs_queue" "dlq" {
-  name = "${var.app_prefix}_summarisation_dlq"
+  name                    = "${var.app_prefix}_summarisation_dlq"
   sqs_managed_sse_enabled = true
 }
 
@@ -32,10 +32,10 @@ resource "aws_lambda_function" "input_validation_lambda" {
     }
   }
 
-#   vpc_config {
-#     subnet_ids         = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
+  #   vpc_config {
+  #     subnet_ids         = var.subnet_ids
+  #     security_group_ids = var.security_groups_ids
+  #   }
 
   memory_size = 1769
   timeout     = 300
@@ -79,10 +79,10 @@ resource "aws_lambda_function" "document_reader_lambda" {
     }
   }
 
-#   vpc_config {
-#     subnet_ids         = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
+  #   vpc_config {
+  #     subnet_ids         = var.subnet_ids
+  #     security_group_ids = var.security_groups_ids
+  #   }
 
   memory_size = 1769
   timeout     = 300
@@ -119,16 +119,16 @@ resource "aws_lambda_function" "generate_summary_lambda" {
 
   environment {
     variables = {
-      ASSET_BUCKET_NAME       = var.processed_assets_bucket_name
-      GRAPHQL_URL             = local.graph_ql_url
-      SUMMARY_LLM_CHAIN_TYPE  = local.summary_chain_type
+      ASSET_BUCKET_NAME      = var.processed_assets_bucket_name
+      GRAPHQL_URL            = local.graph_ql_url
+      SUMMARY_LLM_CHAIN_TYPE = local.summary_chain_type
     }
   }
-#
-#   vpc_config {
-#     subnet_ids         = var.subnet_ids
-#     security_group_ids = var.security_groups_ids
-#   }
+  #
+  #   vpc_config {
+  #     subnet_ids         = var.subnet_ids
+  #     security_group_ids = var.security_groups_ids
+  #   }
 
   memory_size = 1769
   timeout     = 600

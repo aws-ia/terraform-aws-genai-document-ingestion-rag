@@ -21,8 +21,8 @@ resource "aws_kms_key" "customer_managed_kms_key" {
         Resource = "*"
       },
       {
-        Sid       = "Allow access for Key Administrators",
-        Effect    = "Allow",
+        Sid    = "Allow access for Key Administrators",
+        Effect = "Allow",
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
@@ -45,7 +45,7 @@ resource "aws_s3_bucket" "waf_logs" {
   bucket = "${var.app_prefix}-summarization-waf-logs-dev"
 }
 resource "aws_s3_bucket_logging" "waf_logs" {
-  bucket = aws_s3_bucket.waf_logs.id
+  bucket        = aws_s3_bucket.waf_logs.id
   target_bucket = aws_s3_bucket.waf_logs.id
   target_prefix = "log/"
 }
@@ -70,22 +70,22 @@ resource "aws_kinesis_firehose_delivery_stream" "s3_firehose_stream" {
   destination = "extended_s3"
 
   extended_s3_configuration {
-    role_arn   = aws_iam_role.firehose_role.arn
-    bucket_arn = var.access_logs_bucket_arn
-    buffering_size = 10
+    role_arn           = aws_iam_role.firehose_role.arn
+    bucket_arn         = var.access_logs_bucket_arn
+    buffering_size     = 10
     buffering_interval = 300
   }
   server_side_encryption {
-    enabled=true #default is false
+    enabled  = true #default is false
     key_type = "CUSTOMER_MANAGED_CMK"
-    key_arn = aws_kms_key.customer_managed_kms_key.arn
+    key_arn  = aws_kms_key.customer_managed_kms_key.arn
   }
 }
 
 resource "aws_s3_bucket_replication_configuration" "multi_region_replication" {
   depends_on = [aws_s3_bucket_versioning.waf_logs]
-  role   = aws_iam_role.firehose_role.arn
-  bucket = var.access_logs_bucket_name
+  role       = aws_iam_role.firehose_role.arn
+  bucket     = var.access_logs_bucket_name
 
   rule {
     status = "Enabled"
@@ -102,7 +102,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
   bucket = aws_s3_bucket.waf_logs.id
 
   rule {
-    id      = "log"
+    id     = "log"
     status = "Enabled"
 
     expiration {
@@ -120,15 +120,15 @@ resource "aws_kinesis_firehose_delivery_stream" "waf_logs_stream" {
   destination = "extended_s3"
 
   extended_s3_configuration {
-    role_arn   = aws_iam_role.firehose_role.arn
-    bucket_arn = aws_s3_bucket.waf_logs.arn
-    buffering_size = 10
+    role_arn           = aws_iam_role.firehose_role.arn
+    bucket_arn         = aws_s3_bucket.waf_logs.arn
+    buffering_size     = 10
     buffering_interval = 300
   }
 
   server_side_encryption {
-    enabled=true
+    enabled  = true
     key_type = "CUSTOMER_MANAGED_CMK"
-    key_arn = aws_kms_key.customer_managed_kms_key.arn
+    key_arn  = aws_kms_key.customer_managed_kms_key.arn
   }
 }

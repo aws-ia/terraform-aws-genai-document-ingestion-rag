@@ -6,27 +6,27 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
     StartAt = "ValidateInputTask",
     States = {
       ValidateInputTask = {
-        Type       = "Task",
-        Resource   = aws_lambda_function.input_validation_lambda.arn,
-#        ResultPath = "$.validation_result",
-        Next       = "ValidateInputChoice"
+        Type     = "Task",
+        Resource = aws_lambda_function.input_validation_lambda.arn,
+        #        ResultPath = "$.validation_result",
+        Next = "ValidateInputChoice"
       },
       ValidateInputChoice = {
-        Type       = "Choice",
-#        OutputPath = "$.validation_result.Payload.files",
+        Type = "Choice",
+        #        OutputPath = "$.validation_result.Payload.files",
         Choices = [
           {
-#             Variable  = "$.validation_result.Payload.isValid",
-            Variable  = "$.isValid",
+            #             Variable  = "$.validation_result.Payload.isValid",
+            Variable      = "$.isValid",
             BooleanEquals = false,
-            Next      = "JobFailed"
+            Next          = "JobFailed"
           }
         ],
         Default = "RunFilesInParallel"
       },
       RunFilesInParallel = {
-        Type       = "Map",
-        ItemsPath  = "$.files",
+        Type           = "Map",
+        ItemsPath      = "$.files",
         MaxConcurrency = 100,
         Iterator = {
           StartAt = "ReadDocumentTask",
@@ -39,44 +39,44 @@ resource "aws_sfn_state_machine" "summarization_step_function" {
             },
             FileStatusForSummarization = {
               Type       = "Choice",
-             OutputPath = "$.document_result",
+              OutputPath = "$.document_result",
               Choices = [
                 {
-                  Variable  = "$.status",
+                  Variable     = "$.status",
                   StringEquals = "Error",
-                  Next      = "IteratorJobFailed"
+                  Next         = "IteratorJobFailed"
                 }
               ],
               Default = "GenerateSummaryTask"
             },
             GenerateSummaryTask = {
-              Type       = "Task",
-              Resource   = aws_lambda_function.generate_summary_lambda.arn,
-#               InputPath = "$.document_result"
+              Type     = "Task",
+              Resource = aws_lambda_function.generate_summary_lambda.arn,
+              #               InputPath = "$.document_result"
 
-#               ResultPath = "$.summary_result",
-              End        = true
+              #               ResultPath = "$.summary_result",
+              End = true
             },
             IteratorJobFailed = {
-              Type       = "Fail",
-              Error      = "JobFailed",
-              Cause      = "AWS summary Job failed"
+              Type  = "Fail",
+              Error = "JobFailed",
+              Cause = "AWS summary Job failed"
             }
           }
         },
         End = true
       },
       JobFailed = {
-        Type       = "Fail",
-        Error      = "JobFailed",
-        Cause      = "AWS summary Job failed"
+        Type  = "Fail",
+        Error = "JobFailed",
+        Cause = "AWS summary Job failed"
       },
     }
   })
 
   logging_configuration {
-    level = "ALL"
+    level                  = "ALL"
     include_execution_data = true
-    log_destination = "${aws_cloudwatch_log_group.summarization_log_group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.summarization_log_group.arn}:*"
   }
 }

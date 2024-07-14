@@ -60,3 +60,23 @@ resource "aws_appsync_resolver" "ingestion_api" {
     $util.toJson($ctx.result)
   EOF
 }
+
+#TODO: migrate to resource: https://github.com/hashicorp/terraform-provider-aws/issues/33148
+resource "aws_cloudformation_stack" "merge_ingestion_api" {
+  name = "${local.graphql.ingestion_api.name}-merge"
+
+  parameters = {
+    mergedGraphQlApiName = var.merged_api_arn
+    sourceGraphQlApiName = aws_appsync_graphql_api.ingestion_api.arn
+  }
+
+  template_body = templatefile("${path.module}/templates/appsync_association.yaml.tftpl", {})
+
+  tags = local.combined_tags
+}
+
+resource "time_sleep" "wait_merge_ingestion_api" {
+  depends_on = [aws_cloudformation_stack.merge_ingestion_api]
+
+  create_duration = "30s"
+}

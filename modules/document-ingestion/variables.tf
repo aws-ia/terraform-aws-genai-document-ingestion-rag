@@ -22,17 +22,23 @@ variable "ecr_repository_id" {
 
 variable "lambda_ingestion_input_validation_prop" {
   description = "Properties for Lambda document ingestion"
-  type        = map(any)
+  type        = any
 }
 
 variable "lambda_file_transformer_prop" {
   description = "Properties for Lambda file transformer"
-  type        = map(any)
+  type        = any
 }
 
 variable "lambda_embeddings_job_prop" {
   description = "Properties for Lambda embeddings job"
-  type        = map(any)
+  type        = any
+}
+
+variable "merged_api_arn" {
+  description = "AppSync Merged API ARN"
+  type        = string
+  default     = ""
 }
 
 variable "merged_api_url" {
@@ -56,9 +62,3 @@ variable "opensearch_prop" {
   type        = any
   default     = null
 }
-
-
-# TODO: what is the use of these variables?
-# variable "security_groups_ids" {type = list(string)}
-# variable "subnet_ids" {type = list(string)}
-# variable "ecr_repository_url" {type = string}

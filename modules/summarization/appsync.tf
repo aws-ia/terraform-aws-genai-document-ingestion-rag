@@ -1,12 +1,12 @@
 resource "aws_appsync_graphql_api" "summarization_graphql_api" {
-  name = "${var.app_prefix}summarization_graphql_api"
+  name   = "${var.app_prefix}summarization_graphql_api"
   schema = file("${path.module}/schema.graphql")
 
   xray_enabled = true
 
   authentication_type = "AMAZON_COGNITO_USER_POOLS"
   user_pool_config {
-    aws_region = data.aws_region.current_region.name
+    aws_region     = data.aws_region.current_region.name
     default_action = "ALLOW"
     user_pool_id   = var.cognito_user_pool_id
   }
@@ -56,12 +56,12 @@ resource "aws_appsync_datasource" "event_bridge_datasource" {
 }
 
 resource "aws_appsync_resolver" "generate_summary" {
-  api_id              = aws_appsync_graphql_api.summarization_graphql_api.id
-  type                = "Mutation"
-  field               = "generateSummary"
-  data_source         = aws_appsync_datasource.event_bridge_datasource.name
+  api_id      = aws_appsync_graphql_api.summarization_graphql_api.id
+  type        = "Mutation"
+  field       = "generateSummary"
+  data_source = aws_appsync_datasource.event_bridge_datasource.name
 
-  request_template    = <<EOF
+  request_template  = <<EOF
     {
       "version": "2018-05-29",
       "operation": "PutEvents",

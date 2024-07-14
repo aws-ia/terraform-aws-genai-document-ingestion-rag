@@ -203,17 +203,61 @@ data "aws_iam_policy_document" "merged_api" {
     sid = "MergeApiPermissions"
 
     actions = [
-        "appsync:*",
-        "logs:*",
-        "cloudwatch:*",
-        "dynamodb:*",
-        "lambda:*"
+      "appsync:*",
+      "logs:*",
+      "cloudwatch:*",
+      "dynamodb:*",
+      "lambda:*"
     ]
 
     effect = "Allow"
 
     resources = [
       "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "authenticated_cognito" {
+  statement {
+    sid = "InputBucketAccess"
+
+    actions = [
+      "s3:Abort*",
+      "s3:DeleteObject*",
+      "s3:GetBucket*",
+      "s3:GetObject*",
+      "s3:List*",
+      "s3:PutObject",
+      "s3:PutObjectLegalHold",
+      "s3:PutObjectRetention",
+      "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      aws_s3_bucket.input_assets.arn,
+      "${aws_s3_bucket.input_assets.arn}/*",
+    ]
+  }
+
+  # GetObject, GetBucket and List permission to processed bucket
+  statement {
+    sid = "OutputBucketAccess"
+
+    actions = [
+      "s3:GetObject*",
+      "s3:GetBucket*",
+      "s3:List*",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      aws_s3_bucket.processed_assets.arn,
+      "${aws_s3_bucket.processed_assets.arn}/*",
     ]
   }
 }

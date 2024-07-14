@@ -2,7 +2,7 @@ locals {
   combined_tags = merge(
     var.tags,
     {
-      Solution = var.solution_prefix
+      Submodule = "document-ingestion"
     }
   )
 
@@ -41,6 +41,10 @@ locals {
           GRAPHQL_URL = local.graph_ql_url
         }
       }
+      vpc_config = {
+        subnet_ids         = var.lambda_ingestion_input_validation_prop.subnet_ids
+        security_group_ids = var.lambda_ingestion_input_validation_prop.security_group_ids
+      }
     }
 
     file_transformer = {
@@ -55,6 +59,10 @@ locals {
           OUTPUT_BUCKET = var.processed_assets_bucket_prop.bucket_name
           GRAPHQL_URL   = local.graph_ql_url
         }
+      }
+      vpc_config = {
+        subnet_ids         = var.lambda_file_transformer_prop.subnet_ids
+        security_group_ids = var.lambda_file_transformer_prop.security_group_ids
       }
     }
 
@@ -73,6 +81,10 @@ locals {
           OPENSEARCH_INDEX           = var.opensearch_prop.index_name
           OPENSEARCH_SECRET_ID       = var.opensearch_prop.secret
         }
+      }
+      vpc_config = {
+        subnet_ids         = var.lambda_embeddings_job_prop.subnet_ids
+        security_group_ids = var.lambda_embeddings_job_prop.security_group_ids
       }
     }
   }

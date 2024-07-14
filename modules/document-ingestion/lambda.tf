@@ -21,10 +21,13 @@ resource "aws_lambda_function" "ingestion_input_validation" {
   image_uri     = module.docker_image_ingestion_input_validation.image_uri
   package_type  = "Image"
   timeout       = local.lambda.ingestion_input_validation.timeout
+  vpc_config {
+    subnet_ids         = local.lambda.ingestion_input_validation.vpc_config.subnet_ids
+    security_group_ids = local.lambda.ingestion_input_validation.vpc_config.security_group_ids
+  }
   environment {
     variables = local.lambda.ingestion_input_validation.environment.variables
   }
-
   tags = local.combined_tags
 }
 
@@ -38,8 +41,8 @@ module "docker_image_file_transformer" {
 
   ecr_repo      = var.ecr_repository_id
   use_image_tag = true
-  image_tag     = local.lambda.ingestion_input_validation.docker_image_tag
-  source_path   = local.lambda.ingestion_input_validation.source_path
+  image_tag     = local.lambda.file_transformer.docker_image_tag
+  source_path   = local.lambda.file_transformer.source_path
 
 }
 
@@ -49,6 +52,10 @@ resource "aws_lambda_function" "file_transformer" {
   image_uri     = module.docker_image_file_transformer.image_uri
   package_type  = "Image"
   timeout       = local.lambda.file_transformer.timeout
+  vpc_config {
+    subnet_ids         = local.lambda.file_transformer.vpc_config.subnet_ids
+    security_group_ids = local.lambda.file_transformer.vpc_config.security_group_ids
+  }
   environment {
     variables = local.lambda.file_transformer.environment.variables
   }
@@ -77,6 +84,10 @@ resource "aws_lambda_function" "embeddings_job" {
   image_uri     = module.docker_image_embeddings_job.image_uri
   package_type  = "Image"
   timeout       = local.lambda.embeddings_job.timeout
+  vpc_config {
+    subnet_ids         = local.lambda.embeddings_job.vpc_config.subnet_ids
+    security_group_ids = local.lambda.embeddings_job.vpc_config.security_group_ids
+  }
   environment {
     variables = local.lambda.embeddings_job.environment.variables
   }
