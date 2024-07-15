@@ -1,15 +1,16 @@
 resource "aws_appsync_graphql_api" "ingestion_graphql_api" {
-  name = "${var.app_prefix}ingestionGraphqlApi"
+  name = "${var.app_prefix}-ingestion-api"
   schema = file("${path.module}/schema.graphql")
 
   xray_enabled = true
-
   authentication_type = "AMAZON_COGNITO_USER_POOLS"
+
   user_pool_config {
       aws_region = data.aws_region.current_region.name
       default_action = "ALLOW"
       user_pool_id   = var.cognito_user_pool_id
   }
+
   additional_authentication_provider {
     authentication_type = "AWS_IAM"
   }
@@ -22,7 +23,7 @@ resource "aws_appsync_graphql_api" "ingestion_graphql_api" {
 
 resource "aws_appsync_datasource" "ingestion_event_bridge_datasource" {
   api_id           = aws_appsync_graphql_api.ingestion_graphql_api.id
-  name             = "_${var.app_prefix}_ingestionEventBridgeDataSource"
+  name             = "_${var.app_prefix}IngestionEventBridgeDS"
   type             = "AMAZON_EVENTBRIDGE"
   service_role_arn = aws_iam_role.ingestion_construct_role.arn
 

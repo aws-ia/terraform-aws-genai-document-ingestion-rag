@@ -22,8 +22,8 @@ variable "input_assets_bucket_arn" { type = string }
 variable "processed_assets_bucket_name" {type = string}
 variable "processed_assets_bucket_arn" {type = string}
 
-variable "security_groups_ids" {type = list(string)}
-variable "subnet_ids" {type = list(string)}
+variable "private_subnet_id" {type = string}
+variable "security_group_id" {type = string}
 variable "cognito_user_pool_id" {type = string}
 variable "ecr_repository_url" {type = string}
 

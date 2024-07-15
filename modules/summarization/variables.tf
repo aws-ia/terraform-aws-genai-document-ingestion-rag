@@ -17,8 +17,8 @@ variable "ecr_repository_url" {
   type = string
 }
 
-variable "security_groups_ids" {type = list(string)}
-variable "subnet_ids" {type = list(string)}
+variable "private_subnet_id" {type = string}
+variable "security_group_id" {type = string}
 variable "is_file_transformation_required" {
   type = bool
   default = true

@@ -1,5 +1,5 @@
 resource "aws_appsync_graphql_api" "question_answering_graphql_api" {
-  name = "${var.app_prefix}-questionAnsweringGraphqlApi"
+  name = "${var.app_prefix}-qa-api"
   schema = file("${path.module}/schema.graphql")
 
   xray_enabled = true
@@ -38,24 +38,6 @@ resource "aws_appsync_resolver" "job_status_resolver" {
                               "payload": $util.toJson($context.args)
                           }
 EOF
-
-#   request_template = <<EOF
-#     {
-#       "version": "2017-02-28",
-#       "operation": "PutEvents",
-#       "events": [{
-#         "source": "questionanswering",
-#         "detailType": "genAIdemo"
-#       }]
-#     }
-#   EOF
-#   response_template = <<EOF
-#     #if($ctx.result.statusCode == 200)
-#       $util.toJson($context.result)
-#     #else
-#       $utils.appendError($ctx.result.body, $ctx.result.statusCode)
-#     #end
-#   EOF
   response_template = <<EOF
  $util.toJson($context.result)
 EOF

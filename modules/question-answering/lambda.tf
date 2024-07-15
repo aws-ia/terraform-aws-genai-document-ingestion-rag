@@ -53,6 +53,10 @@ resource "aws_lambda_function" "question_answering_function" {
   tracing_config {
     mode = "Active"
   }
+  vpc_config {
+    security_group_ids = [var.security_group_id]
+    subnet_ids = [var.private_subnet_id]
+  }
   environment {
     variables = {
       GRAPHQL_URL                = local.graph_ql_url
