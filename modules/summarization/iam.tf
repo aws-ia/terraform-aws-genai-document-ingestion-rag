@@ -104,6 +104,58 @@ resource "aws_iam_role_policy" "summarization_input_validation" {
   policy = data.aws_iam_policy_document.summarization_input_validation.json
 }
 
+############################################################################################################
+# IAM Role for Summarization Doc Reader Lambda
+############################################################################################################
+
+resource "aws_iam_role" "summarization_doc_reader" {
+  name = local.lambda.summarization_doc_reader.name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "summarization_doc_reader" {
+  name   = local.lambda.summarization_doc_reader.name
+  role   = aws_iam_role.summarization_doc_reader.id
+  policy = data.aws_iam_policy_document.summarization_doc_reader.json
+}
+
+############################################################################################################
+# IAM Role for Summarization Generator Lambda
+############################################################################################################
+
+resource "aws_iam_role" "summarization_generator" {
+  name = local.lambda.summarization_generator.name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "summarization_generator" {
+  name   = local.lambda.summarization_generator.name
+  role   = aws_iam_role.summarization_generator.id
+  policy = data.aws_iam_policy_document.summarization_generator.json
+}
+
 # # Lambda shared role
 # resource "aws_iam_role" "lambda_shared_role" {
 #   name = "${var.app_prefix}-lambda-shared-role"

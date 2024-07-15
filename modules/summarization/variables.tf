@@ -21,7 +21,17 @@ variable "ecr_repository_id" {
 }
 
 variable "lambda_summarization_input_validation_prop" {
-  description = "Properties for Lambda document ingestion"
+  description = "Properties for Lambda summarization input validation"
+  type        = any
+}
+
+variable "lambda_summarization_doc_reader_prop" {
+  description = "Properties for Lambda summarization doc reader"
+  type        = any
+}
+
+variable "lambda_summarization_generatror_prop" {
+  description = "Properties for Lambda summarization generator"
   type        = any
 }
 

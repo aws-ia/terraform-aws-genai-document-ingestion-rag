@@ -34,7 +34,8 @@ locals {
       source_path              = var.lambda_ingestion_input_validation_prop.src_path
       platform                 = "linux/amd64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_ingestion_input_validation_prop.image_tag}-log"
-      timeout                  = 600
+      timeout                  = 900
+      memory_size              = 7076
       environment = {
         variables = {
           GRAPHQL_URL = local.graph_ql_url
@@ -52,7 +53,8 @@ locals {
       source_path              = var.lambda_file_transformer_prop.src_path
       platform                 = "linux/amd64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_file_transformer_prop.image_tag}-log"
-      timeout                  = 600
+      timeout                  = 900
+      memory_size              = 7076
       environment = {
         variables = {
           INPUT_BUCKET  = var.input_assets_bucket_prop.bucket_name
@@ -72,7 +74,8 @@ locals {
       source_path              = var.lambda_embeddings_job_prop.src_path
       platform                 = "linux/amd64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_embeddings_job_prop.image_tag}-log"
-      timeout                  = 600
+      timeout                  = 900
+      memory_size              = 7076
       environment = {
         variables = {
           INPUT_BUCKET               = var.input_assets_bucket_prop.bucket_name
