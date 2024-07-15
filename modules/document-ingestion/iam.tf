@@ -164,7 +164,7 @@ resource "aws_iam_role_policy" "ingestion_sm" {
 ############################################################################################################
 
 resource "aws_iam_role" "ingestion_sm_eventbridge" {
-  name = "eventbridge-sfn-role"
+  name = "${local.statemachine.ingestion.name}-eventbridge"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",

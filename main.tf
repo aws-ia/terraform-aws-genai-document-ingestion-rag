@@ -77,25 +77,6 @@ module "document-ingestion" {
   merged_api_url = module.persistence_resources.merged_api_url
 
   tags = local.root_combined_tags
-
-  # app_prefix = random_string.app_prefix.result
-  # existing_opensearch_domain_mame = module.persistence_resources.opensearch_domain_mame
-  # existing_open_search_domain_endpoint = module.persistence_resources.open_search_domain_endpoint
-  # existing_open_search_index_name = "doc-rag-search"
-  # subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
-  # security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
-  # input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
-  # input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
-  # opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
-  # open_search_secret = "NONE"
-  # processed_assets_bucket_arn = module.persistence_resources.processed_assets_bucket_arn
-  # processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
-  # cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
-  # stage = "dev"
-  # ecr_repository_url = module.persistence_resources.ecr_repository_url
-  # merged_api_url = local.merged_api_url
-
-  # depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
 
 # resource "null_resource" "ecr_login" {

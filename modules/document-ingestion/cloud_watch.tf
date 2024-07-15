@@ -25,10 +25,8 @@ resource "aws_cloudwatch_event_target" "ingestion" {
   arn            = aws_sfn_state_machine.ingestion_sm.arn
   role_arn       = aws_iam_role.ingestion_sm_eventbridge.arn
   event_bus_name = aws_cloudwatch_event_bus.ingestion.name
-
 }
 
-# Log Group for Step Functions
 # TODO: add KMS key
 resource "aws_cloudwatch_log_group" "ingestion_sm" {
   name              = local.cloudwatch.ingestion_sm.log_group_name

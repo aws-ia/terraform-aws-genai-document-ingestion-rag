@@ -14,7 +14,6 @@ locals {
     }
   }
 
-  #TODO: finalize log group namespace
   cloudwatch = {
     ingestion = {
       event_bus_name = "${var.solution_prefix}-ingestion-event-bus"
@@ -25,7 +24,6 @@ locals {
       event_bridge_target_id = "${var.solution_prefix}-ingestion-sm-target"
       log_group_name         = "/${var.solution_prefix}/${var.solution_prefix}-ingestion-sm"
       log_retention          = 90
-
     }
   }
 
@@ -34,6 +32,7 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_ingestion_input_validation_prop.image_tag}"
       docker_image_tag         = var.lambda_ingestion_input_validation_prop.image_tag
       source_path              = var.lambda_ingestion_input_validation_prop.src_path
+      platform                 = "linux/amd64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_ingestion_input_validation_prop.image_tag}-log"
       timeout                  = 600
       environment = {
@@ -51,6 +50,7 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_file_transformer_prop.image_tag}"
       docker_image_tag         = var.lambda_file_transformer_prop.image_tag
       source_path              = var.lambda_file_transformer_prop.src_path
+      platform                 = "linux/amd64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_file_transformer_prop.image_tag}-log"
       timeout                  = 600
       environment = {
@@ -70,6 +70,7 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_embeddings_job_prop.image_tag}"
       docker_image_tag         = var.lambda_embeddings_job_prop.image_tag
       source_path              = var.lambda_embeddings_job_prop.src_path
+      platform                 = "linux/amd64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_embeddings_job_prop.image_tag}-log"
       timeout                  = 600
       environment = {

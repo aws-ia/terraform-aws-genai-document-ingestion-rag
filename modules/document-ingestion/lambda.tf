@@ -1,5 +1,3 @@
-# TODO: add Lambda to VPC 
-
 ############################################################################################################
 # Ingestion Input Validation Lambda
 ############################################################################################################
@@ -12,7 +10,7 @@ module "docker_image_ingestion_input_validation" {
   use_image_tag = true
   image_tag     = local.lambda.ingestion_input_validation.docker_image_tag
   source_path   = local.lambda.ingestion_input_validation.source_path
-
+  platform      = local.lambda.ingestion_input_validation.platform
 }
 
 resource "aws_lambda_function" "ingestion_input_validation" {
@@ -43,7 +41,7 @@ module "docker_image_file_transformer" {
   use_image_tag = true
   image_tag     = local.lambda.file_transformer.docker_image_tag
   source_path   = local.lambda.file_transformer.source_path
-
+  platform      = local.lambda.file_transformer.platform
 }
 
 resource "aws_lambda_function" "file_transformer" {
@@ -75,7 +73,7 @@ module "docker_image_embeddings_job" {
   use_image_tag = true
   image_tag     = local.lambda.embeddings_job.docker_image_tag
   source_path   = local.lambda.embeddings_job.source_path
-
+  platform      = local.lambda.embeddings_job.platform
 }
 
 resource "aws_lambda_function" "embeddings_job" {

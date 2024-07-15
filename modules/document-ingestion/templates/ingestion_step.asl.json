@@ -21,7 +21,7 @@
       "ResultPath": "$.validation_result",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "{lambda_ingestion_input_validation}}",
+        "FunctionName": "${lambda_ingestion_input_validation}",
         "Payload.$": "$"
       }
     },
@@ -65,7 +65,7 @@
             "ResultPath": "$.s3_transformer_result",
             "Resource": "arn:aws:states:::lambda:invoke",
             "Parameters": {
-              "FunctionName": "{lambda_file_transformer}}",
+              "FunctionName": "${lambda_file_transformer}",
               "Payload.$": "$"
             }
           }
@@ -92,7 +92,7 @@
       "ResultPath": "$",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "{lambda_embeddings_job}",
+        "FunctionName": "${lambda_embeddings_job}",
         "Payload.$": "$"
       }
     },

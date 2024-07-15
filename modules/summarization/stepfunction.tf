@@ -1,82 +1,17 @@
-resource "aws_sfn_state_machine" "summarization_step_function" {
-  name     = "${var.app_prefix}summarizationStepFunction"
-  role_arn = aws_iam_role.sfn_role.arn
-
-  definition = jsonencode({
-    StartAt = "ValidateInputTask",
-    States = {
-      ValidateInputTask = {
-        Type     = "Task",
-        Resource = aws_lambda_function.input_validation_lambda.arn,
-        #        ResultPath = "$.validation_result",
-        Next = "ValidateInputChoice"
-      },
-      ValidateInputChoice = {
-        Type = "Choice",
-        #        OutputPath = "$.validation_result.Payload.files",
-        Choices = [
-          {
-            #             Variable  = "$.validation_result.Payload.isValid",
-            Variable      = "$.isValid",
-            BooleanEquals = false,
-            Next          = "JobFailed"
-          }
-        ],
-        Default = "RunFilesInParallel"
-      },
-      RunFilesInParallel = {
-        Type           = "Map",
-        ItemsPath      = "$.files",
-        MaxConcurrency = 100,
-        Iterator = {
-          StartAt = "ReadDocumentTask",
-          States = {
-            ReadDocumentTask = {
-              Type       = "Task",
-              Resource   = aws_lambda_function.document_reader_lambda.arn,
-              ResultPath = "$.document_result",
-              Next       = "FileStatusForSummarization"
-            },
-            FileStatusForSummarization = {
-              Type       = "Choice",
-              OutputPath = "$.document_result",
-              Choices = [
-                {
-                  Variable     = "$.status",
-                  StringEquals = "Error",
-                  Next         = "IteratorJobFailed"
-                }
-              ],
-              Default = "GenerateSummaryTask"
-            },
-            GenerateSummaryTask = {
-              Type     = "Task",
-              Resource = aws_lambda_function.generate_summary_lambda.arn,
-              #               InputPath = "$.document_result"
-
-              #               ResultPath = "$.summary_result",
-              End = true
-            },
-            IteratorJobFailed = {
-              Type  = "Fail",
-              Error = "JobFailed",
-              Cause = "AWS summary Job failed"
-            }
-          }
-        },
-        End = true
-      },
-      JobFailed = {
-        Type  = "Fail",
-        Error = "JobFailed",
-        Cause = "AWS summary Job failed"
-      },
-    }
+resource "aws_sfn_state_machine" "summarization_sm" {
+  name     = local.statemachine.summarization.name
+  role_arn = aws_iam_role.summarization_sm.arn
+  definition = templatefile("${path.module}/templates/summarization_step.asl.json", {
+    lambda_summarization_input_validation = aws_lambda_function.summarization_input_validation.arn
+    lambda_summarization_doc_reader       = aws_lambda_function.summarization_doc_reader.arn
+    lambda_summarization_generator        = aws_lambda_function.summarization_generator.arn
   })
 
   logging_configuration {
-    level                  = "ALL"
-    include_execution_data = true
-    log_destination        = "${aws_cloudwatch_log_group.summarization_log_group.arn}:*"
+    level                  = local.statemachine.summarization.logging_configuration.level
+    include_execution_data = local.statemachine.summarization.logging_configuration.include_execution_data
+    log_destination        = "${aws_cloudwatch_log_group.summarization_sm.arn}:*"
   }
+
+  tags = local.combined_tags
 }

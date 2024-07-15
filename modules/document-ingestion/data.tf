@@ -62,10 +62,11 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
 
     actions = [
       "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
       "ec2:DeleteNetworkInterface",
       "ec2:AssignPrivateIpAddresses",
-      "ec2:UnassignPrivateIpAddresses",
-      "ec2:DescribeNetworkInterfaces"
+      "ec2:UnassignPrivateIpAddresses"
     ]
 
     effect = "Allow"
@@ -116,22 +117,6 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
 
     resources = [
       "${aws_appsync_graphql_api.ingestion_api.arn}/*"
-    ]
-  }
-
-  statement {
-    sid = "ECR"
-
-    actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability"
-    ]
-
-    effect = "Allow"
-
-    resources = [
-      "*"
     ]
   }
 }
@@ -158,10 +143,11 @@ data "aws_iam_policy_document" "file_transformer" {
 
     actions = [
       "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
       "ec2:DeleteNetworkInterface",
       "ec2:AssignPrivateIpAddresses",
-      "ec2:UnassignPrivateIpAddresses",
-      "ec2:DescribeNetworkInterfaces"
+      "ec2:UnassignPrivateIpAddresses"
     ]
 
     effect = "Allow"
@@ -212,22 +198,6 @@ data "aws_iam_policy_document" "file_transformer" {
 
     resources = [
       "${aws_appsync_graphql_api.ingestion_api.arn}/*"
-    ]
-  }
-
-  statement {
-    sid = "ECR"
-
-    actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability"
-    ]
-
-    effect = "Allow"
-
-    resources = [
-      "*"
     ]
   }
 }
@@ -254,10 +224,11 @@ data "aws_iam_policy_document" "embeddings_job" {
 
     actions = [
       "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
       "ec2:DeleteNetworkInterface",
       "ec2:AssignPrivateIpAddresses",
-      "ec2:UnassignPrivateIpAddresses",
-      "ec2:DescribeNetworkInterfaces"
+      "ec2:UnassignPrivateIpAddresses"
     ]
 
     effect = "Allow"
@@ -308,22 +279,6 @@ data "aws_iam_policy_document" "embeddings_job" {
 
     resources = [
       "${aws_appsync_graphql_api.ingestion_api.arn}/*"
-    ]
-  }
-
-  statement {
-    sid = "ECR"
-
-    actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability"
-    ]
-
-    effect = "Allow"
-
-    resources = [
-      "*"
     ]
   }
 }

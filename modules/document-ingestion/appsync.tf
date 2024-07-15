@@ -1,7 +1,6 @@
-# TODO: need to connect to a function
 resource "aws_appsync_graphql_api" "ingestion_api" {
   name                = local.graphql.ingestion_api.name
-  schema              = file("${path.module}/templates/schema.graphql")
+  schema              = file("${path.module}/templates/document_ingestion_schema.graphql")
   xray_enabled        = true
   authentication_type = "AMAZON_COGNITO_USER_POOLS"
 
