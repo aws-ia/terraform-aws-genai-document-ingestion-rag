@@ -39,6 +39,7 @@ module "persistence_resources" {
   stage = var.stage
   app_prefix = random_string.app_prefix.result
   merged_api_name = var.merged_api_name
+  client_url = var.client_url
 
   depends_on = [module.networking_resources]
 }
@@ -79,8 +80,6 @@ module "question-answering" {
   source = "./modules/question-answering"
   bucket_prefix = "gen-ai"
   stage = "_dev"
-  subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
-  security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
   input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
   input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
@@ -96,6 +95,8 @@ module "question-answering" {
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
   ecr_repository_url = module.persistence_resources.ecr_repository_url
   merged_api_url = local.merged_api_url
+  private_subnet_id = module.networking_resources.private_subnet_id
+  security_group_id = module.networking_resources.lambda_security_group_id
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
@@ -106,8 +107,6 @@ module "document-ingestion" {
   existing_opensearch_domain_mame = module.persistence_resources.existing_opensearch_domain_mame
   existing_open_search_domain_endpoint = module.persistence_resources.existing_open_search_domain_endpoint
   existing_open_search_index_name = "doc-rag-search"
-  subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
-  security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
   input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
   input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
   opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
@@ -118,6 +117,8 @@ module "document-ingestion" {
   stage = "dev"
   ecr_repository_url = module.persistence_resources.ecr_repository_url
   merged_api_url = local.merged_api_url
+  private_subnet_id = module.networking_resources.private_subnet_id
+  security_group_id = module.networking_resources.lambda_security_group_id
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }
@@ -130,14 +131,14 @@ module "summarization" {
   input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
   processed_assets_bucket_arn = module.persistence_resources.processed_assets_bucket_arn
   processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
-  security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
-  subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
   vpc_id = module.networking_resources.vpc_id
   access_logs_bucket_arn  = module.persistence_resources.access_logs_bucket_arn
   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
   cognito_user_pool_id    = module.persistence_resources.cognito_user_pool_id
   stage                   = var.stage
   merged_api_url = local.merged_api_url
+  private_subnet_id = module.networking_resources.private_subnet_id
+  security_group_id = module.networking_resources.lambda_security_group_id
 
   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 }

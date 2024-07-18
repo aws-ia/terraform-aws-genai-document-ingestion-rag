@@ -25,6 +25,10 @@ resource "aws_lambda_function" "input_validation_lambda" {
   image_uri     = "${var.ecr_repository_url}:${local.summary_input_validator_lambda_image_name}"
   package_type  = "Image"
   description   = "Lambda function to validate input for summary api"
+  vpc_config {
+    security_group_ids = [var.security_group_id]
+    subnet_ids = [var.private_subnet_id]
+  }
 
   environment {
     variables = {
@@ -64,6 +68,10 @@ resource "aws_lambda_function" "document_reader_lambda" {
   image_uri     = "${var.ecr_repository_url}:${local.document_reader_lambda_image_name}"
   package_type  = "Image"
   description   = "Lambda function to read the input transformed document"
+  vpc_config {
+    security_group_ids = [var.security_group_id]
+    subnet_ids = [var.private_subnet_id]
+  }
 
   environment {
     variables = {
@@ -111,6 +119,10 @@ resource "aws_lambda_function" "generate_summary_lambda" {
   image_uri     = "${var.ecr_repository_url}:${local.generate_summary_lambda_image_name}"
   package_type  = "Image"
   description   = "Lambda function to generate the summary"
+  vpc_config {
+    security_group_ids = [var.security_group_id]
+    subnet_ids = [var.private_subnet_id]
+  }
 
   environment {
     variables = {

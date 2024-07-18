@@ -1,17 +1,19 @@
 resource "aws_iam_role" "ingestion_construct_role" {
-  name = "ingestionConstructRole"
+  name = "${var.app_prefix}-ingestion-construct-role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "appsync.amazonaws.com"
       }
     }]
   })
+
   inline_policy {
-    name = "ingestionConstructRole_inline"
+    name = "ingestion_construct_inline_policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [{
@@ -20,7 +22,7 @@ resource "aws_iam_role" "ingestion_construct_role" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "*"
       }]
     })
@@ -33,13 +35,13 @@ resource "aws_iam_role" "ingestion_construct_role" {
 }
 
 resource "aws_iam_policy" "eventbridge_put_events_policy" {
-  name = "eventbridgePutEventsPolicy"
+  name = "${var.app_prefix}-eventbridge-put-events-policy"
 
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow",
-      Action = "events:PutEvents",
+      Effect   = "Allow"
+      Action   = "events:PutEvents"
       Resource = "*"
     }]
   })
@@ -52,12 +54,13 @@ resource "aws_iam_role_policy_attachment" "attach_eventbridge_policy" {
 
 # IAM Role for AppSync Logs
 resource "aws_iam_role" "appsync_logs_role" {
-  name = "AppSyncLogsRole"
+  name = "${var.app_prefix}-appsync-logs-role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "appsync.amazonaws.com"
       }
@@ -65,7 +68,7 @@ resource "aws_iam_role" "appsync_logs_role" {
   })
 
   inline_policy {
-    name = "appsync-logs-policy"
+    name = "appsync_logs_inline_policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [{
@@ -74,7 +77,7 @@ resource "aws_iam_role" "appsync_logs_role" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "*"
       }]
     })
@@ -84,11 +87,12 @@ resource "aws_iam_role" "appsync_logs_role" {
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_exec_role" {
   name = "${var.app_prefix}-lambda-exec-role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "lambda.amazonaws.com"
       }
@@ -96,20 +100,21 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 
   inline_policy {
-    name = "lambda-policy"
+    name = "lambda_exec_inline_policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
         {
+          Effect = "Allow"
           Action = [
             "logs:CreateLogGroup",
             "logs:CreateLogStream",
             "logs:PutLogEvents"
           ]
-          Effect   = "Allow"
           Resource = "*"
         },
         {
+          Effect = "Allow"
           Action = [
             "ec2:CreateNetworkInterface",
             "ec2:DeleteNetworkInterface",
@@ -117,27 +122,23 @@ resource "aws_iam_role" "lambda_exec_role" {
             "ec2:UnassignPrivateIpAddresses",
             "ec2:DescribeNetworkInterfaces"
           ]
-          Effect   = "Allow"
           Resource = "*"
         },
         {
+          Effect = "Allow"
           Action = [
             "s3:GetObject",
             "s3:GetObject*",
             "s3:GetBucket*",
             "s3:List*",
             "s3:PutObjectRetention",
-            "s3:List*",
-            "s3:GetBucket*",
             "s3:Abort*",
             "s3:DeleteObject*",
             "s3:PutObjectLegalHold",
             "s3:PutObjectTagging",
             "s3:PutObjectVersionTagging",
-            "s3:PutObject",
-            "s3:GetObject*"
+            "s3:PutObject"
           ]
-          Effect   = "Allow"
           Resource = [
             var.input_assets_bucket_arn,
             "${var.input_assets_bucket_arn}/*",
@@ -146,10 +147,8 @@ resource "aws_iam_role" "lambda_exec_role" {
           ]
         },
         {
-          Action = [
-            "appsync:GraphQL"
-          ]
-          Effect   = "Allow"
+          Effect = "Allow"
+          Action = ["appsync:GraphQL"]
           Resource = "arn:aws:appsync:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:apis/${aws_appsync_graphql_api.ingestion_graphql_api.id}/*"
         },
         {
@@ -160,19 +159,21 @@ resource "aws_iam_role" "lambda_exec_role" {
             "ecr:BatchCheckLayerAvailability"
           ]
           Resource = "*"
-        },
+        }
       ]
     })
   }
 }
 
+
 resource "aws_iam_role" "sfn_role" {
-  name = "sfn-role"
+  name = "${var.app_prefix}-sfn-role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "states.amazonaws.com"
       }
@@ -180,15 +181,13 @@ resource "aws_iam_role" "sfn_role" {
   })
 
   inline_policy {
-    name = "sfn-policy"
+    name = "sfn_inline_policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
         {
-          Action = [
-            "lambda:InvokeFunction"
-          ]
-          Effect   = "Allow"
+          Effect = "Allow"
+          Action = ["lambda:InvokeFunction"]
           Resource = [
             aws_lambda_function.input_validation_lambda.arn,
             aws_lambda_function.file_transformer_lambda.arn,
@@ -196,6 +195,7 @@ resource "aws_iam_role" "sfn_role" {
           ]
         },
         {
+          Effect = "Allow"
           Action = [
             "logs:CreateLogDelivery",
             "logs:CreateLogStream",
@@ -211,36 +211,31 @@ resource "aws_iam_role" "sfn_role" {
             "xray:PutTelemetryRecords",
             "xray:GetSamplingRules",
             "xray:GetSamplingTargets"
-          ],
-          Effect = "Allow"
-          Resource = ["*"]
-        },
-        {
-          Effect = "Allow",
-          Action = [
-            "states:StartExecution"
-          ],
+          ]
           Resource = "*"
         },
+        {
+          Effect = "Allow"
+          Action = ["states:StartExecution"]
+          Resource = "*"
+        }
       ]
     })
   }
 }
 
 resource "aws_iam_role" "eventbridge_sfn_role" {
-  name = "eventbridge-sfn-role"
+  name = "${var.app_prefix}-eventbridge-sfn-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "events.amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "events.amazonaws.com"
       }
-    ]
+      Action = "sts:AssumeRole"
+    }]
   })
 
   managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]

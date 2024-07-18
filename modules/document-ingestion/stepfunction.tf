@@ -1,5 +1,5 @@
 resource "aws_sfn_state_machine" "ingestion_state_machine" {
-  name     = "${var.app_prefix}IngestionStateMachine"
+  name     = "${var.app_prefix}-ingestion-state-machine"
   role_arn = aws_iam_role.sfn_role.arn
   definition = jsonencode({
     StartAt = "Validate Ingestion Input"
@@ -34,7 +34,12 @@ resource "aws_sfn_state_machine" "ingestion_state_machine" {
             }
           }
         }
-        End = true
+        Next = "Generate embeddings from processed documents and store them"
+      }
+      "Generate embeddings from processed documents and store them" = {
+        Type     = "Task"
+        Resource = aws_lambda_function.embeddings_job_lambda.arn
+        End      = true
       }
       "Job Failed" = {
         Type = "Fail"

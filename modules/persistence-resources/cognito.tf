@@ -29,3 +29,30 @@ resource "aws_cognito_user_pool" "user_pool" {
     ]
   }
 }
+
+resource "aws_cognito_user_pool_client" "cognito_client" {
+  name         = "CognitoClient"
+  user_pool_id = aws_cognito_user_pool.user_pool.id
+
+  generate_secret = true
+
+  callback_urls = [var.client_url]
+  logout_urls   = [var.client_url]
+
+  allowed_oauth_flows                  = ["code", "implicit"]
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_scopes                 = ["email", "openid", "profile"]
+  supported_identity_providers         = ["COGNITO"]
+}
+
+# Cognito Identity Pool
+resource "aws_cognito_identity_pool" "identity_pool" {
+  identity_pool_name               = "IdentityPool"
+  allow_unauthenticated_identities = false
+
+  cognito_identity_providers {
+    client_id               = aws_cognito_user_pool_client.cognito_client.id
+    provider_name           = aws_cognito_user_pool.user_pool.endpoint
+    server_side_token_check = false
+  }
+}

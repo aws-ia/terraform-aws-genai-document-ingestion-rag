@@ -49,3 +49,4 @@ variable "bucket_prefix" {}
 variable "stage" {}
 variable "app_prefix" {}
 variable "merged_api_name" {}
+variable "client_url" { type = string }

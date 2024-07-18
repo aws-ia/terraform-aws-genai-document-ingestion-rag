@@ -121,13 +121,6 @@ resource "aws_security_group" "security_group_primary" {
   vpc_id      = aws_vpc.main_vpc.id
 }
 
-# resource "aws_vpc_endpoint" "opensearch" {
-#   vpc_id            = aws_vpc.main_vpc.id
-#   service_name      = "com.amazonaws.${data.aws_region.current.name}.es"
-#   vpc_endpoint_type = "Interface"
-#   subnet_ids        = [aws_subnet.isolated.id, aws_subnet.private.id, aws_subnet.public.id]
-#   security_group_ids = [aws_security_group.lambda_sg.id]
-# }
 resource "aws_opensearchserverless_vpc_endpoint" "opensearch" {
   name       = "opensearch-vpc-endpoint-${var.stage}"
   subnet_ids = [aws_subnet.isolated.id, aws_subnet.private.id, aws_subnet.public.id]

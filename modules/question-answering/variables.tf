@@ -16,8 +16,8 @@ variable "existing_open_search_domain_endpoint" {}
 variable "opensearch_serverless_collection_endpoint" {}
 variable "existing_open_search_index_name" {}
 variable "app_prefix" {}
-variable "security_groups_ids" {type = list(string)}
-variable "subnet_ids" {type = list(string)}
+variable "private_subnet_id" {type = string}
+variable "security_group_id" {type = string}
 variable "ecr_repository_url" {}
 
 variable "merged_api_url" {
