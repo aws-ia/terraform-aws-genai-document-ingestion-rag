@@ -11,6 +11,7 @@ locals {
       name                         = "${var.solution_prefix}-summarization-api"
       cloudwatch_log_role_name     = "${var.solution_prefix}-summarization-api-log"
       event_bridge_datasource_name = replace("${var.solution_prefix}-summarization-datasource", "-", "_") # must match pattern [_A-Za-z][_0-9A-Za-z]*
+      status_datasource_name       = replace("${var.solution_prefix}-summarization-status-datasource", "-", "_")
     }
   }
 

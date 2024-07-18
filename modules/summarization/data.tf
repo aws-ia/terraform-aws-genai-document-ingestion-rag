@@ -100,6 +100,24 @@ data "aws_iam_policy_document" "summarization_sm" {
   }
 }
 
+data "aws_iam_policy_document" "summarization_sm_eventbridge" {
+
+  statement {
+    sid = "StartStateMachine"
+
+    actions = [
+      "states:StartExecution"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      aws_sfn_state_machine.summarization_sm.arn,
+    ]
+  }
+}
+
+
 data "aws_iam_policy_document" "summarization_input_validation" {
   statement {
     sid = "CloudWatchLog"

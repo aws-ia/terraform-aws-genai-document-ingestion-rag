@@ -85,9 +85,9 @@ module "document_ingestion" {
 }
 
 resource "awscc_appsync_source_api_association" "document_ingestion_association" {
-  description             = "Association for document ingestion"
-  merged_api_identifier   = module.persistence_resources.merged_api_arn
-  source_api_identifier   = module.document_ingestion.ingestion_api_arn
+  description           = "Association for document ingestion"
+  merged_api_identifier = module.persistence_resources.merged_api_arn
+  source_api_identifier = module.document_ingestion.ingestion_api_arn
 
   source_api_association_config = {
     merge_type = "AUTO_MERGE"
@@ -144,9 +144,9 @@ module "summarization" {
 }
 
 resource "awscc_appsync_source_api_association" "summarization_association" {
-  description             = "Association for summarization"
-  merged_api_identifier   = module.persistence_resources.merged_api_arn
-  source_api_identifier   = module.summarization.summarization_api_arn
+  description           = "Association for summarization"
+  merged_api_identifier = module.persistence_resources.merged_api_arn
+  source_api_identifier = module.summarization.summarization_api_arn
 
   source_api_association_config = {
     merge_type = "AUTO_MERGE"

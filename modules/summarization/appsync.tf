@@ -60,56 +60,25 @@ resource "aws_appsync_resolver" "summarization_api" {
   EOF
 }
 
+resource "aws_appsync_datasource" "summarization_status" {
+  api_id = aws_appsync_graphql_api.summarization_api.id
+  name   = local.graphql.summarization_api.status_datasource_name
+  type   = "NONE"
+}
 
-# resource "aws_appsync_datasource" "summary_status_datasource" {
-#   api_id           = aws_appsync_graphql_api.summarization_graphql_api.id
-#   name             = "_${var.app_prefix}_summmary_status_data_source"
-#   type             = "NONE"
-#   service_role_arn = aws_iam_role.summarization_construct_role.arn
-# }
+resource "aws_appsync_resolver" "summarization_status" {
+  api_id      = aws_appsync_graphql_api.summarization_api.id
+  type        = "Mutation"
+  field       = "updateSummaryJobStatus"
+  data_source = aws_appsync_datasource.summarization_status.name
 
-# resource "aws_appsync_resolver" "summary_response_resolver" {
-#   api_id      = aws_appsync_graphql_api.summarization_graphql_api.id
-#   type        = "Mutation"
-#   field       = "updateSummaryJobStatus"
-#   data_source = aws_appsync_datasource.summary_status_datasource.name
-
-#   request_template  = <<EOF
-#     {
-#       "version": "2017-02-28",
-#       "payload": $util.toJson($context.args)
-#     }
-#   EOF
-#   response_template = <<EOF
-#     $util.toJson($context.result)
-#   EOF
-# }
-
-
-# resource "aws_appsync_resolver" "generate_summary" {
-#   api_id      = aws_appsync_graphql_api.summarization_graphql_api.id
-#   type        = "Mutation"
-#   field       = "generateSummary"
-#   data_source = aws_appsync_datasource.event_bridge_datasource.name
-
-#   request_template  = <<EOF
-#     {
-#       "version": "2018-05-29",
-#       "operation": "PutEvents",
-#       "events": [{
-#         "source": "summary",
-#         "detail": {
-#             "summaryInput": $util.toJson($ctx.arguments.summaryInput),
-#         },
-#         "detailType": "genAIdemo"
-#       }]
-#     }
-#   EOF
-#   response_template = <<EOF
-#     #if($ctx.error)
-#       $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
-#     #end
-#     $util.toJson($ctx.result)
-#   EOF
-# }
-
+  request_template  = <<EOF
+    {
+      "version": "2017-02-28",
+      "payload": $util.toJson($context.args)
+    }
+  EOF
+  response_template = <<EOF
+    $util.toJson($context.result)
+  EOF
+}
