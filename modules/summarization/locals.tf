@@ -72,7 +72,10 @@ locals {
       memory_size              = 1769
       environment = {
         variables = {
-          GRAPHQL_URL = local.graph_ql_url
+          TRANSFORMED_ASSET_BUCKET = var.processed_assets_bucket_prop.bucket_name
+          INPUT_ASSET_BUCKET       = var.input_assets_bucket_prop.bucket_name
+          IS_FILE_TRANSFORMED      = var.is_file_transformation_required
+          GRAPHQL_URL              = local.graph_ql_url
         }
       }
       vpc_config = {
@@ -93,7 +96,9 @@ locals {
       memory_size              = 1769
       environment = {
         variables = {
-          GRAPHQL_URL = local.graph_ql_url
+          GRAPHQL_URL            = local.graph_ql_url
+          ASSET_BUCKET_NAME      = var.processed_assets_bucket_prop.bucket_name
+          SUMMARY_LLM_CHAIN_TYPE = var.summary_chain_type
         }
       }
       vpc_config = {
@@ -103,10 +108,6 @@ locals {
     }
   }
   # update_graphql_api_id                     = var.existing_merged_api_id != "" ? var.existing_merged_api_id : aws_appsync_graphql_api.summarization_graphql_api.id
-  # summary_input_validator_lambda_image_name = "summary_input_validator"
-  # document_reader_lambda_image_name         = "summary_document_reader"
-  # generate_summary_lambda_image_name        = "summary_generator_lambda"
-  # summary_chain_type                        = var.summary_chain_type == "" ? "stuff" : var.summary_chain_type
 
   graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.summarization_api.uris["GRAPHQL"] : var.merged_api_url
 }

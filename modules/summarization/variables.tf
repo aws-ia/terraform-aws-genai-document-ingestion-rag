@@ -63,6 +63,18 @@ variable "container_platform" {
   type        = string
 }
 
+variable "is_file_transformation_required" {
+  description = "Whether file transformation is required or not"
+  type        = bool
+  default     = true
+}
+
+variable "summary_chain_type" {
+  description = "Summarization chain type (default 'stuff')"
+  type        = string
+  default     = "stuff"
+}
+
 # variable "vpc_id" {
 #   description = "The ID of the VPC"
 #   type        = string

@@ -139,6 +139,8 @@ module "summarization" {
   merged_api_arn = module.persistence_resources.merged_api_arn
   merged_api_url = module.persistence_resources.merged_api_url
 
+  is_file_transformation_required = true
+
   container_platform = var.container_platform
   tags               = local.root_combined_tags
 }

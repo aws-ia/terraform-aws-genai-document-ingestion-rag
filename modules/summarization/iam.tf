@@ -194,22 +194,3 @@ resource "aws_iam_role_policy" "summarization_generator" {
 
 #   assume_role_policy = data.aws_iam_policy_document.firehose_role.json
 # }
-
-# resource "aws_iam_role" "eventbridge_sfn_role" {
-#   name = "summarization-eventbridge-sfn-role"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         "Effect" : "Allow",
-#         "Principal" : {
-#           "Service" : "events.amazonaws.com"
-#         },
-#         "Action" : "sts:AssumeRole"
-#       }
-#     ]
-#   })
-
-#   managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]
-# }

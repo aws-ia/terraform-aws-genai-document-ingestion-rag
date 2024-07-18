@@ -391,34 +391,6 @@ data "aws_iam_policy_document" "summarization_generator" {
   }
 }
 
-# data "aws_iam_policy_document" "summarization_construct_role" {
-#   statement {
-#     effect = "Allow"
-
-#     principals {
-#       type = "Service"
-#       #       identifiers = ["events.amazonaws.com"]
-#       identifiers = ["appsync.amazonaws.com"]
-#     }
-
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
-
-# data "aws_iam_policy_document" "summarization_construct_policy" {
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "logs:CreateLogGroup",
-#       "logs:CreateLogStream",
-#       "logs:PutLogEvents",
-#       "logs:DescribeLogGroups",
-#       "logs:DescribeLogStreams",
-#     ]
-#     resources = ["*"]
-#   }
-# }
-
 # data "aws_iam_policy_document" "firehose_role" {
 #   statement {
 #     effect = "Allow"
