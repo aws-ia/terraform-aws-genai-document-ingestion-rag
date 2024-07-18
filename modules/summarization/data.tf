@@ -117,6 +117,52 @@ data "aws_iam_policy_document" "summarization_sm_eventbridge" {
   }
 }
 
+data "aws_iam_policy_document" "summarization_sm_dlq" {
+
+  statement {
+    sid = "SecureTransport"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = ["sqs:*"]
+    effect  = "Deny"
+
+    resources = [
+      aws_sqs_queue.summarization_sm_dlq.arn,
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid = "AllowEventBridgeDLQ"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    actions = ["sqs:SendMessage"]
+    effect  = "Allow"
+
+    resources = [
+      aws_sqs_queue.summarization_sm_dlq.arn,
+    ]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.summarization.arn]
+    }
+  }
+}
 
 data "aws_iam_policy_document" "summarization_input_validation" {
   statement {

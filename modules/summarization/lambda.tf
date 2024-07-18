@@ -101,12 +101,6 @@ resource "aws_lambda_function" "summarization_generator" {
   tags = local.combined_tags
 }
 
-# resource "aws_sqs_queue" "dlq" {
-#   name                    = "${var.app_prefix}_summarisation_dlq"
-#   sqs_managed_sse_enabled = true
-# }
-
-
 # # Lambda function used to read documents in the step function
 
 

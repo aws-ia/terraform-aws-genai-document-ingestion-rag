@@ -24,6 +24,9 @@ resource "aws_cloudwatch_event_target" "summarization" {
   arn            = aws_sfn_state_machine.summarization_sm.arn
   role_arn       = aws_iam_role.summarization_sm_eventbridge.arn
   event_bus_name = aws_cloudwatch_event_bus.summarization.name
+  dead_letter_config {
+    arn = aws_sqs_queue.summarization_sm_dlq.arn
+  }
 }
 
 # TODO: add KMS key
