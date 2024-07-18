@@ -157,52 +157,36 @@ resource "awscc_appsync_source_api_association" "summarization_association" {
   depends_on = [module.persistence_resources, module.summarization]
 }
 
-
-# resource "null_resource" "ecr_login" {
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       docker logout ${module.persistence_resources.ecr_repository_url} || true
-#       echo "Attempting to remove existing credentials from keychain..."
-
-#       # Explicitly remove the Docker credentials if they exist
-#       EXISTING_CREDS=$(security find-generic-password -s "docker-credential-osxkeychain" -a "${module.persistence_resources.ecr_repository_url}" 2>&1)
-#       if [[ $EXISTING_CREDS == *"attributes"* ]]; then
-#         security delete-generic-password -s "docker-credential-osxkeychain" -a "${module.persistence_resources.ecr_repository_url}"
-#       fi
-
-#       # Authenticate Docker with ECR
-#       aws ecr get-login-password --region ${data.aws_region.current_region.name} | docker login --username AWS --password-stdin ${module.persistence_resources.ecr_repository_url}
-#     EOT
-#   }
-
-#   triggers = {
-#     always_run = timestamp()
-#   }
-# }
+############################################################################################################
+# Question Answering
+############################################################################################################
 
 # module "question-answering" {
 #   source = "./modules/question-answering"
-#   bucket_prefix = "gen-ai"
-#   stage = "_dev"
-#   subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
-#   security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
-#   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
-#   input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
-#   input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
-#   existing_opensearch_domain_mame = module.persistence_resources.existing_opensearch_domain_mame
-#   existing_open_search_domain_endpoint = module.persistence_resources.existing_open_search_domain_endpoint
-#   existing_open_search_index_name = "doc-rag-search"
-#   open_search_secret = "NONE"
-#   vpc_id = module.networking_resources.vpc_id
-#   service_access_log_bucket_arn = module.persistence_resources.access_logs_bucket_arn
-#   opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
-#   app_prefix = random_string.app_prefix.result
-#   access_logs_bucket_arn = module.persistence_resources.access_logs_bucket_arn
-#   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
-#   ecr_repository_url = module.persistence_resources.ecr_repository_url
-#   merged_api_url = local.merged_api_url
 
-#   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
+#   solution_prefix      = local.solution_prefix
+#   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+
+#   # bucket_prefix = "gen-ai"
+#   # stage = "_dev"
+#   # subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
+#   # security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
+#   # cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+#   # input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
+#   # input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
+#   # existing_opensearch_domain_mame = module.persistence_resources.existing_opensearch_domain_mame
+#   # existing_open_search_domain_endpoint = module.persistence_resources.existing_open_search_domain_endpoint
+#   # existing_open_search_index_name = "doc-rag-search"
+#   # open_search_secret = "NONE"
+#   # vpc_id = module.networking_resources.vpc_id
+#   # service_access_log_bucket_arn = module.persistence_resources.access_logs_bucket_arn
+#   # opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
+#   # app_prefix = random_string.app_prefix.result
+#   # access_logs_bucket_arn = module.persistence_resources.access_logs_bucket_arn
+#   # access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
+#   # ecr_repository_url = module.persistence_resources.ecr_repository_url
+#   # merged_api_url = local.merged_api_url
+
 # }
 
 # # APIs association
