@@ -179,5 +179,11 @@ resource "aws_iam_role" "ingestion_sm_eventbridge" {
     ]
   })
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess"]
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "ingestion_sm_eventbridge" {
+  name   = "${local.statemachine.ingestion.name}-eventbridge"
+  role   = aws_iam_role.ingestion_sm_eventbridge.id
+  policy = data.aws_iam_policy_document.ingestion_sm_eventbridge.json
 }

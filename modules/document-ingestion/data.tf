@@ -342,3 +342,20 @@ data "aws_iam_policy_document" "ingestion_sm" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "ingestion_sm_eventbridge" {
+
+  statement {
+    sid = "StartStateMachine"
+
+    actions = [
+      "states:StartExecution"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      aws_sfn_state_machine.ingestion_sm.arn
+    ]
+  }
+}
