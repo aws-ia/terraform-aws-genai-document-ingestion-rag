@@ -2,6 +2,26 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
+data "aws_ecr_authorization_token" "token" {}
+
+data "aws_iam_policy_document" "summarization_api_log" {
+  statement {
+    sid = "SummarizationApiLogPermissions"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "summarization_api_datasource" {
   statement {
     sid = "SummarizationApiPermissions"
@@ -145,7 +165,7 @@ data "aws_iam_policy_document" "summarization_input_validation" {
     effect = "Allow"
 
     resources = [
-      "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+      "${aws_appsync_graphql_api.summarization_api.arn}/*"
     ]
   }
 }
@@ -216,7 +236,7 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
     effect = "Allow"
 
     resources = [
-      "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+      "${aws_appsync_graphql_api.summarization_api.arn}/*"
     ]
   }
 }
@@ -287,7 +307,7 @@ data "aws_iam_policy_document" "summarization_generator" {
     effect = "Allow"
 
     resources = [
-      "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+      "${aws_appsync_graphql_api.summarization_api.arn}/*"
     ]
   }
 
@@ -302,7 +322,7 @@ data "aws_iam_policy_document" "summarization_generator" {
     effect = "Allow"
 
     resources = [
-      "arn:${data.aws_partition.current}:bedrock:${data.aws_region.current}::foundation-model/*"
+      "arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.name}::foundation-model/*"
     ]
   }
 }

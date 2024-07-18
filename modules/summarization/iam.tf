@@ -1,4 +1,30 @@
 ############################################################################################################
+# IAM Role for AppSync Summarization API CloudWatch Log
+############################################################################################################
+resource "aws_iam_role" "summarization_api_log" {
+  name = local.graphql.summarization_api.cloudwatch_log_role_name
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "appsync.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy" "summarization_api_log" {
+  name   = local.graphql.summarization_api.cloudwatch_log_role_name
+  role   = aws_iam_role.summarization_api_log.id
+  policy = data.aws_iam_policy_document.summarization_api_log.json
+}
+
+############################################################################################################
 # IAM Role for AppSync Summarization API Data Source
 ############################################################################################################
 resource "aws_iam_role" "summarization_api_datasource" {
@@ -30,7 +56,7 @@ resource "aws_iam_role_policy" "summarization_api_datasource" {
 }
 
 ############################################################################################################
-# IAM Role for Summarizatio State Machine
+# IAM Role for Summarization State Machine
 ############################################################################################################
 
 resource "aws_iam_role" "summarization_sm" {
@@ -60,7 +86,7 @@ resource "aws_iam_role_policy" "summarization_sm" {
 ############################################################################################################
 
 resource "aws_iam_role" "summarization_sm_eventbridge" {
-  name = "${local.statemachine.ingestion.name}-eventbridge"
+  name = "${local.statemachine.summarization.name}-eventbridge"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",

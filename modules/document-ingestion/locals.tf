@@ -32,7 +32,9 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_ingestion_input_validation_prop.image_tag}"
       docker_image_tag         = var.lambda_ingestion_input_validation_prop.image_tag
       source_path              = var.lambda_ingestion_input_validation_prop.src_path
-      platform                 = "linux/amd64"
+      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_ingestion_input_validation_prop.src_path, "*") : filesha1("${var.lambda_ingestion_input_validation_prop.src_path}/${f}")]))
+      platform                 = var.container_platform
+      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_ingestion_input_validation_prop.image_tag}-log"
       timeout                  = 900
       memory_size              = 7076
@@ -51,7 +53,9 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_file_transformer_prop.image_tag}"
       docker_image_tag         = var.lambda_file_transformer_prop.image_tag
       source_path              = var.lambda_file_transformer_prop.src_path
-      platform                 = "linux/amd64"
+      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_file_transformer_prop.src_path, "*") : filesha1("${var.lambda_file_transformer_prop.src_path}/${f}")]))
+      platform                 = var.container_platform
+      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_file_transformer_prop.image_tag}-log"
       timeout                  = 900
       memory_size              = 7076
@@ -72,7 +76,9 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_embeddings_job_prop.image_tag}"
       docker_image_tag         = var.lambda_embeddings_job_prop.image_tag
       source_path              = var.lambda_embeddings_job_prop.src_path
-      platform                 = "linux/amd64"
+      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_embeddings_job_prop.src_path, "*") : filesha1("${var.lambda_embeddings_job_prop.src_path}/${f}")]))
+      platform                 = var.container_platform
+      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_embeddings_job_prop.image_tag}-log"
       timeout                  = 900
       memory_size              = 7076

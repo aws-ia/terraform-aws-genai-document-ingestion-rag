@@ -62,3 +62,9 @@ variable "opensearch_prop" {
   type        = any
   default     = null
 }
+
+variable "container_platform" {
+  description = "The platform for the container image, default is 'linux/arm64'"
+  default     = "linux/arm64"
+  type        = string
+}

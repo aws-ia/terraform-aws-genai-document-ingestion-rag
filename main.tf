@@ -33,7 +33,11 @@ module "persistence_resources" {
   tags          = local.root_combined_tags
 }
 
-module "document-ingestion" {
+############################################################################################################
+# Document Ingestion
+############################################################################################################
+
+module "document_ingestion" {
   source = "./modules/document-ingestion"
 
   solution_prefix      = local.solution_prefix
@@ -76,8 +80,81 @@ module "document-ingestion" {
   merged_api_arn = module.persistence_resources.merged_api_arn
   merged_api_url = module.persistence_resources.merged_api_url
 
-  tags = local.root_combined_tags
+  container_platform = var.container_platform
+  tags               = local.root_combined_tags
 }
+
+resource "awscc_appsync_source_api_association" "document_ingestion_association" {
+  description             = "Association for document ingestion"
+  merged_api_identifier   = module.persistence_resources.merged_api_arn
+  source_api_identifier   = module.document_ingestion.ingestion_api_arn
+
+  source_api_association_config = {
+    merge_type = "AUTO_MERGE"
+  }
+}
+
+############################################################################################################
+# Summarization
+############################################################################################################
+
+module "summarization" {
+  source = "./modules/summarization"
+
+  solution_prefix      = local.solution_prefix
+  cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+  ecr_repository_id    = module.persistence_resources.ecr_repository_id
+
+  lambda_summarization_input_validation_prop = {
+    image_tag          = "summarization_input_validation"
+    src_path           = "${path.module}/lambda/summarization/input_validator"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
+  }
+
+  lambda_summarization_doc_reader_prop = {
+    image_tag          = "summarization_doc_reader"
+    src_path           = "${path.module}/lambda/summarization/document_reader"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
+  }
+
+  lambda_summarization_generator_prop = {
+    image_tag          = "summarization_generator"
+    src_path           = "${path.module}/lambda/summarization/summary_generator"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
+  }
+
+  input_assets_bucket_prop = {
+    bucket_arn  = module.persistence_resources.input_assets_bucket_arn
+    bucket_name = module.persistence_resources.input_assets_bucket_name
+  }
+
+  processed_assets_bucket_prop = {
+    bucket_arn  = module.persistence_resources.processed_assets_bucket_arn
+    bucket_name = module.persistence_resources.processed_assets_bucket_name
+  }
+
+  merged_api_arn = module.persistence_resources.merged_api_arn
+  merged_api_url = module.persistence_resources.merged_api_url
+
+  container_platform = var.container_platform
+  tags               = local.root_combined_tags
+}
+
+resource "awscc_appsync_source_api_association" "summarization_association" {
+  description             = "Association for summarization"
+  merged_api_identifier   = module.persistence_resources.merged_api_arn
+  source_api_identifier   = module.summarization.summarization_api_arn
+
+  source_api_association_config = {
+    merge_type = "AUTO_MERGE"
+  }
+
+  depends_on = [module.persistence_resources, module.summarization]
+}
+
 
 # resource "null_resource" "ecr_login" {
 #   provisioner "local-exec" {
@@ -126,48 +203,6 @@ module "document-ingestion" {
 #   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
 # }
 
-# module "document-ingestion" {
-#   source = "./modules/document-ingestion"
-#   app_prefix = random_string.app_prefix.result
-#   existing_opensearch_domain_mame = module.persistence_resources.existing_opensearch_domain_mame
-#   existing_open_search_domain_endpoint = module.persistence_resources.existing_open_search_domain_endpoint
-#   existing_open_search_index_name = "doc-rag-search"
-#   subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
-#   security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
-#   input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
-#   input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
-#   opensearch_serverless_collection_endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint
-#   open_search_secret = "NONE"
-#   processed_assets_bucket_arn = module.persistence_resources.processed_assets_bucket_arn
-#   processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
-#   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
-#   stage = "dev"
-#   ecr_repository_url = module.persistence_resources.ecr_repository_url
-#   merged_api_url = local.merged_api_url
-
-#   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
-# }
-
-# module "summarization" {
-#   source = "./modules/summarization"
-#   app_prefix = random_string.app_prefix.result
-#   ecr_repository_url = module.persistence_resources.ecr_repository_url
-#   input_assets_bucket_arn = module.persistence_resources.input_assets_bucket_arn
-#   input_assets_bucket_name = module.persistence_resources.input_assets_bucket_name
-#   processed_assets_bucket_arn = module.persistence_resources.processed_assets_bucket_arn
-#   processed_assets_bucket_name = module.persistence_resources.processed_assets_bucket_name
-#   security_groups_ids = [tostring(module.networking_resources.primary_security_group_id), tostring(module.networking_resources.lambda_security_group_id)]
-#   subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]
-#   vpc_id = module.networking_resources.vpc_id
-#   access_logs_bucket_arn  = module.persistence_resources.access_logs_bucket_arn
-#   access_logs_bucket_name = module.persistence_resources.access_logs_bucket_name
-#   cognito_user_pool_id    = module.persistence_resources.cognito_user_pool_id
-#   stage                   = var.stage
-#   merged_api_url = local.merged_api_url
-
-#   depends_on = [module.networking_resources, module.persistence_resources, null_resource.ecr_login]
-# }
-
 # # APIs association
 # resource "awscc_appsync_source_api_association" "question-answering_association" {
 #   description             = "Association for question-answering"
@@ -179,25 +214,4 @@ module "document-ingestion" {
 #   }
 #   depends_on = [module.persistence_resources, module.question-answering]
 # }
-# resource "awscc_appsync_source_api_association" "document_ingestion_association" {
-#   description             = "Association for document ingestion"
-#   merged_api_identifier   = local.merged_api_id
-#   source_api_identifier   = module.document-ingestion.ingestion_graphql_api_id
 
-#   source_api_association_config = {
-#     merge_type = "AUTO_MERGE"
-#   }
-
-#   depends_on = [module.persistence_resources, module.document-ingestion]
-# }
-# resource "awscc_appsync_source_api_association" "summarization_association" {
-#   description             = "Association for summarization"
-#   merged_api_identifier   = local.merged_api_id
-#   source_api_identifier   = module.summarization.summarization_graphql_api_id
-
-#   source_api_association_config = {
-#     merge_type = "AUTO_MERGE"
-#   }
-
-#   depends_on = [module.persistence_resources, module.summarization]
-# }

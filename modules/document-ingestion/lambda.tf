@@ -11,6 +11,10 @@ module "docker_image_ingestion_input_validation" {
   image_tag     = local.lambda.ingestion_input_validation.docker_image_tag
   source_path   = local.lambda.ingestion_input_validation.source_path
   platform      = local.lambda.ingestion_input_validation.platform
+
+  triggers = {
+    dir_sha = local.lambda.ingestion_input_validation.dir_sha
+  }
 }
 
 resource "aws_lambda_function" "ingestion_input_validation" {
@@ -18,6 +22,7 @@ resource "aws_lambda_function" "ingestion_input_validation" {
   role          = aws_iam_role.ingestion_input_validation.arn
   image_uri     = module.docker_image_ingestion_input_validation.image_uri
   package_type  = "Image"
+  architectures = [local.lambda.ingestion_input_validation.runtime_architecture]
   timeout       = local.lambda.ingestion_input_validation.timeout
   memory_size   = local.lambda.ingestion_input_validation.memory_size
   vpc_config {
@@ -27,6 +32,7 @@ resource "aws_lambda_function" "ingestion_input_validation" {
   environment {
     variables = local.lambda.ingestion_input_validation.environment.variables
   }
+
   tags = local.combined_tags
 }
 
@@ -43,6 +49,10 @@ module "docker_image_file_transformer" {
   image_tag     = local.lambda.file_transformer.docker_image_tag
   source_path   = local.lambda.file_transformer.source_path
   platform      = local.lambda.file_transformer.platform
+
+  triggers = {
+    dir_sha = local.lambda.file_transformer.dir_sha
+  }
 }
 
 resource "aws_lambda_function" "file_transformer" {
@@ -50,6 +60,7 @@ resource "aws_lambda_function" "file_transformer" {
   role          = aws_iam_role.file_transformer.arn
   image_uri     = module.docker_image_file_transformer.image_uri
   package_type  = "Image"
+  architectures = [local.lambda.file_transformer.runtime_architecture]
   timeout       = local.lambda.file_transformer.timeout
   memory_size   = local.lambda.file_transformer.memory_size
   vpc_config {
@@ -76,6 +87,10 @@ module "docker_image_embeddings_job" {
   image_tag     = local.lambda.embeddings_job.docker_image_tag
   source_path   = local.lambda.embeddings_job.source_path
   platform      = local.lambda.embeddings_job.platform
+
+  triggers = {
+    dir_sha = local.lambda.embeddings_job.dir_sha
+  }
 }
 
 resource "aws_lambda_function" "embeddings_job" {
@@ -83,6 +98,7 @@ resource "aws_lambda_function" "embeddings_job" {
   role          = aws_iam_role.embeddings_job.arn
   image_uri     = module.docker_image_embeddings_job.image_uri
   package_type  = "Image"
+  architectures = [local.lambda.embeddings_job.runtime_architecture]
   timeout       = local.lambda.embeddings_job.timeout
   memory_size   = local.lambda.embeddings_job.memory_size
   vpc_config {

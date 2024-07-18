@@ -30,7 +30,7 @@ variable "lambda_summarization_doc_reader_prop" {
   type        = any
 }
 
-variable "lambda_summarization_generatror_prop" {
+variable "lambda_summarization_generator_prop" {
   description = "Properties for Lambda summarization generator"
   type        = any
 }
@@ -45,6 +45,22 @@ variable "merged_api_url" {
   description = "AppSync Merged API URL"
   type        = string
   default     = ""
+}
+
+variable "input_assets_bucket_prop" {
+  description = "Properties for input assets S3 bucket"
+  type        = map(any)
+}
+
+variable "processed_assets_bucket_prop" {
+  description = "Properties for processed assets S3 bucket"
+  type        = map(any)
+}
+
+variable "container_platform" {
+  description = "The platform for the container image, default is 'linux/arm64'"
+  default     = "linux/arm64"
+  type        = string
 }
 
 # variable "vpc_id" {

@@ -11,6 +11,10 @@ module "docker_image_summarization_input_validation" {
   image_tag     = local.lambda.summarization_input_validation.docker_image_tag
   source_path   = local.lambda.summarization_input_validation.source_path
   platform      = local.lambda.summarization_input_validation.platform
+
+  triggers = {
+    dir_sha = local.lambda.summarization_input_validation.dir_sha
+  }
 }
 
 resource "aws_lambda_function" "summarization_input_validation" {
@@ -18,6 +22,7 @@ resource "aws_lambda_function" "summarization_input_validation" {
   role          = aws_iam_role.summarization_input_validation.arn
   image_uri     = module.docker_image_summarization_input_validation.image_uri
   package_type  = "Image"
+  architectures = [local.lambda.summarization_input_validation.runtime_architecture]
   timeout       = local.lambda.summarization_input_validation.timeout
   memory_size   = local.lambda.summarization_input_validation.memory_size
   vpc_config {
@@ -50,6 +55,7 @@ resource "aws_lambda_function" "summarization_doc_reader" {
   role          = aws_iam_role.summarization_doc_reader.arn
   image_uri     = module.docker_image_summarization_doc_reader.image_uri
   package_type  = "Image"
+  architectures = [local.lambda.summarization_doc_reader.runtime_architecture]
   timeout       = local.lambda.summarization_doc_reader.timeout
   memory_size   = local.lambda.summarization_doc_reader.memory_size
   vpc_config {
@@ -82,6 +88,7 @@ resource "aws_lambda_function" "summarization_generator" {
   role          = aws_iam_role.summarization_generator.arn
   image_uri     = module.docker_image_summarization_generator.image_uri
   package_type  = "Image"
+  architectures = [local.lambda.summarization_generator.runtime_architecture]
   timeout       = local.lambda.summarization_generator.timeout
   memory_size   = local.lambda.summarization_generator.memory_size
   vpc_config {

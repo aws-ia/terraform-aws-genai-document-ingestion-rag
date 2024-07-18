@@ -15,7 +15,7 @@ resource "aws_appsync_graphql_api" "summarization_api" {
   }
 
   log_config {
-    cloudwatch_logs_role_arn = aws_iam_role.summarization_api.arn
+    cloudwatch_logs_role_arn = aws_iam_role.summarization_api_log.arn
     field_log_level          = "ALL"
   }
 
@@ -32,6 +32,34 @@ resource "aws_appsync_datasource" "summarization_api" {
     event_bus_arn = aws_cloudwatch_event_bus.summarization.arn
   }
 }
+
+resource "aws_appsync_resolver" "summarization_api" {
+  api_id      = aws_appsync_graphql_api.summarization_api.id
+  type        = "Mutation"
+  field       = "generateSummary"
+  data_source = aws_appsync_datasource.summarization_api.name
+
+  request_template  = <<EOF
+    {
+      "version": "2018-05-29",
+      "operation": "PutEvents",
+      "events": [{
+        "source": "summary",
+        "detail": {
+            "summaryInput": $util.toJson($ctx.arguments.summaryInput),
+        },
+        "detailType": "genAIdemo"
+      }]
+    }
+  EOF
+  response_template = <<EOF
+    #if($ctx.error)
+      $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
+    #end
+    $util.toJson($ctx.result)
+  EOF
+}
+
 
 # resource "aws_appsync_datasource" "summary_status_datasource" {
 #   api_id           = aws_appsync_graphql_api.summarization_graphql_api.id

@@ -42,7 +42,9 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_summarization_input_validation_prop.image_tag}"
       docker_image_tag         = var.lambda_summarization_input_validation_prop.image_tag
       source_path              = var.lambda_summarization_input_validation_prop.src_path
-      platform                 = "linux/amd64"
+      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_summarization_input_validation_prop.src_path, "*") : filesha1("${var.lambda_summarization_input_validation_prop.src_path}/${f}")]))
+      platform                 = var.container_platform
+      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_summarization_input_validation_prop.image_tag}-log"
       timeout                  = 600
       memory_size              = 1769
@@ -61,7 +63,9 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_summarization_doc_reader_prop.image_tag}"
       docker_image_tag         = var.lambda_summarization_doc_reader_prop.image_tag
       source_path              = var.lambda_summarization_doc_reader_prop.src_path
-      platform                 = "linux/amd64"
+      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_summarization_doc_reader_prop.src_path, "*") : filesha1("${var.lambda_summarization_doc_reader_prop.src_path}/${f}")]))
+      platform                 = var.container_platform
+      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_summarization_doc_reader_prop.image_tag}-log"
       timeout                  = 600
       memory_size              = 1769
@@ -80,7 +84,9 @@ locals {
       name                     = "${var.solution_prefix}-${var.lambda_summarization_generator_prop.image_tag}"
       docker_image_tag         = var.lambda_summarization_generator_prop.image_tag
       source_path              = var.lambda_summarization_generator_prop.src_path
-      platform                 = "linux/amd64"
+      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_summarization_generator_prop.src_path, "*") : filesha1("${var.lambda_summarization_generator_prop.src_path}/${f}")]))
+      platform                 = var.container_platform
+      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_summarization_generator_prop.image_tag}-log"
       timeout                  = 600
       memory_size              = 1769
@@ -101,5 +107,5 @@ locals {
   # generate_summary_lambda_image_name        = "summary_generator_lambda"
   # summary_chain_type                        = var.summary_chain_type == "" ? "stuff" : var.summary_chain_type
 
-  graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.ingestion_api.uris["GRAPHQL"] : var.merged_api_url
+  graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.summarization_api.uris["GRAPHQL"] : var.merged_api_url
 }

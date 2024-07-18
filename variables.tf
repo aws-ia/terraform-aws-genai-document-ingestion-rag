@@ -17,6 +17,12 @@ variable "tags" {
   default     = null
 }
 
+variable "container_platform" {
+  description = "The platform for the container image, default is 'linux/arm64'"
+  default     = "linux/arm64"
+  type        = string
+}
+
 ###### VPC variables ######
 variable "vpc_props" {
   description = "Properties for the VPC to be deployed. Error if both this and 'deploy_vpc' are provided"
