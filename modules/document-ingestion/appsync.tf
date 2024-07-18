@@ -16,7 +16,7 @@ resource "aws_appsync_graphql_api" "ingestion_api" {
 
   log_config {
     cloudwatch_logs_role_arn = aws_iam_role.ingestion_api_log.arn
-    field_log_level          = local.graphql.ingestion_api.log_level
+    field_log_level          = local.graphql.ingestion_api.field_log_level
   }
 
   tags = local.combined_tags
