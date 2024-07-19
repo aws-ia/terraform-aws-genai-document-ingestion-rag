@@ -22,6 +22,22 @@ data "aws_iam_policy_document" "question_answering_api_log" {
   }
 }
 
+data "aws_iam_policy_document" "question_answering_api_event_bridge_datasource" {
+  statement {
+    sid = "EventBus"
+
+    actions = [
+      "events:PutEvents",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      aws_cloudwatch_event_bus.question_answering.arn,
+    ]
+  }
+}
+
 # data "aws_iam_policy_document" "qa_construct_log_group_assume_role" {
 #   statement {
 #     effect = "Allow"

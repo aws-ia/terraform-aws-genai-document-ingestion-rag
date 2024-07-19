@@ -1,3 +1,9 @@
+# TODO: setup encryption with CME, setup resource policy
+resource "aws_cloudwatch_event_bus" "question_answering" {
+  name = local.cloudwatch.question_answering.event_bus_name
+  tags = local.combined_tags
+}
+
 # resource "aws_cloudwatch_log_group" "qa_construct_log_group" {
 #   name = "${var.app_prefix}-qaConstructLogGroup"
 # }
@@ -8,10 +14,6 @@
 #   iam_role_arn         = aws_iam_role.qa_construct_role.arn
 #   traffic_type         = "ALL"
 #   vpc_id               = var.vpc_id
-# }
-
-# resource "aws_cloudwatch_event_bus" "question_answering_event_bus" {
-#   name = "${var.app_prefix}questionAnsweringEventBus"
 # }
 
 # resource "aws_cloudwatch_event_rule" "question_answering_rule" {

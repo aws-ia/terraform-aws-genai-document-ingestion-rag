@@ -22,17 +22,17 @@ resource "aws_appsync_graphql_api" "question_answering_api" {
   tags = local.combined_tags
 }
 
-resource "aws_appsync_datasource" "job_status" {
+resource "aws_appsync_datasource" "question_answering_api_job_status" {
   api_id = aws_appsync_graphql_api.question_answering_api.id
   name   = local.graphql.question_answering_api.job_status_datasource_name
   type   = "NONE"
 }
 
-resource "aws_appsync_resolver" "job_status" {
+resource "aws_appsync_resolver" "question_answering_api_job_status" {
   api_id           = aws_appsync_graphql_api.question_answering_api.id
   type             = "Mutation"
   field            = "updateQAJobStatus"
-  data_source      = aws_appsync_datasource.job_status.name
+  data_source      = aws_appsync_datasource.question_answering_api_job_status.name
   request_template = <<EOF
     {
         "version": "2017-02-28",
@@ -45,51 +45,48 @@ resource "aws_appsync_resolver" "job_status" {
   EOF
 }
 
-# resource "aws_appsync_datasource" "event_bridge_datasource" {
-#   api_id           = aws_appsync_graphql_api.question_answering_graphql_api.id
-#   name             = "_${var.app_prefix}_question_answering_event_bridge_data_source"
-#   type             = "AMAZON_EVENTBRIDGE"
-#   service_role_arn = aws_iam_role.qa_construct_role.arn
+resource "aws_appsync_datasource" "question_answering_api_event_bridge" {
+  api_id           = aws_appsync_graphql_api.question_answering_api.id
+  name             = local.graphql.question_answering_api.event_bridge_datasource_name
+  type             = "AMAZON_EVENTBRIDGE"
+  service_role_arn = aws_iam_role.question_answering_api_event_bridge_datasource.arn
 
-#   event_bridge_config {
-#     event_bus_arn = aws_cloudwatch_event_bus.question_answering_event_bus.arn
-#   }
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  event_bridge_config {
+    event_bus_arn = aws_cloudwatch_event_bus.question_answering.arn
+  }
+}
 
-# resource "aws_appsync_resolver" "question_answering_resolver" {
-#   api_id      = aws_appsync_graphql_api.question_answering_graphql_api.id
-#   type        = "Mutation"
-#   field       = "postQuestion"
-#   data_source = aws_appsync_datasource.event_bridge_datasource.name
+resource "aws_appsync_resolver" "question_answering_api_event_bridge" {
+  api_id      = aws_appsync_graphql_api.question_answering_api.id
+  type        = "Mutation"
+  field       = "postQuestion"
+  data_source = aws_appsync_datasource.question_answering_api_event_bridge.name
 
-#   request_template = <<EOF
-#   {
-#       "version": "2018-05-29",
-#       "operation": "PutEvents",
-#       "events": [{
-#           "source": "questionanswering",
-#           "detail": {
-#             "filename": $util.toJson($ctx.arguments.filename),
-#             "jobid": $util.toJson($ctx.arguments.jobid),
-#             "jobstatus": $util.toJson($ctx.arguments.jobid),
-#             "max_docs": $util.toJson($ctx.arguments.jobid),
-#             "question": $util.toJson($ctx.arguments.jobid),
-#             "responseGenerationMethod": $util.toJson($ctx.arguments.jobid),
-#             "streaming": $util.toJson($ctx.arguments.jobid),
-#             "verbose": $util.toJson($ctx.arguments.jobid)
-#           },
-#           "detailType": "genAIdemo"
-#       }]
-#   }
-#   EOF
+  request_template = <<EOF
+  {
+    "version": "2018-05-29",
+    "operation": "PutEvents",
+    "events": [{
+        "source": "questionanswering",
+        "detail": {
+          "filename": $util.toJson($ctx.arguments.filename),
+          "jobid": $util.toJson($ctx.arguments.jobid),
+          "jobstatus": $util.toJson($ctx.arguments.jobid),
+          "max_docs": $util.toJson($ctx.arguments.jobid),
+          "question": $util.toJson($ctx.arguments.jobid),
+          "responseGenerationMethod": $util.toJson($ctx.arguments.jobid),
+          "streaming": $util.toJson($ctx.arguments.jobid),
+          "verbose": $util.toJson($ctx.arguments.jobid)
+        },
+        "detailType": "genAIdemo"
+    }]
+  }
+  EOF
 
-#   response_template = <<EOF
-#   #if($ctx.error)
-#       $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
-#   #end
-#   $util.toJson($ctx.result)
-#   EOF
-# }
+  response_template = <<EOF
+  #if($ctx.error)
+      $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
+  #end
+  $util.toJson($ctx.result)
+  EOF
+}

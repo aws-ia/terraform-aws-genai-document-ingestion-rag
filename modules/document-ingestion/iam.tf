@@ -28,7 +28,7 @@ resource "aws_iam_role_policy" "ingestion_api_log" {
 # IAM Role for AppSync Ingestion API Data Source
 ############################################################################################################
 resource "aws_iam_role" "ingestion_api_datasource" {
-  name = local.graphql.ingestion_api.name
+  name = local.graphql.ingestion_api.event_bridge_datasource_name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -50,7 +50,7 @@ resource "aws_iam_role" "ingestion_api_datasource" {
 }
 
 resource "aws_iam_role_policy" "ingestion_api_datasource" {
-  name   = local.graphql.ingestion_api.name
+  name   = local.graphql.ingestion_api.event_bridge_datasource_name
   role   = aws_iam_role.ingestion_api_datasource.id
   policy = data.aws_iam_policy_document.ingestion_api_datasource.json
 }

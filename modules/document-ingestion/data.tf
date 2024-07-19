@@ -24,18 +24,16 @@ data "aws_iam_policy_document" "ingestion_api_log" {
 
 data "aws_iam_policy_document" "ingestion_api_datasource" {
   statement {
-    sid = "IngestionApiPermissions"
+    sid = "EventBus"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "events:PutEvents",
     ]
 
     effect = "Allow"
 
     resources = [
-      "*",
+      aws_cloudwatch_event_bus.ingestion.arn,
     ]
   }
 }
