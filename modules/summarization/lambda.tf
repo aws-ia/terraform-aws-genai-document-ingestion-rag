@@ -48,6 +48,10 @@ module "docker_image_summarization_doc_reader" {
   image_tag     = local.lambda.summarization_doc_reader.docker_image_tag
   source_path   = local.lambda.summarization_doc_reader.source_path
   platform      = local.lambda.summarization_doc_reader.platform
+
+  triggers = {
+    dir_sha = local.lambda.summarization_doc_reader.dir_sha
+  }
 }
 
 resource "aws_lambda_function" "summarization_doc_reader" {
@@ -81,6 +85,10 @@ module "docker_image_summarization_generator" {
   image_tag     = local.lambda.summarization_generator.docker_image_tag
   source_path   = local.lambda.summarization_generator.source_path
   platform      = local.lambda.summarization_generator.platform
+
+  triggers = {
+    dir_sha = local.lambda.summarization_generator.dir_sha
+  }
 }
 
 resource "aws_lambda_function" "summarization_generator" {

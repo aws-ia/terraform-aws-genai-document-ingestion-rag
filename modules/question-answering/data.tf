@@ -4,6 +4,23 @@ data "aws_partition" "current" {}
 
 data "aws_ecr_authorization_token" "token" {}
 
+data "aws_iam_policy_document" "question_answering_api_log" {
+  statement {
+    sid = "IngestionApiLogPermissions"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+}
 
 # data "aws_iam_policy_document" "qa_construct_log_group_assume_role" {
 #   statement {
@@ -53,24 +70,7 @@ data "aws_ecr_authorization_token" "token" {}
 #   }
 # }
 
-# data "aws_iam_policy_document" "job_status_data_source_role" {
-#   statement {
-#     effect  = "Allow"
-#     actions = ["sts:AssumeRole"]
-#     principals {
-#       identifiers = ["appsync.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-# }
 
-# data "aws_iam_policy_document" "job_status_data_source_role_policy" {
-#   statement {
-#     effect    = "Allow"
-#     actions   = ["dynamodb:*", "lambda:*"]
-#     resources = ["*"]
-#   }
-# }
 
 # data "aws_iam_policy_document" "firehose_role" {
 #   statement {

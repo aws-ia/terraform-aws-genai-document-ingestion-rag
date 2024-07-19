@@ -8,10 +8,10 @@ locals {
 
   graphql = {
     question_answering_api = {
-      name                         = "${var.solution_prefix}-qa-api"
-      cloudwatch_log_role_name     = "${var.solution_prefix}-qa-api-log"
-      field_log_level              = "ALL"
-      event_bridge_datasource_name = replace("${var.solution_prefix}-qa-datasource", "-", "_") # must match pattern [_A-Za-z][_0-9A-Za-z]*
+      name                       = "${var.solution_prefix}-qa-api"
+      cloudwatch_log_role_name   = "${var.solution_prefix}-qa-api-log"
+      field_log_level            = "ALL"
+      job_status_datasource_name = replace("${var.solution_prefix}-qa-jobstatus-datasource", "-", "_") # must match pattern [_A-Za-z][_0-9A-Za-z]*
     }
   }
 
