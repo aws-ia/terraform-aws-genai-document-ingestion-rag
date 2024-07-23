@@ -16,15 +16,13 @@ locals {
   }
 
   cloudwatch = {
-    ingestion = {
+    ingestion_api = {
       event_bus_name = "${var.solution_prefix}-ingestion-event-bus"
-      log_group_name = "/${var.solution_prefix}/${var.solution_prefix}-ingestion"
-      log_retention  = 90
+      log_group_name = "/aws/appsync/apis/${aws_appsync_graphql_api.ingestion_api.id}"
     }
     ingestion_sm = {
       event_bridge_target_id = "${var.solution_prefix}-ingestion-sm-target"
-      log_group_name         = "/${var.solution_prefix}/${var.solution_prefix}-ingestion-sm"
-      log_retention          = 90
+      log_group_name         = "/aws/state/${var.solution_prefix}-ingestion-sm"
     }
   }
 

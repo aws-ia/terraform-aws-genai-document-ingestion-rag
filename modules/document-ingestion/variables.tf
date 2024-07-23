@@ -68,3 +68,13 @@ variable "container_platform" {
   default     = "linux/arm64"
   type        = string
 }
+
+variable "cloudwatch_log_group_retention" {
+  description = "Lambda CloudWatch log group retention period"
+  type        = string
+  default     = "365"
+  validation {
+    condition     = contains(["1", "3", "5", "7", "14", "30", "60", "90", "120", "150", "180", "365", "400", "545", "731", "1827", "3653", "0"], var.cloudwatch_log_group_retention)
+    error_message = "Valid values for var: cloudwatch_log_group_retention are (1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653, and 0)."
+  }
+}

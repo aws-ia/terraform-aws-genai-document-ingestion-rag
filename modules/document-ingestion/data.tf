@@ -354,3 +354,68 @@ data "aws_iam_policy_document" "ingestion_sm_eventbridge" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "ingestion_kms_key" {
+  #checkov:skip=CKV_AWS_109:Skip
+  #checkov:skip=CKV_AWS_111:Skip
+  statement {
+    sid    = "Enable IAM User Permissions"
+    effect = "Allow"
+    actions = [
+      "kms:Create*",
+      "kms:Describe*",
+      "kms:Enable*",
+      "kms:List*",
+      "kms:Put*",
+      "kms:Update*",
+      "kms:Revoke*",
+      "kms:Disable*",
+      "kms:Get*",
+      "kms:Delete*",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:${data.aws_partition.current.id}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+  }
+  statement {
+    sid    = "Allow Service CloudWatchLogGroup"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:Describe",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "logs.${data.aws_region.current.name}.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values = [
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+      ]
+    }
+  }
+}
