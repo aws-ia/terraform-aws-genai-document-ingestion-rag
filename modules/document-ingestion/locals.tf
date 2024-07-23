@@ -31,6 +31,7 @@ locals {
   lambda = {
     ingestion_input_validation = {
       name                     = "${var.solution_prefix}-${var.lambda_ingestion_input_validation_prop.image_tag}"
+      description              = "Lambda function to validate input for summary api"
       docker_image_tag         = var.lambda_ingestion_input_validation_prop.image_tag
       source_path              = var.lambda_ingestion_input_validation_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_ingestion_input_validation_prop.src_path, "*") : filesha1("${var.lambda_ingestion_input_validation_prop.src_path}/${f}")]))
@@ -52,6 +53,7 @@ locals {
 
     file_transformer = {
       name                     = "${var.solution_prefix}-${var.lambda_file_transformer_prop.image_tag}"
+      description              = "Lambda function for converting files from their input format to text"
       docker_image_tag         = var.lambda_file_transformer_prop.image_tag
       source_path              = var.lambda_file_transformer_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_file_transformer_prop.src_path, "*") : filesha1("${var.lambda_file_transformer_prop.src_path}/${f}")]))
@@ -75,6 +77,7 @@ locals {
 
     embeddings_job = {
       name                     = "${var.solution_prefix}-${var.lambda_embeddings_job_prop.image_tag}"
+      description              = "Lambda function for creating documents chunks, embeddings and storing them in Amazon Opensearch"
       docker_image_tag         = var.lambda_embeddings_job_prop.image_tag
       source_path              = var.lambda_embeddings_job_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_embeddings_job_prop.src_path, "*") : filesha1("${var.lambda_embeddings_job_prop.src_path}/${f}")]))

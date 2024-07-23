@@ -42,6 +42,7 @@ locals {
   lambda = {
     summarization_input_validation = {
       name                     = "${var.solution_prefix}-${var.lambda_summarization_input_validation_prop.image_tag}"
+      description              = "Lambda function to validate input for summary api"
       docker_image_tag         = var.lambda_summarization_input_validation_prop.image_tag
       source_path              = var.lambda_summarization_input_validation_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_summarization_input_validation_prop.src_path, "*") : filesha1("${var.lambda_summarization_input_validation_prop.src_path}/${f}")]))
@@ -63,6 +64,7 @@ locals {
 
     summarization_doc_reader = {
       name                     = "${var.solution_prefix}-${var.lambda_summarization_doc_reader_prop.image_tag}"
+      description              = "Lambda function to read the input transformed document"
       docker_image_tag         = var.lambda_summarization_doc_reader_prop.image_tag
       source_path              = var.lambda_summarization_doc_reader_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_summarization_doc_reader_prop.src_path, "*") : filesha1("${var.lambda_summarization_doc_reader_prop.src_path}/${f}")]))
@@ -87,6 +89,7 @@ locals {
 
     summarization_generator = {
       name                     = "${var.solution_prefix}-${var.lambda_summarization_generator_prop.image_tag}"
+      description              = "Lambda function to generate the summary"
       docker_image_tag         = var.lambda_summarization_generator_prop.image_tag
       source_path              = var.lambda_summarization_generator_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_summarization_generator_prop.src_path, "*") : filesha1("${var.lambda_summarization_generator_prop.src_path}/${f}")]))

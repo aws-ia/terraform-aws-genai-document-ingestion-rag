@@ -19,6 +19,7 @@ module "docker_image_summarization_input_validation" {
 
 resource "aws_lambda_function" "summarization_input_validation" {
   function_name = local.lambda.summarization_input_validation.name
+  description   = local.lambda.summarization_input_validation.description
   role          = aws_iam_role.summarization_input_validation.arn
   image_uri     = module.docker_image_summarization_input_validation.image_uri
   package_type  = "Image"
@@ -56,6 +57,7 @@ module "docker_image_summarization_doc_reader" {
 
 resource "aws_lambda_function" "summarization_doc_reader" {
   function_name = local.lambda.summarization_doc_reader.name
+  description   = local.lambda.summarization_doc_reader.description
   role          = aws_iam_role.summarization_doc_reader.arn
   image_uri     = module.docker_image_summarization_doc_reader.image_uri
   package_type  = "Image"
@@ -93,6 +95,7 @@ module "docker_image_summarization_generator" {
 
 resource "aws_lambda_function" "summarization_generator" {
   function_name = local.lambda.summarization_generator.name
+  description   = local.lambda.summarization_generator.description
   role          = aws_iam_role.summarization_generator.arn
   image_uri     = module.docker_image_summarization_generator.image_uri
   package_type  = "Image"

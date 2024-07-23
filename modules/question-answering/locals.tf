@@ -31,6 +31,7 @@ locals {
   lambda = {
     question_answering = {
       name                     = "${var.solution_prefix}-${var.lambda_question_answering_prop.image_tag}"
+      description              = "Lambda function for question answering"
       docker_image_tag         = var.lambda_question_answering_prop.image_tag
       source_path              = var.lambda_question_answering_prop.src_path
       dir_sha                  = sha1(join("", [for f in fileset(var.lambda_question_answering_prop.src_path, "*") : filesha1("${var.lambda_question_answering_prop.src_path}/${f}")]))
@@ -41,7 +42,7 @@ locals {
       memory_size              = 7076
       environment = {
         variables = {
-          GRAPHQL_URL = local.graph_ql_url
+          GRAPHQL_URL                = local.graph_ql_url
           INPUT_BUCKET               = var.processed_assets_bucket_prop.bucket_name
           OPENSEARCH_API_NAME        = var.opensearch_prop.type
           OPENSEARCH_DOMAIN_ENDPOINT = var.opensearch_prop.endpoint
@@ -59,10 +60,10 @@ locals {
   opensearch_policy = {
     es = {
       actions = [
-        "es:ESHttpGet", 
-        "es:ESHttpPut", 
-        "es:ESHttpPost", 
-        "es:ESHttpDelete", 
+        "es:ESHttpGet",
+        "es:ESHttpPut",
+        "es:ESHttpPost",
+        "es:ESHttpDelete",
         "es:ESHttpHead",
       ],
     },
@@ -72,6 +73,6 @@ locals {
       ],
     }
   }
-  
+
   graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.question_answering_api.uris["GRAPHQL"] : var.merged_api_url
 }

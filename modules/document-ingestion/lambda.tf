@@ -19,6 +19,7 @@ module "docker_image_ingestion_input_validation" {
 
 resource "aws_lambda_function" "ingestion_input_validation" {
   function_name = local.lambda.ingestion_input_validation.name
+  description   = local.lambda.ingestion_input_validation.description
   role          = aws_iam_role.ingestion_input_validation.arn
   image_uri     = module.docker_image_ingestion_input_validation.image_uri
   package_type  = "Image"
@@ -57,6 +58,7 @@ module "docker_image_file_transformer" {
 
 resource "aws_lambda_function" "file_transformer" {
   function_name = local.lambda.file_transformer.name
+  description   = local.lambda.file_transformer.description
   role          = aws_iam_role.file_transformer.arn
   image_uri     = module.docker_image_file_transformer.image_uri
   package_type  = "Image"
@@ -95,6 +97,7 @@ module "docker_image_embeddings_job" {
 
 resource "aws_lambda_function" "embeddings_job" {
   function_name = local.lambda.embeddings_job.name
+  description   = local.lambda.embeddings_job.description
   role          = aws_iam_role.embeddings_job.arn
   image_uri     = module.docker_image_embeddings_job.image_uri
   package_type  = "Image"

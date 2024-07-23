@@ -19,6 +19,7 @@ module "docker_image_question_answering" {
 
 resource "aws_lambda_function" "question_answering" {
   function_name = local.lambda.question_answering.name
+  description   = local.lambda.question_answering.description
   role          = aws_iam_role.question_answering.arn
   image_uri     = module.docker_image_question_answering.image_uri
   package_type  = "Image"
