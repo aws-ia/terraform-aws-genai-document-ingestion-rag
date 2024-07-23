@@ -29,7 +29,7 @@ resource "aws_appsync_datasource" "ingestion_api" {
   service_role_arn = aws_iam_role.ingestion_api_datasource.arn
 
   event_bridge_config {
-    event_bus_arn = aws_cloudwatch_event_bus.ingestion.arn
+    event_bus_arn = awscc_events_event_bus.ingestion.arn
   }
 }
 

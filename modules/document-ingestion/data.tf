@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "ingestion_api_datasource" {
     effect = "Allow"
 
     resources = [
-      aws_cloudwatch_event_bus.ingestion.arn,
+      awscc_events_event_bus.ingestion.arn,
     ]
   }
 }
@@ -390,6 +390,7 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
       ]
     }
   }
+
   statement {
     sid    = "Allow Service CloudWatchLogGroup"
     effect = "Allow"
@@ -397,7 +398,7 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
       "kms:Encrypt",
       "kms:Decrypt",
       "kms:ReEncrypt*",
-      "kms:Describe",
+      "kms:Describe*",
       "kms:GenerateDataKey*"
     ]
     resources = ["*"]
@@ -415,6 +416,39 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
         "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
         "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
         "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "Allow Service EventBus"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:events:event-bus:arn"
+      values = [
+        "arn:${data.aws_partition.current.id}:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/${var.solution_prefix}*",
+      ]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:${data.aws_partition.current.id}:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/${var.solution_prefix}*",
       ]
     }
   }
