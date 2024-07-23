@@ -25,8 +25,12 @@ output "cognito_user_pool_id" {
 output "opensearch_domain_mame" {
   value = local.opensearch.domain_name
 }
-output "open_search_domain_endpoint" {
+output "opensearch_domain_endpoint" {
   value = module.opensearch[*].domain_endpoint
+}
+
+output "opensearch_domain_arn" {
+  value = module.opensearch[*].domain_arn
 }
 
 output "opensearch_serverless_collection_name" {
@@ -35,6 +39,10 @@ output "opensearch_serverless_collection_name" {
 
 output "opensearch_serverless_collection_endpoint" {
   value = aws_opensearchserverless_collection.opensearch_serverless_collection[*].collection_endpoint
+}
+
+output "opensearch_serverless_arn" {
+  value = aws_opensearchserverless_collection.opensearch_serverless_collection[*].arn
 }
 
 output "ecr_repository_url" {
@@ -46,6 +54,10 @@ output "ecr_repository_id" {
 }
 
 output "merged_api_arn" {
+  value = data.aws_cloudformation_export.merged_api_arn.value
+}
+
+output "merged_api_id" {
   value = data.aws_cloudformation_export.merged_api_id.value
 }
 

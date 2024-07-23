@@ -271,3 +271,8 @@ data "aws_cloudformation_export" "merged_api_url" {
   name       = local.graphql.merged_api.export_url
   depends_on = [aws_cloudformation_stack.merged_api]
 }
+
+data "aws_cloudformation_export" "merged_api_arn" {
+  name       = local.graphql.merged_api.export_arn
+  depends_on = [aws_cloudformation_stack.merged_api]
+}

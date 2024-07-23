@@ -1,84 +1,45 @@
-# # Build and push Docker image to ECR
-# resource "null_resource" "build_and_push_image" {
-#   triggers = {
-#     always_run = timestamp()
-#   }
+############################################################################################################
+# Question Answering Lambda
+############################################################################################################
 
-#   provisioner "local-exec" {
-#     environment = {
-#       REPOSITORY_URL = var.ecr_repository_url
-#       AWS_REGION     = data.aws_region.current_region.name
-#       IMAGE_NAME     = local.question_answering_lambda_image_name
-#     }
-#     command = "${abspath(path.module)}/../../lambda/aws-qa-appsync-opensearch/question_answering/src/build_push_docker.sh"
-#   }
-# }
+module "docker_image_question_answering" {
+  source  = "terraform-aws-modules/lambda/aws//modules/docker-build"
+  version = "7.7.0"
 
-# resource "aws_sqs_queue" "dlq" {
-#   name                    = "${var.app_prefix}question_answering_function_dlq"
-#   sqs_managed_sse_enabled = true
-# }
+  ecr_repo      = var.ecr_repository_id
+  use_image_tag = true
+  image_tag     = local.lambda.question_answering.docker_image_tag
+  source_path   = local.lambda.question_answering.source_path
+  platform      = local.lambda.question_answering.platform
 
-# resource "aws_signer_signing_profile" "question_answering_profile" {
-#   name        = "${var.app_prefix}qa_sign_profile"
-#   platform_id = "AWSLambda-SHA384-ECDSA"
+  triggers = {
+    dir_sha = local.lambda.question_answering.dir_sha
+  }
+}
 
-#   signature_validity_period {
-#     type  = "DAYS"
-#     value = 365
-#   }
+resource "aws_lambda_function" "question_answering" {
+  function_name = local.lambda.question_answering.name
+  role          = aws_iam_role.question_answering.arn
+  image_uri     = module.docker_image_question_answering.image_uri
+  package_type  = "Image"
+  architectures = [local.lambda.question_answering.runtime_architecture]
+  timeout       = local.lambda.question_answering.timeout
+  memory_size   = local.lambda.question_answering.memory_size
+  vpc_config {
+    subnet_ids         = local.lambda.question_answering.vpc_config.subnet_ids
+    security_group_ids = local.lambda.question_answering.vpc_config.security_group_ids
+  }
+  environment {
+    variables = local.lambda.question_answering.environment.variables
+  }
 
-#   tags = {
-#     Name = "question_answering Profile"
-#   }
-# }
+  tags = local.combined_tags
+}
 
-# resource "aws_lambda_code_signing_config" "question_answering_function" {
-#   allowed_publishers {
-#     signing_profile_version_arns = [aws_signer_signing_profile.question_answering_profile.arn]
-#   }
-
-#   policies {
-#     untrusted_artifact_on_deployment = "Enforce"
-#   }
-# }
-
-# # Create Lambda function using Docker image from ECR
-# resource "aws_lambda_function" "question_answering_function" {
-#   function_name = "${var.app_prefix}question_answering_function"
-#   role          = aws_iam_role.question_answering_function_role.arn
-#   image_uri     = "${var.ecr_repository_url}:${local.question_answering_lambda_image_name}"
-#   package_type  = "Image"
-#   timeout       = 300
-#   #   vpc_config {
-#   #     security_group_ids = var.security_groups_ids
-#   #     subnet_ids         = var.subnet_ids
-#   #   }
-#   tracing_config {
-#     mode = "Active"
-#   }
-#   environment {
-#     variables = {
-#       GRAPHQL_URL                = local.graph_ql_url
-#       INPUT_BUCKET               = var.input_assets_bucket_name
-#       OPENSEARCH_DOMAIN_ENDPOINT = local.selected_open_search_endpoint
-#       OPENSEARCH_INDEX           = var.existing_open_search_index_name
-#       OPENSEARCH_SECRET_ID       = var.open_search_secret
-#     }
-#   }
-#   dead_letter_config {
-#     target_arn = aws_sqs_queue.dlq.arn
-#   }
-#   reserved_concurrent_executions = 10
-#   depends_on                     = [null_resource.build_and_push_image]
-#   kms_key_arn                    = aws_kms_key.customer_managed_kms_key.arn
-# }
-
-# resource "aws_lambda_permission" "grant_invoke_lambda" {
-#   statement_id  = "AllowAppSyncToInvokeLambda"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.question_answering_function.arn
-#   principal     = "appsync.amazonaws.com"
-#   source_arn    = aws_appsync_datasource.event_bridge_datasource.arn
-# }
-
+resource "aws_lambda_permission" "question_answering" {
+  statement_id  = "AllowEventBridgeToInvokeLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.question_answering.arn
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.question_answering.arn
+}

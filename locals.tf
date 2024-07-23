@@ -18,9 +18,11 @@ locals {
   temp_opensearch_prop = local.opensearch.use_serverless_opensearch ? {
     name     = module.persistence_resources.opensearch_serverless_collection_name
     endpoint = module.persistence_resources.opensearch_serverless_collection_endpoint[0]
+    arn      = module.persistence_resources.opensearch_serverless_arn[0]
     } : local.opensearch.use_opensearch ? {
     name     = module.persistence_resources.opensearch_domain_mame
-    endpoint = module.persistence_resources.open_search_domain_endpoint[0]
+    endpoint = module.persistence_resources.opensearch_domain_endpoint[0]
+    arn      = module.persistence_resources.opensearch_domain_arn[0]
   } : {}
 
   # set common properties for both aoss and es

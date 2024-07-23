@@ -83,15 +83,12 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
       "s3:GetBucket*",
       "s3:List*",
       "s3:PutObjectRetention",
-      "s3:List*",
-      "s3:GetBucket*",
       "s3:Abort*",
       "s3:DeleteObject*",
       "s3:PutObjectLegalHold",
       "s3:PutObjectTagging",
       "s3:PutObjectVersionTagging",
       "s3:PutObject",
-      "s3:GetObject*"
     ]
 
     effect = "Allow"

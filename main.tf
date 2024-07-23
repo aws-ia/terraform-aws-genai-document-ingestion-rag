@@ -166,7 +166,27 @@ module "question-answering" {
 
   solution_prefix      = local.solution_prefix
   cognito_user_pool_id = module.persistence_resources.cognito_user_pool_id
+  ecr_repository_id    = module.persistence_resources.ecr_repository_id
 
+  lambda_question_answering_prop = {
+    image_tag          = "question_answering"
+    src_path           = "${path.module}/lambda/aws-qa-appsync-opensearch/question_answering/src"
+    subnet_ids         = [for _, value in module.networking_resources.private_subnet_attributes_by_az : value.id]
+    security_group_ids = [module.networking_resources.lambda_sg]
+  }
+
+  merged_api_arn = module.persistence_resources.merged_api_arn
+  merged_api_url = module.persistence_resources.merged_api_url
+
+  processed_assets_bucket_prop = {
+    bucket_arn  = module.persistence_resources.processed_assets_bucket_arn
+    bucket_name = module.persistence_resources.processed_assets_bucket_name
+  }
+
+  opensearch_prop = local.final_opensearch_prop
+
+  container_platform = var.container_platform
+  tags               = local.root_combined_tags
   # bucket_prefix = "gen-ai"
   # stage = "_dev"
   # subnet_ids = [tostring(module.networking_resources.public_subnet_id), tostring(module.networking_resources.private_subnet_id), tostring(module.networking_resources.isolated_subnet_id)]

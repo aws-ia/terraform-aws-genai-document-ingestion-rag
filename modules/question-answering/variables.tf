@@ -15,29 +15,41 @@ variable "cognito_user_pool_id" {
   type        = string
 }
 
-# variable "bucket_prefix" {}
-# variable "stage" {}
-# variable "vpc_id" {
-#   description = "The ID of the VPC"
-#   type        = string
-# }
-# variable "service_access_log_bucket_arn" {}
-# variable "cognito_user_pool_id" {}
-# variable "open_search_secret" {}
-# variable "input_assets_bucket_arn" {}
-# variable "access_logs_bucket_name" {}
-# variable "access_logs_bucket_arn" {}
-# variable "input_assets_bucket_name" {}
-# variable "existing_opensearch_domain_mame" {}
-# variable "existing_open_search_domain_endpoint" {}
-# variable "opensearch_serverless_collection_endpoint" {}
-# variable "existing_open_search_index_name" {}
-# variable "app_prefix" {}
-# variable "security_groups_ids" { type = list(string) }
-# variable "subnet_ids" { type = list(string) }
-# variable "ecr_repository_url" {}
+variable "ecr_repository_id" {
+  description = "ECR Repo Name"
+  type        = string
+}
 
-# variable "merged_api_url" {
-#   type    = string
-#   default = ""
-# }
+variable "lambda_question_answering_prop" {
+  description = "Properties for Lambda question answering"
+  type        = any
+}
+
+variable "merged_api_arn" {
+  description = "AppSync Merged API ARN"
+  type        = string
+  default     = ""
+}
+
+variable "merged_api_url" {
+  description = "AppSync Merged API URL"
+  type        = string
+  default     = ""
+}
+
+variable "container_platform" {
+  description = "The platform for the container image, default is 'linux/arm64'"
+  default     = "linux/arm64"
+  type        = string
+}
+
+variable "opensearch_prop" {
+  description = "Properties for Opensearch cluster"
+  type        = any
+  default     = null
+}
+
+variable "processed_assets_bucket_prop" {
+  description = "Properties for processed assets S3 bucket"
+  type        = map(any)
+}

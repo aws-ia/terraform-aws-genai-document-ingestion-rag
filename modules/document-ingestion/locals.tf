@@ -18,7 +18,7 @@ locals {
   cloudwatch = {
     ingestion = {
       event_bus_name = "${var.solution_prefix}-ingestion-event-bus"
-      log_group_name = "/${var.solution_prefix}/${var.solution_prefix}-ingestion-log-group"
+      log_group_name = "/${var.solution_prefix}/${var.solution_prefix}-ingestion"
       log_retention  = 90
     }
     ingestion_sm = {
