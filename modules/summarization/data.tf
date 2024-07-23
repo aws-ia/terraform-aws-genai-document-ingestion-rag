@@ -390,29 +390,3 @@ data "aws_iam_policy_document" "summarization_generator" {
     ]
   }
 }
-
-# data "aws_iam_policy_document" "firehose_role" {
-#   statement {
-#     effect = "Allow"
-#     principals {
-#       identifiers = ["firehose.amazonaws.com"]
-#       type        = "Service"
-#     }
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
-
-# data "aws_iam_policy_document" "firehose_to_s3_policy" {
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "s3:AbortMultipartUpload",
-#       "s3:GetBucketLocation",
-#       "s3:GetObject",
-#       "s3:ListBucket",
-#       "s3:ListBucketMultipartUploads",
-#       "s3:PutObject"
-#     ]
-#     resources = ["${aws_s3_bucket.waf_logs.arn}/*"]
-#   }
-# }

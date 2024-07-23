@@ -33,6 +33,7 @@ resource "aws_appsync_datasource" "summarization_api" {
   }
 }
 
+# TODO: move to templatefile
 resource "aws_appsync_resolver" "summarization_api" {
   api_id      = aws_appsync_graphql_api.summarization_api.id
   type        = "Mutation"
@@ -66,6 +67,7 @@ resource "aws_appsync_datasource" "summarization_status" {
   type   = "NONE"
 }
 
+# TODO: move to templatefile
 resource "aws_appsync_resolver" "summarization_status" {
   api_id      = aws_appsync_graphql_api.summarization_api.id
   type        = "Mutation"

@@ -48,7 +48,7 @@ locals {
       platform                 = var.container_platform
       runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_summarization_input_validation_prop.image_tag}-log"
-      timeout                  = 600
+      timeout                  = 300
       memory_size              = 1769
       environment = {
         variables = {
@@ -69,7 +69,7 @@ locals {
       platform                 = var.container_platform
       runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_summarization_doc_reader_prop.image_tag}-log"
-      timeout                  = 600
+      timeout                  = 300
       memory_size              = 1769
       environment = {
         variables = {
@@ -94,7 +94,7 @@ locals {
       runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
       cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_summarization_generator_prop.image_tag}-log"
       timeout                  = 600
-      memory_size              = 1769
+      memory_size              = 7076
       environment = {
         variables = {
           GRAPHQL_URL            = local.graph_ql_url
@@ -108,7 +108,6 @@ locals {
       }
     }
   }
-  # update_graphql_api_id                     = var.existing_merged_api_id != "" ? var.existing_merged_api_id : aws_appsync_graphql_api.summarization_graphql_api.id
 
   graph_ql_url = var.merged_api_url == "" ? aws_appsync_graphql_api.summarization_api.uris["GRAPHQL"] : var.merged_api_url
 }

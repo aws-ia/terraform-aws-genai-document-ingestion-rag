@@ -4,6 +4,7 @@ resource "aws_cloudwatch_event_bus" "ingestion" {
   tags = local.combined_tags
 }
 
+# TODO: move to templatefile
 resource "aws_cloudwatch_event_rule" "ingestion" {
   name           = local.cloudwatch.ingestion.event_bus_name
   description    = "Rule to trigger ingestion state machine"

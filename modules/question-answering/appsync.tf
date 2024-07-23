@@ -28,6 +28,7 @@ resource "aws_appsync_datasource" "question_answering_api_job_status" {
   type   = "NONE"
 }
 
+# TODO: move to templatefile
 resource "aws_appsync_resolver" "question_answering_api_job_status" {
   api_id           = aws_appsync_graphql_api.question_answering_api.id
   type             = "Mutation"
@@ -56,6 +57,7 @@ resource "aws_appsync_datasource" "question_answering_api_event_bridge" {
   }
 }
 
+# TODO: move to templatefile
 resource "aws_appsync_resolver" "question_answering_api_event_bridge" {
   api_id      = aws_appsync_graphql_api.question_answering_api.id
   type        = "Mutation"

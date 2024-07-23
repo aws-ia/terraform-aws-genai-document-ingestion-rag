@@ -187,10 +187,3 @@ resource "aws_iam_role_policy" "summarization_generator" {
   role   = aws_iam_role.summarization_generator.id
   policy = data.aws_iam_policy_document.summarization_generator.json
 }
-
-
-# resource "aws_iam_role" "firehose_role" {
-#   name = "${var.app_prefix}-summarization_firehose_delivery_role"
-
-#   assume_role_policy = data.aws_iam_policy_document.firehose_role.json
-# }

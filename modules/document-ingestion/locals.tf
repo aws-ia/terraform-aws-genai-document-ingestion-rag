@@ -88,6 +88,7 @@ locals {
           INPUT_BUCKET               = var.input_assets_bucket_prop.bucket_name
           OUTPUT_BUCKET              = var.processed_assets_bucket_prop.bucket_name
           GRAPHQL_URL                = local.graph_ql_url
+          OPENSEARCH_API_NAME        = var.opensearch_prop.type
           OPENSEARCH_DOMAIN_ENDPOINT = var.opensearch_prop.endpoint
           OPENSEARCH_INDEX           = var.opensearch_prop.index_name
           OPENSEARCH_SECRET_ID       = var.opensearch_prop.secret

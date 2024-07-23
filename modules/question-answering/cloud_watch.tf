@@ -4,6 +4,7 @@ resource "aws_cloudwatch_event_bus" "question_answering" {
   tags = local.combined_tags
 }
 
+# TODO: move to templatefile
 resource "aws_cloudwatch_event_rule" "question_answering" {
   name           = local.cloudwatch.question_answering.event_bus_name
   description    = "Rule to trigger question answering function"

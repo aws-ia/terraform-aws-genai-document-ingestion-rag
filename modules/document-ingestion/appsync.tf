@@ -33,6 +33,7 @@ resource "aws_appsync_datasource" "ingestion_api" {
   }
 }
 
+# TODO: move to templatefile
 resource "aws_appsync_resolver" "ingestion_api" {
   api_id      = aws_appsync_graphql_api.ingestion_api.id
   type        = "Mutation"
