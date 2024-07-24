@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
     effect = "Allow"
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.ingestion_input_validation.cloudwatch_log_role_name}/*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.ingestion_input_validation.log_group_name}/*",
     ]
   }
 
@@ -149,7 +149,7 @@ data "aws_iam_policy_document" "file_transformer" {
     effect = "Allow"
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.file_transformer.cloudwatch_log_role_name}/*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.file_transformer.log_group_name}/*",
     ]
   }
 
@@ -250,7 +250,7 @@ data "aws_iam_policy_document" "embeddings_job" {
     effect = "Allow"
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.embeddings_job.cloudwatch_log_role_name}/*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.embeddings_job.log_group_name}/*",
     ]
   }
 

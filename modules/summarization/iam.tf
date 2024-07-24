@@ -40,12 +40,6 @@ resource "aws_iam_role" "summarization_api_datasource" {
       }
     }]
   })
-
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-    "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
-  ]
-
   tags = local.combined_tags
 }
 

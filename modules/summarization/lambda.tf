@@ -15,6 +15,7 @@ module "docker_image_summarization_input_validation" {
   triggers = {
     dir_sha = local.lambda.summarization_input_validation.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "summarization_input_validation" {
@@ -26,6 +27,7 @@ resource "aws_lambda_function" "summarization_input_validation" {
   architectures = [local.lambda.summarization_input_validation.runtime_architecture]
   timeout       = local.lambda.summarization_input_validation.timeout
   memory_size   = local.lambda.summarization_input_validation.memory_size
+  kms_key_arn   = aws_kms_key.summarization.arn
   vpc_config {
     subnet_ids         = local.lambda.summarization_input_validation.vpc_config.subnet_ids
     security_group_ids = local.lambda.summarization_input_validation.vpc_config.security_group_ids
@@ -33,7 +35,13 @@ resource "aws_lambda_function" "summarization_input_validation" {
   environment {
     variables = local.lambda.summarization_input_validation.environment.variables
   }
-  tags = local.combined_tags
+  tracing_config {
+    mode = "Active"
+  }
+  reserved_concurrent_executions = local.lambda.summarization_input_validation.lambda_reserved_concurrency
+  tags                           = local.combined_tags
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
 }
 
 ############################################################################################################
@@ -53,6 +61,7 @@ module "docker_image_summarization_doc_reader" {
   triggers = {
     dir_sha = local.lambda.summarization_doc_reader.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "summarization_doc_reader" {
@@ -64,6 +73,7 @@ resource "aws_lambda_function" "summarization_doc_reader" {
   architectures = [local.lambda.summarization_doc_reader.runtime_architecture]
   timeout       = local.lambda.summarization_doc_reader.timeout
   memory_size   = local.lambda.summarization_doc_reader.memory_size
+  kms_key_arn   = aws_kms_key.summarization.arn
   vpc_config {
     subnet_ids         = local.lambda.summarization_doc_reader.vpc_config.subnet_ids
     security_group_ids = local.lambda.summarization_doc_reader.vpc_config.security_group_ids
@@ -71,7 +81,13 @@ resource "aws_lambda_function" "summarization_doc_reader" {
   environment {
     variables = local.lambda.summarization_doc_reader.environment.variables
   }
-  tags = local.combined_tags
+  tracing_config {
+    mode = "Active"
+  }
+  reserved_concurrent_executions = local.lambda.summarization_doc_reader.lambda_reserved_concurrency
+  tags                           = local.combined_tags
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
 }
 
 ############################################################################################################
@@ -91,6 +107,7 @@ module "docker_image_summarization_generator" {
   triggers = {
     dir_sha = local.lambda.summarization_generator.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "summarization_generator" {
@@ -102,6 +119,7 @@ resource "aws_lambda_function" "summarization_generator" {
   architectures = [local.lambda.summarization_generator.runtime_architecture]
   timeout       = local.lambda.summarization_generator.timeout
   memory_size   = local.lambda.summarization_generator.memory_size
+  kms_key_arn   = aws_kms_key.summarization.arn
   vpc_config {
     subnet_ids         = local.lambda.summarization_generator.vpc_config.subnet_ids
     security_group_ids = local.lambda.summarization_generator.vpc_config.security_group_ids
@@ -109,5 +127,11 @@ resource "aws_lambda_function" "summarization_generator" {
   environment {
     variables = local.lambda.summarization_generator.environment.variables
   }
-  tags = local.combined_tags
+  tracing_config {
+    mode = "Active"
+  }
+  reserved_concurrent_executions = local.lambda.summarization_generator.lambda_reserved_concurrency
+  tags                           = local.combined_tags
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
 }

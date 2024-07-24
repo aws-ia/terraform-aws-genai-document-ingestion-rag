@@ -16,6 +16,6 @@ resource "aws_sfn_state_machine" "ingestion_sm" {
   tracing_configuration {
     enabled = true
   }
-  
+
   tags = local.combined_tags
 }

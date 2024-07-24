@@ -1,7 +1,7 @@
 # TODO: setup resource policy, DLQ
 resource "awscc_events_event_bus" "question_answering" {
-  name = "${local.cloudwatch.question_answering_api.event_bus_name}"
-  kms_key_identifier = aws_kms_alias.question_answering.arn  
+  name               = local.cloudwatch.question_answering_api.event_bus_name
+  kms_key_identifier = aws_kms_alias.question_answering.arn
   tags = [
     for k, v in local.combined_tags :
     {
@@ -30,4 +30,11 @@ resource "aws_cloudwatch_event_target" "question_answering" {
   target_id      = local.cloudwatch.question_answering_sm.event_bridge_target_id
   arn            = aws_lambda_function.question_answering.arn
   event_bus_name = awscc_events_event_bus.question_answering.name
+}
+
+resource "aws_cloudwatch_log_group" "question_answering" {
+  name              = local.lambda.question_answering.log_group_name
+  retention_in_days = var.cloudwatch_log_group_retention
+  kms_key_id        = aws_kms_alias.question_answering.arn
+  tags              = local.combined_tags
 }

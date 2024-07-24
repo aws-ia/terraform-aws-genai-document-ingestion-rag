@@ -39,7 +39,7 @@ resource "aws_lambda_function" "ingestion_input_validation" {
     mode = "Active"
   }
   reserved_concurrent_executions = local.lambda.ingestion_input_validation.lambda_reserved_concurrency
-  tags = local.combined_tags
+  tags                           = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
 }
@@ -85,7 +85,7 @@ resource "aws_lambda_function" "file_transformer" {
     mode = "Active"
   }
   reserved_concurrent_executions = local.lambda.file_transformer.lambda_reserved_concurrency
-  tags = local.combined_tags
+  tags                           = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
 }
@@ -131,7 +131,7 @@ resource "aws_lambda_function" "embeddings_job" {
     mode = "Active"
   }
   reserved_concurrent_executions = local.lambda.embeddings_job.lambda_reserved_concurrency
-  tags = local.combined_tags
+  tags                           = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
 }

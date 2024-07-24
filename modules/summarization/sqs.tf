@@ -2,8 +2,8 @@
 resource "aws_sqs_queue" "summarization_sm_dlq" {
   name                      = local.statemachine.summarization.name
   message_retention_seconds = 604800 # 7 days
-
-  tags = local.combined_tags
+  kms_master_key_id         = aws_kms_alias.summarization.arn
+  tags                      = local.combined_tags
 }
 
 resource "aws_sqs_queue_policy" "summarization_sm_dlq" {

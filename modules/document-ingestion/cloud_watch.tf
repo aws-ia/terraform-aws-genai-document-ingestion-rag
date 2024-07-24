@@ -1,7 +1,7 @@
 # TODO: setup resource policy, DLQ
 resource "awscc_events_event_bus" "ingestion" {
-  name = "${local.cloudwatch.ingestion_api.event_bus_name}"
-  kms_key_identifier = aws_kms_alias.ingestion.arn  
+  name               = local.cloudwatch.ingestion_api.event_bus_name
+  kms_key_identifier = aws_kms_alias.ingestion.arn
   tags = [
     for k, v in local.combined_tags :
     {
@@ -50,21 +50,21 @@ resource "aws_cloudwatch_log_group" "ingestion_sm" {
 }
 
 resource "aws_cloudwatch_log_group" "ingestion_input_validation" {
-  name              = "/aws/lambda/${aws_lambda_function.ingestion_input_validation.function_name}"
+  name              = local.lambda.ingestion_input_validation.log_group_name
   retention_in_days = var.cloudwatch_log_group_retention
   kms_key_id        = aws_kms_alias.ingestion.arn
   tags              = local.combined_tags
 }
 
 resource "aws_cloudwatch_log_group" "file_transformer" {
-  name              = "/aws/lambda/${aws_lambda_function.file_transformer.function_name}"
+  name              = local.lambda.file_transformer.log_group_name
   retention_in_days = var.cloudwatch_log_group_retention
   kms_key_id        = aws_kms_alias.ingestion.arn
   tags              = local.combined_tags
 }
 
 resource "aws_cloudwatch_log_group" "embeddings_job" {
-  name              = "/aws/lambda/${aws_lambda_function.embeddings_job.function_name}"
+  name              = local.lambda.embeddings_job.log_group_name
   retention_in_days = var.cloudwatch_log_group_retention
   kms_key_id        = aws_kms_alias.ingestion.arn
   tags              = local.combined_tags

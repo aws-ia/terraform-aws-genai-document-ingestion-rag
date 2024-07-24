@@ -39,7 +39,7 @@ resource "aws_lambda_function" "question_answering" {
     mode = "Active"
   }
   reserved_concurrent_executions = local.lambda.question_answering.lambda_reserved_concurrency
-  tags = local.combined_tags
+  tags                           = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
 }

@@ -20,6 +20,7 @@ resource "aws_appsync_graphql_api" "summarization_api" {
   }
 
   tags = local.combined_tags
+  #checkov:skip=CKV2_AWS_33:WAF is not required for demonstration purpose
 }
 
 resource "aws_appsync_datasource" "summarization_api" {
@@ -29,7 +30,7 @@ resource "aws_appsync_datasource" "summarization_api" {
   service_role_arn = aws_iam_role.summarization_api_datasource.arn
 
   event_bridge_config {
-    event_bus_arn = aws_cloudwatch_event_bus.summarization.arn
+    event_bus_arn = awscc_events_event_bus.summarization.arn
   }
 }
 

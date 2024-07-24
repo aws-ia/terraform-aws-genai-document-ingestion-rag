@@ -30,16 +30,16 @@ locals {
 
   lambda = {
     question_answering = {
-      name                     = "${var.solution_prefix}-${var.lambda_question_answering_prop.image_tag}"
-      description              = "Lambda function for question answering"
-      docker_image_tag         = var.lambda_question_answering_prop.image_tag
-      source_path              = var.lambda_question_answering_prop.src_path
-      dir_sha                  = sha1(join("", [for f in fileset(var.lambda_question_answering_prop.src_path, "*") : filesha1("${var.lambda_question_answering_prop.src_path}/${f}")]))
-      platform                 = var.container_platform
-      runtime_architecture     = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
-      cloudwatch_log_role_name = "${var.solution_prefix}-${var.lambda_question_answering_prop.image_tag}-log"
-      timeout                  = 900
-      memory_size              = 7076
+      name                 = "${var.solution_prefix}-${var.lambda_question_answering_prop.image_tag}"
+      description          = "Lambda function for question answering"
+      docker_image_tag     = var.lambda_question_answering_prop.image_tag
+      source_path          = var.lambda_question_answering_prop.src_path
+      dir_sha              = sha1(join("", [for f in fileset(var.lambda_question_answering_prop.src_path, "*") : filesha1("${var.lambda_question_answering_prop.src_path}/${f}")]))
+      platform             = var.container_platform
+      runtime_architecture = var.container_platform == "linux/arm64" ? "arm64" : "x86_64"
+      log_group_name       = "/aws/lambda/${var.solution_prefix}-${var.lambda_question_answering_prop.image_tag}"
+      timeout              = 900
+      memory_size          = 7076
       environment = {
         variables = {
           GRAPHQL_URL                = local.graph_ql_url

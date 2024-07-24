@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "question_answering" {
     effect = "Allow"
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.question_answering.cloudwatch_log_role_name}/*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.question_answering.log_group_name}/*",
     ]
   }
 
@@ -140,7 +140,7 @@ data "aws_iam_policy_document" "question_answering" {
       "*"
     ]
   }
-  
+
   dynamic "statement" {
     for_each = var.opensearch_prop.type == "es" ? [local.opensearch_policy.es] : [local.opensearch_policy.aoss]
     content {

@@ -13,5 +13,9 @@ resource "aws_sfn_state_machine" "summarization_sm" {
     log_destination        = "${aws_cloudwatch_log_group.summarization_sm.arn}:*"
   }
 
+  tracing_configuration {
+    enabled = true
+  }
+
   tags = local.combined_tags
 }
