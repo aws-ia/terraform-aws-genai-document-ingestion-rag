@@ -6,7 +6,7 @@ locals {
     }
   )
   cloudwatch = {
-    question_answering = {
+    question_answering_api = {
       event_bus_name = "${var.solution_prefix}-qa-event-bus"
       log_group_name = "/${var.solution_prefix}/${var.solution_prefix}-qa"
       log_retention  = 90
@@ -54,6 +54,7 @@ locals {
         subnet_ids         = var.lambda_question_answering_prop.subnet_ids
         security_group_ids = var.lambda_question_answering_prop.security_group_ids
       }
+      lambda_reserved_concurrency = var.lambda_reserved_concurrency
     }
   }
 

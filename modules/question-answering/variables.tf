@@ -53,3 +53,9 @@ variable "processed_assets_bucket_prop" {
   description = "Properties for processed assets S3 bucket"
   type        = map(any)
 }
+
+variable "lambda_reserved_concurrency" {
+  description = "Maximum Lambda reserved concurrency, make sure your AWS quota is sufficient"
+  type        = number
+  default     = 10
+}

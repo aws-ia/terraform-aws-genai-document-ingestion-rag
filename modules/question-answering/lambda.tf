@@ -15,6 +15,7 @@ module "docker_image_question_answering" {
   triggers = {
     dir_sha = local.lambda.question_answering.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "question_answering" {
@@ -26,6 +27,7 @@ resource "aws_lambda_function" "question_answering" {
   architectures = [local.lambda.question_answering.runtime_architecture]
   timeout       = local.lambda.question_answering.timeout
   memory_size   = local.lambda.question_answering.memory_size
+  kms_key_arn   = aws_kms_key.question_answering.arn
   vpc_config {
     subnet_ids         = local.lambda.question_answering.vpc_config.subnet_ids
     security_group_ids = local.lambda.question_answering.vpc_config.security_group_ids
@@ -33,8 +35,13 @@ resource "aws_lambda_function" "question_answering" {
   environment {
     variables = local.lambda.question_answering.environment.variables
   }
-
+  tracing_config {
+    mode = "Active"
+  }
+  reserved_concurrent_executions = local.lambda.question_answering.lambda_reserved_concurrency
   tags = local.combined_tags
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
 }
 
 resource "aws_lambda_permission" "question_answering" {

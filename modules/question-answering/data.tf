@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "question_answering_api_log" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch.question_answering_api.log_group_name}/*",
     ]
   }
 }
@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "question_answering_api_event_bridge_datasource" 
     effect = "Allow"
 
     resources = [
-      aws_cloudwatch_event_bus.question_answering.arn,
+      awscc_events_event_bus.question_answering.arn,
     ]
   }
 }
@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "question_answering" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.question_answering.cloudwatch_log_role_name}/*",
     ]
   }
 
@@ -123,6 +123,24 @@ data "aws_iam_policy_document" "question_answering" {
     ]
   }
 
+  statement {
+    sid = "XRayAccess"
+
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets",
+      "xray:GetSamplingStatisticSummaries"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
+  
   dynamic "statement" {
     for_each = var.opensearch_prop.type == "es" ? [local.opensearch_policy.es] : [local.opensearch_policy.aoss]
     content {
@@ -135,4 +153,106 @@ data "aws_iam_policy_document" "question_answering" {
       resources = [var.opensearch_prop.arn]
     }
   }
+  #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
+}
+
+data "aws_iam_policy_document" "question_answering_kms_key" {
+  statement {
+    sid    = "Enable IAM User Permissions"
+    effect = "Allow"
+    actions = [
+      "kms:Create*",
+      "kms:Describe*",
+      "kms:Enable*",
+      "kms:List*",
+      "kms:Put*",
+      "kms:Update*",
+      "kms:Revoke*",
+      "kms:Disable*",
+      "kms:Get*",
+      "kms:Delete*",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:${data.aws_partition.current.id}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+  }
+
+  statement {
+    sid    = "Allow Service CloudWatchLogGroup"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:Describe*",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "logs.${data.aws_region.current.name}.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values = [
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "Allow Service EventBus"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:events:event-bus:arn"
+      values = [
+        "arn:${data.aws_partition.current.id}:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/${var.solution_prefix}*",
+      ]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:${data.aws_partition.current.id}:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/${var.solution_prefix}*",
+      ]
+    }
+  }
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
