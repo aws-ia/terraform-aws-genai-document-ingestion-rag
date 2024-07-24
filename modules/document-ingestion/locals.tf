@@ -47,6 +47,7 @@ locals {
         subnet_ids         = var.lambda_ingestion_input_validation_prop.subnet_ids
         security_group_ids = var.lambda_ingestion_input_validation_prop.security_group_ids
       }
+      lambda_reserved_concurrency = var.lambda_reserved_concurrency
     }
 
     file_transformer = {
@@ -71,6 +72,7 @@ locals {
         subnet_ids         = var.lambda_file_transformer_prop.subnet_ids
         security_group_ids = var.lambda_file_transformer_prop.security_group_ids
       }
+      lambda_reserved_concurrency = var.lambda_reserved_concurrency
     }
 
     embeddings_job = {
@@ -99,6 +101,7 @@ locals {
         subnet_ids         = var.lambda_embeddings_job_prop.subnet_ids
         security_group_ids = var.lambda_embeddings_job_prop.security_group_ids
       }
+      lambda_reserved_concurrency = var.lambda_reserved_concurrency
     }
   }
 

@@ -20,6 +20,7 @@ resource "aws_appsync_graphql_api" "ingestion_api" {
   }
 
   tags = local.combined_tags
+  #checkov:skip=CKV2_AWS_33:WAF is not required for demonstration purpose
 }
 
 resource "aws_appsync_datasource" "ingestion_api" {

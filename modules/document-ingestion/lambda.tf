@@ -15,6 +15,7 @@ module "docker_image_ingestion_input_validation" {
   triggers = {
     dir_sha = local.lambda.ingestion_input_validation.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "ingestion_input_validation" {
@@ -37,9 +38,10 @@ resource "aws_lambda_function" "ingestion_input_validation" {
   tracing_config {
     mode = "Active"
   }
+  reserved_concurrent_executions = local.lambda.ingestion_input_validation.lambda_reserved_concurrency
+  tags = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
-  tags = local.combined_tags
 }
 
 ############################################################################################################
@@ -59,6 +61,7 @@ module "docker_image_file_transformer" {
   triggers = {
     dir_sha = local.lambda.file_transformer.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "file_transformer" {
@@ -81,9 +84,10 @@ resource "aws_lambda_function" "file_transformer" {
   tracing_config {
     mode = "Active"
   }
+  reserved_concurrent_executions = local.lambda.file_transformer.lambda_reserved_concurrency
+  tags = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
-  tags = local.combined_tags
 }
 
 ############################################################################################################
@@ -103,6 +107,7 @@ module "docker_image_embeddings_job" {
   triggers = {
     dir_sha = local.lambda.embeddings_job.dir_sha
   }
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_lambda_function" "embeddings_job" {
@@ -125,7 +130,8 @@ resource "aws_lambda_function" "embeddings_job" {
   tracing_config {
     mode = "Active"
   }
+  reserved_concurrent_executions = local.lambda.embeddings_job.lambda_reserved_concurrency
+  tags = local.combined_tags
   #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
   #checkov:skip=CKV_AWS_272:skip code-signing
-  tags = local.combined_tags
 }

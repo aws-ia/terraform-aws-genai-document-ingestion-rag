@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "ingestion_api_log" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch.ingestion_api.log_group_name}/*",
     ]
   }
 }
@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.ingestion_input_validation.cloudwatch_log_role_name}/*",
     ]
   }
 
@@ -132,6 +132,8 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
       "*"
     ]
   }
+  #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
 }
 
 data "aws_iam_policy_document" "file_transformer" {
@@ -147,7 +149,7 @@ data "aws_iam_policy_document" "file_transformer" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.file_transformer.cloudwatch_log_role_name}/*",
     ]
   }
 
@@ -231,6 +233,8 @@ data "aws_iam_policy_document" "file_transformer" {
       "*"
     ]
   }
+  #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
 }
 
 data "aws_iam_policy_document" "embeddings_job" {
@@ -246,7 +250,7 @@ data "aws_iam_policy_document" "embeddings_job" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.embeddings_job.cloudwatch_log_role_name}/*",
     ]
   }
 
@@ -330,6 +334,8 @@ data "aws_iam_policy_document" "embeddings_job" {
       "*"
     ]
   }
+  #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
 }
 
 data "aws_iam_policy_document" "ingestion_sm" {
@@ -376,20 +382,8 @@ data "aws_iam_policy_document" "ingestion_sm" {
       "*"
     ]
   }
-
-  statement {
-    sid = "StateMachine"
-
-    actions = [
-      "states:StartExecution"
-    ]
-
-    effect = "Allow"
-
-    resources = [
-      "*"
-    ]
-  }
+  #checkov:skip=CKV_AWS_356:State machine log and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_111:State machine log and Xray permission require wildcard
 }
 
 data "aws_iam_policy_document" "ingestion_sm_eventbridge" {
@@ -410,8 +404,6 @@ data "aws_iam_policy_document" "ingestion_sm_eventbridge" {
 }
 
 data "aws_iam_policy_document" "ingestion_kms_key" {
-  #checkov:skip=CKV_AWS_109:Skip
-  #checkov:skip=CKV_AWS_111:Skip
   statement {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
@@ -506,4 +498,7 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
       ]
     }
   }
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
