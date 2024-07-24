@@ -1,4 +1,4 @@
-# TODO: setup resource policy
+# TODO: setup resource policy, DLQ
 resource "awscc_events_event_bus" "ingestion" {
   name = "${local.cloudwatch.ingestion_api.event_bus_name}"
   kms_key_identifier = aws_kms_alias.ingestion.arn  

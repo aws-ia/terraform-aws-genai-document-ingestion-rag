@@ -114,6 +114,24 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
       "${aws_appsync_graphql_api.ingestion_api.arn}/*"
     ]
   }
+
+  statement {
+    sid = "XRayAccess"
+
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets",
+      "xray:GetSamplingStatisticSummaries"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "file_transformer" {
@@ -195,6 +213,24 @@ data "aws_iam_policy_document" "file_transformer" {
       "${aws_appsync_graphql_api.ingestion_api.arn}/*"
     ]
   }
+
+  statement {
+    sid = "XRayAccess"
+
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets",
+      "xray:GetSamplingStatisticSummaries"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "embeddings_job" {
@@ -274,6 +310,24 @@ data "aws_iam_policy_document" "embeddings_job" {
 
     resources = [
       "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+    ]
+  }
+
+  statement {
+    sid = "XRayAccess"
+
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets",
+      "xray:GetSamplingStatisticSummaries"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
     ]
   }
 }

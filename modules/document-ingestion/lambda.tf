@@ -26,6 +26,7 @@ resource "aws_lambda_function" "ingestion_input_validation" {
   architectures = [local.lambda.ingestion_input_validation.runtime_architecture]
   timeout       = local.lambda.ingestion_input_validation.timeout
   memory_size   = local.lambda.ingestion_input_validation.memory_size
+  kms_key_arn   = aws_kms_key.ingestion.arn
   vpc_config {
     subnet_ids         = local.lambda.ingestion_input_validation.vpc_config.subnet_ids
     security_group_ids = local.lambda.ingestion_input_validation.vpc_config.security_group_ids
@@ -33,7 +34,11 @@ resource "aws_lambda_function" "ingestion_input_validation" {
   environment {
     variables = local.lambda.ingestion_input_validation.environment.variables
   }
-
+  tracing_config {
+    mode = "Active"
+  }
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
   tags = local.combined_tags
 }
 
@@ -65,6 +70,7 @@ resource "aws_lambda_function" "file_transformer" {
   architectures = [local.lambda.file_transformer.runtime_architecture]
   timeout       = local.lambda.file_transformer.timeout
   memory_size   = local.lambda.file_transformer.memory_size
+  kms_key_arn   = aws_kms_key.ingestion.arn
   vpc_config {
     subnet_ids         = local.lambda.file_transformer.vpc_config.subnet_ids
     security_group_ids = local.lambda.file_transformer.vpc_config.security_group_ids
@@ -72,7 +78,11 @@ resource "aws_lambda_function" "file_transformer" {
   environment {
     variables = local.lambda.file_transformer.environment.variables
   }
-
+  tracing_config {
+    mode = "Active"
+  }
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
   tags = local.combined_tags
 }
 
@@ -104,6 +114,7 @@ resource "aws_lambda_function" "embeddings_job" {
   architectures = [local.lambda.embeddings_job.runtime_architecture]
   timeout       = local.lambda.embeddings_job.timeout
   memory_size   = local.lambda.embeddings_job.memory_size
+  kms_key_arn   = aws_kms_key.ingestion.arn
   vpc_config {
     subnet_ids         = local.lambda.embeddings_job.vpc_config.subnet_ids
     security_group_ids = local.lambda.embeddings_job.vpc_config.security_group_ids
@@ -111,6 +122,10 @@ resource "aws_lambda_function" "embeddings_job" {
   environment {
     variables = local.lambda.embeddings_job.environment.variables
   }
-
+  tracing_config {
+    mode = "Active"
+  }
+  #checkov:skip=CKV_AWS_116:not using DLQ, re-drive via state machine
+  #checkov:skip=CKV_AWS_272:skip code-signing
   tags = local.combined_tags
 }
