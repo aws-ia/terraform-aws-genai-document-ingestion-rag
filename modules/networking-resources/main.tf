@@ -9,6 +9,7 @@ module "vpc" {
   vpc_flow_logs = var.vpc_props.vpc_flow_logs
 
   tags = local.combined_tags
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_security_group" "lambda" {
@@ -17,6 +18,7 @@ resource "aws_security_group" "lambda" {
   vpc_id      = module.vpc.vpc_attributes.id
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -24,6 +26,7 @@ resource "aws_security_group" "lambda" {
   }
 
   ingress {
+    description = "Allow inbound traffic from VPC subnets"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -31,6 +34,7 @@ resource "aws_security_group" "lambda" {
   }
 
   tags = local.combined_tags
+  #checkov:skip=CKV2_AWS_5:security group is attached to lambda on separate module
 }
 
 resource "aws_security_group" "primary" {
@@ -39,6 +43,7 @@ resource "aws_security_group" "primary" {
   vpc_id      = module.vpc.vpc_attributes.id
 
   tags = local.combined_tags
+  #checkov:skip=CKV2_AWS_5:security group is attached to lambda on separate module
 }
 
 resource "aws_opensearchserverless_vpc_endpoint" "opensearch" {
