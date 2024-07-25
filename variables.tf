@@ -78,4 +78,4 @@ variable "open_search_props" {
       zone_awareness_enabled = true
     }
   }
-}`
+}
