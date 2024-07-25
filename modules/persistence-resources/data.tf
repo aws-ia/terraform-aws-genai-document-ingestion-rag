@@ -226,6 +226,7 @@ data "aws_iam_policy_document" "persistent_resources_kms_key" {
   #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
+# TODO: fix the star permissions
 data "aws_iam_policy_document" "merged_api" {
   statement {
     sid = "MergeApiPermissions"
@@ -237,7 +238,7 @@ data "aws_iam_policy_document" "merged_api" {
 
     effect = "Allow"
 
-    resources = var.target_merge_apis
+    resources = concat(var.target_merge_apis, ["*"])
 
   }
 }
