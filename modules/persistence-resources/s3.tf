@@ -2,10 +2,13 @@
 # Access Logs bucket
 ############################################################################################################
 resource "aws_s3_bucket" "access_logs" {
-  #checkov:skip=CKV_AWS_145: SSE-KMS not supported for access log
   bucket_prefix = local.s3.access_logs.bucket
   force_destroy = var.force_destroy
   tags          = local.combined_tags
+  #checkov:skip=CKV2_AWS_61: lifecycle config is optional
+  #checkov:skip=CKV2_AWS_62: disable event notification
+  #checkov:skip=CKV_AWS_144: cross-region replication is optional
+  #checkov:skip=CKV_AWS_145: SSE-KMS not supported for access log
 }
 
 resource "aws_s3_bucket_policy" "access_logs" {
@@ -71,6 +74,10 @@ resource "aws_s3_bucket" "input_assets" {
   bucket_prefix = local.s3.input_assets.bucket
   force_destroy = var.force_destroy
   tags          = local.combined_tags
+  #checkov:skip=CKV2_AWS_61: lifecycle config is optional
+  #checkov:skip=CKV2_AWS_62: disable event notification
+  #checkov:skip=CKV_AWS_144: cross-region replication is optional
+  #checkov:skip=CKV_AWS_145: SSE-KMS not supported for access log
 }
 
 resource "aws_s3_bucket_policy" "input_assets" {
@@ -92,7 +99,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "input_assets" {
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = local.s3.input_assets.sse_algorithm
-      kms_master_key_id = aws_kms_alias.app_kms_key.target_key_arn
+      kms_master_key_id = aws_kms_alias.persistent_resources.arn
     }
   }
 }
@@ -129,6 +136,10 @@ resource "aws_s3_bucket" "processed_assets" {
   bucket_prefix = local.s3.processed_assets.bucket
   force_destroy = var.force_destroy
   tags          = local.combined_tags
+  #checkov:skip=CKV2_AWS_61: lifecycle config is optional
+  #checkov:skip=CKV2_AWS_62: disable event notification
+  #checkov:skip=CKV_AWS_144: cross-region replication is optional
+  #checkov:skip=CKV_AWS_145: SSE-KMS not supported for access log
 }
 
 resource "aws_s3_bucket_policy" "processed_assets" {
@@ -150,9 +161,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "processed_assets"
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = local.s3.processed_assets.sse_algorithm
-      kms_master_key_id = aws_kms_alias.app_kms_key.target_key_arn
+      kms_master_key_id = aws_kms_alias.persistent_resources.arn
     }
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "processed_assets" {
+  bucket                  = aws_s3_bucket.processed_assets.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_logging" "processed_assets" {

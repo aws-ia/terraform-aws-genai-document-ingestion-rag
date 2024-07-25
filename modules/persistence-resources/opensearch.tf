@@ -5,6 +5,12 @@ module "opensearch" {
   source  = "terraform-aws-modules/opensearch/aws"
   version = "1.3.1"
 
+  access_policy_statements = data.aws_iam_policy_document.opensearch_domain_policy[count.index].statement
+  cluster_config           = var.open_search_props.cluster_config
+  domain_name              = local.opensearch.domain_name
+  engine_version           = var.open_search_props.engine_version
+  ebs_options              = var.open_search_props.ebs_options
+
   advanced_options = {
     "rest.action.multi.allow_explicit_index" = "true"
   }
@@ -18,22 +24,14 @@ module "opensearch" {
     }
   }
 
-  cluster_config = var.open_search_props.cluster_config
-
   domain_endpoint_options = {
     enforce_https       = true
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
   }
 
-  domain_name = local.opensearch.domain_name
-
-  ebs_options = var.open_search_props.ebs_options
-
   encrypt_at_rest = {
     enabled = true
   }
-
-  engine_version = var.open_search_props.engine_version
 
   node_to_node_encryption = {
     enabled = true
@@ -43,9 +41,8 @@ module "opensearch" {
     subnet_ids = var.open_search_props.subnet_ids
   }
 
-  access_policy_statements = data.aws_iam_policy_document.opensearch_domain_policy[count.index].statement
-
   tags = local.combined_tags
+  #checkov:skip=CKV_TF_1:skip module source commit hash
 }
 
 resource "aws_opensearchserverless_security_policy" "encryption_policy" {
@@ -63,7 +60,7 @@ resource "aws_opensearchserverless_security_policy" "encryption_policy" {
       }
     ],
     AWSOwnedKey = false
-    KmsARN      = aws_kms_alias.app_kms_key.target_key_arn
+    KmsARN      = aws_kms_key.persistent_resources.arn
   })
 }
 

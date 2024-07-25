@@ -17,6 +17,7 @@ resource "aws_cloudformation_stack" "merged_api" {
   })
 
   tags = local.combined_tags
+  #checkov:skip=CKV_AWS_124:skip SNS notification, this is temp workaround until native resource is available in AWS/AWSCC provider
 }
 
 resource "time_sleep" "wait_merge_api" {

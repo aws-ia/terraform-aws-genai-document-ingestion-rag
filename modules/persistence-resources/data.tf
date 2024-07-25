@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "opensearch_domain_policy" {
   }
 }
 
-data "aws_iam_policy_document" "app_kms_key" {
+data "aws_iam_policy_document" "persistent_resources_kms_key" {
   statement {
     sid = "AllowECR"
     actions = [
@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "app_kms_key" {
       "kms:DescribeKey",
       "kms:Encrypt",
       "kms:GenerateDataKey*",
-      "kms:ReEncrypt*"
+      "kms:ReEncrypt*",
     ]
 
     resources = ["*"]
@@ -128,6 +128,12 @@ data "aws_iam_policy_document" "app_kms_key" {
     principals {
       type        = "Service"
       identifiers = ["ecr.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["ecr.${data.aws_region.current.name}.amazonaws.com"]
     }
   }
 
@@ -160,7 +166,7 @@ data "aws_iam_policy_document" "app_kms_key" {
   }
 
   statement {
-    sid = "AllowS3Logging"
+    sid = "Allow Service CloudWatchLogGroup"
     actions = [
       "kms:Decrypt",
       "kms:DescribeKey",
@@ -184,36 +190,55 @@ data "aws_iam_policy_document" "app_kms_key" {
   }
 
   statement {
-    sid = "AllowRootUserAccess"
+    sid    = "Enable IAM User Permissions"
+    effect = "Allow"
     actions = [
-      "kms:*"
+      "kms:Create*",
+      "kms:Describe*",
+      "kms:Enable*",
+      "kms:List*",
+      "kms:Put*",
+      "kms:Update*",
+      "kms:Revoke*",
+      "kms:Disable*",
+      "kms:Get*",
+      "kms:Delete*",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*"
     ]
     resources = ["*"]
 
     principals {
-      type        = "AWS"
-      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
+      type = "AWS"
+      identifiers = [
+        "arn:${data.aws_partition.current.id}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
     }
   }
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
-# TODO: tidy up the permissions
 data "aws_iam_policy_document" "merged_api" {
   statement {
     sid = "MergeApiPermissions"
 
     actions = [
-      "appsync:*",
-      "logs:*",
-      "cloudwatch:*",
-      "dynamodb:*",
-      "lambda:*"
+      "appsync:SourceGraphQL",
+      "appsync:StartSchemaMerge"
     ]
 
     effect = "Allow"
 
     resources = [
-      "*",
+      var.target_merge_apis,
     ]
   }
 }

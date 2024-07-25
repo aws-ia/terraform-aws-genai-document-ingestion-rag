@@ -30,3 +30,9 @@ variable "force_destroy" {
   type        = bool
   default     = false
 }
+
+variable "target_merge_apis" {
+  description = "ARNs of all AppSync APIs to be merged"
+  type        = string
+  default     = ["*"]
+}

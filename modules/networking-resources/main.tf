@@ -27,10 +27,10 @@ resource "aws_security_group" "lambda" {
 
   ingress {
     description = "Allow inbound traffic from VPC subnets"
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    self      = true
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    self        = true
   }
 
   tags = local.combined_tags

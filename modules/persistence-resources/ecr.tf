@@ -9,10 +9,11 @@ resource "aws_ecr_repository" "app_ecr_repository" {
 
   encryption_configuration {
     encryption_type = "KMS"
-    kms_key         = aws_kms_alias.app_kms_key.target_key_arn
+    kms_key         = aws_kms_alias.persistent_resources.arn
   }
 
   tags = local.combined_tags
+  #checkov:skip=CKV_AWS_51:allow customer to re-write Lambda image and re-deploy
 }
 
 resource "aws_ecr_lifecycle_policy" "app_ecr_repository" {
