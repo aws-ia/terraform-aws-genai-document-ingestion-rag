@@ -9,7 +9,7 @@ resource "aws_ecr_repository" "app_ecr_repository" {
 
   encryption_configuration {
     encryption_type = "KMS"
-    kms_key         = aws_kms_alias.persistent_resources.arn
+    kms_key         = aws_kms_alias.persistent_resources.target_key_arn
   }
 
   tags = local.combined_tags

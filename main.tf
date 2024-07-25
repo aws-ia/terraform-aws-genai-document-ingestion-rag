@@ -33,7 +33,7 @@ module "persistence_resources" {
   target_merge_apis = [
     module.document_ingestion.ingestion_api_arn,
     module.summarization.summarization_api_arn,
-    question-answering.question_answering_arn,
+    module.question-answering.question_answering_arn,
   ]
   tags          = local.root_combined_tags
 }

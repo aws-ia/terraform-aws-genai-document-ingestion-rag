@@ -237,9 +237,8 @@ data "aws_iam_policy_document" "merged_api" {
 
     effect = "Allow"
 
-    resources = [
-      var.target_merge_apis,
-    ]
+    resources = var.target_merge_apis
+
   }
 }
 
