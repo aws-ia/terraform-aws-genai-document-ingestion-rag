@@ -3,8 +3,8 @@
   "exclude": [
     "aws-ec2-no-public-egress-sgr", #duplicate checkov suppression
     "aws-iam-no-policy-wildcards", #duplicate checkov suppression
-    "aws-s3-enable-bucket-logging" #duplicate checkov suppression
-    "aws-ecr-enforce-immutable-repository" # duplicate checkov suppression 
-    "aws-s3-encryption-customer-key" #duplicate checkov suppression
+    "aws-s3-enable-bucket-logging", #duplicate checkov suppression
+    "aws-ecr-enforce-immutable-repository", # duplicate checkov suppression 
+    "aws-s3-encryption-customer-key", #duplicate checkov suppression
     ]
 }
