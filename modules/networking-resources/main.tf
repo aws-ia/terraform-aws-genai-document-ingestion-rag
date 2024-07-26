@@ -16,25 +16,26 @@ resource "aws_security_group" "lambda" {
   name        = "${var.solution_prefix}-lambda-sg"
   description = "Security group for ${var.solution_prefix} Lambda"
   vpc_id      = module.vpc.vpc_attributes.id
-
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow inbound traffic from VPC subnets"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    self        = true
-  }
-
-  tags = local.combined_tags
+  tags        = local.combined_tags
   #checkov:skip=CKV2_AWS_5:security group is attached to lambda on separate module
+}
+
+resource "aws_vpc_security_group_egress_rule" "to_internet" {
+  description       = "Allow all outbound traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = -1 
+  cidr_ipv4         = "0.0.0.0/0"
+  security_group_id = aws_security_group.lambda.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "https_within_sg" {
+  description       = "Allow inbound traffic from VPC subnets"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+  security_group_id = aws_security_group.lambda.id
 }
 
 resource "aws_security_group" "primary" {
