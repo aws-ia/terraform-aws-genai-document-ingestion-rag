@@ -17,6 +17,12 @@ variable "container_platform" {
   type        = string
 }
 
+variable "force_destroy" {
+  description = "Set to true if you want to force delete resources created by this module"
+  type        = bool
+  default     = false
+}
+
 ###### VPC variables ######
 variable "vpc_props" {
   description = "Properties for the VPC to be deployed. Error if both this and 'deploy_vpc' are provided"

@@ -4,6 +4,10 @@ resource "random_string" "solution_prefix" {
   upper   = false
 }
 
+############################################################################################################
+# Networking resources
+############################################################################################################
+
 module "networking_resources" {
   source = "./modules/networking-resources"
 
@@ -11,6 +15,10 @@ module "networking_resources" {
   vpc_props       = var.vpc_props
   tags            = local.root_combined_tags
 }
+
+############################################################################################################
+# Persistent resources
+############################################################################################################
 
 module "persistence_resources" {
   source = "./modules/persistence-resources"
@@ -29,7 +37,7 @@ module "persistence_resources" {
       "open_search_vpc_endpoint_id" = module.networking_resources.open_search_vpc_endpoint_id
     }
   )
-  force_destroy = true
+  force_destroy = var.force_destroy
   target_merge_apis = [
     module.document_ingestion.ingestion_api_arn,
     module.summarization.summarization_api_arn,
