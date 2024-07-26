@@ -1,0 +1,121 @@
+{
+  "Comment": "Summarization State Machine",
+  "StartAt": "Validate Input ",
+  "States": {
+    "Validate Input ": {
+      "Next": "is Valid Parameters?",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ClientExecutionTimeoutException",
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Type": "Task",
+      "ResultPath": "$.validation_result",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${lambda_summarization_input_validation}", 
+        "Payload.$": "$"
+      }
+    },
+    "is Valid Parameters?": {
+      "Type": "Choice",
+      "OutputPath": "$.validation_result.Payload.files",
+      "Choices": [
+        {
+          "Variable": "$.validation_result.Payload.isValid",
+          "BooleanEquals": false,
+          "Next": "Failed"
+        }
+      ],
+      "Default": "Run Files in Parallel"
+    },
+    "Run Files in Parallel": {
+      "Type": "Map",
+      "End": true,
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "Read document and check summary in cache ",
+        "States": {
+          "Read document and check summary in cache ": {
+            "Next": "is file status ready for summarization?",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ClientExecutionTimeoutException",
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "Type": "Task",
+            "ResultPath": "$.document_result",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${lambda_summarization_doc_reader}",
+              "Payload.$": "$"
+            }
+          },
+          "is file status ready for summarization?": {
+            "Type": "Choice",
+            "OutputPath": "$.document_result.Payload",
+            "Choices": [
+              {
+                "Variable": "$.document_result.Payload.status",
+                "StringMatches": "Error",
+                "Next": "succeeded"
+              }
+            ],
+            "Default": "Generate Summary with llm"
+          },
+          "Generate Summary with llm": {
+            "Next": "succeeded",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ClientExecutionTimeoutException",
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "Type": "Task",
+            "ResultPath": "$.summary_result",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${lambda_summarization_generator}",
+              "Payload.$": "$"
+            }
+          },
+          "succeeded": {
+            "Type": "Succeed",
+            "Comment": "AWS summary Job succeeded"
+          }
+        }
+      },
+      "MaxConcurrency": 100
+    },
+    "Failed": {
+      "Type": "Fail",
+      "Comment": "AWS summary Job failed"
+    }
+  },
+  "TimeoutSeconds": 900
+}
