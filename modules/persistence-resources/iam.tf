@@ -26,6 +26,18 @@ resource "aws_iam_role_policy" "merged_api" {
   policy = data.aws_iam_policy_document.merged_api.json
 }
 
+## additional attachment of IAM policy after the MergedAPI is created
+resource "aws_iam_policy" "merged_api_addition" {
+  name        = "${local.graphql.merged_api.name}-addition"
+  description = "Additional policy to allow the Merged API to invoke itself"
+  policy      = data.aws_iam_policy_document.merged_api_addition.json
+}
+
+resource "aws_iam_role_policy_attachment" "merged_api_addition" {
+  role       = aws_iam_role.merged_api.name
+  policy_arn = aws_iam_policy.merged_api_addition.arn
+}
+
 ############################################################################################################
 # IAM Role for Cognito Identity Pool
 ############################################################################################################
