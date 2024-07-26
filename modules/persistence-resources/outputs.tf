@@ -64,3 +64,7 @@ output "merged_api_id" {
 output "merged_api_url" {
   value = data.aws_cloudformation_export.merged_api_url.value
 }
+
+output "cognito_user_client_secret" {
+  value = aws_secretsmanager_secret.cognito_user_client_secret.arn
+}

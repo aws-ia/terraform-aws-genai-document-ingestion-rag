@@ -41,7 +41,7 @@ resource "aws_cognito_user_pool_domain" "merged_api" {
 resource "aws_cognito_user_pool_client" "merged_api" {
   name            = local.cognito.user_pool_client_name
   user_pool_id    = aws_cognito_user_pool.merged_api.id
-  generate_secret = false
+  generate_secret = true
 
   explicit_auth_flows          = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH"]
   enable_token_revocation      = true
