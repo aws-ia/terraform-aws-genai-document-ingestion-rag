@@ -12,7 +12,6 @@ functional_tests:
     contents: write
   dockerfile: .project_automation/functional_tests/Dockerfile
   entrypoint: .project_automation/functional_tests/entrypoint.sh
-  enable_docker: true
 publication:
   github_permissions:
     contents: write
