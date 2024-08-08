@@ -11,3 +11,4 @@ PROJECT_TYPE_PATH=${BASE_PATH}/projecttype
 cd ${PROJECT_PATH}
 
 export AWS_DEFAULT_REGION=us-east-1
+export TF_LOG=DEBUG
