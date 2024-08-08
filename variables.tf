@@ -1,4 +1,5 @@
 ###### General variables ######
+
 variable "solution_prefix" {
   description = "Prefix to be included in all resources deployed by this solution"
   type        = string
@@ -24,6 +25,7 @@ variable "force_destroy" {
 }
 
 ###### VPC variables ######
+
 variable "vpc_props" {
   description = "Properties for the VPC to be deployed. Error if both this and 'deploy_vpc' are provided"
   type        = any
@@ -48,6 +50,7 @@ variable "vpc_props" {
 }
 
 ###### Open Search variables ######
+
 variable "open_search_props" {
   description = "Properties for the OpenSearch configuration"
   type        = any

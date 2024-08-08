@@ -1,6 +1,7 @@
 output "access_logs_bucket_name" {
   value = aws_s3_bucket.access_logs.bucket
 }
+
 output "access_logs_bucket_arn" {
   value = aws_s3_bucket.access_logs.arn
 }
@@ -8,6 +9,7 @@ output "access_logs_bucket_arn" {
 output "input_assets_bucket_arn" {
   value = aws_s3_bucket.input_assets.arn
 }
+
 output "input_assets_bucket_name" {
   value = aws_s3_bucket.input_assets.bucket
 }
@@ -15,9 +17,11 @@ output "input_assets_bucket_name" {
 output "processed_assets_bucket_name" {
   value = aws_s3_bucket.processed_assets.bucket
 }
+
 output "processed_assets_bucket_arn" {
   value = aws_s3_bucket.processed_assets.arn
 }
+
 output "cognito_user_pool_id" {
   value = aws_cognito_user_pool.merged_api.id
 }
@@ -25,6 +29,7 @@ output "cognito_user_pool_id" {
 output "opensearch_domain_mame" {
   value = local.opensearch.domain_name
 }
+
 output "opensearch_domain_endpoint" {
   value = module.opensearch[*].domain_endpoint
 }

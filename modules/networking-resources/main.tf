@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 module "vpc" {
   source  = "aws-ia/vpc/aws"
   version = "4.4.2"
@@ -52,8 +54,6 @@ resource "aws_opensearchserverless_vpc_endpoint" "opensearch" {
   subnet_ids = [for _, value in module.vpc.private_subnet_attributes_by_az : value.id]
   vpc_id     = module.vpc.vpc_attributes.id
 }
-
-data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = module.vpc.vpc_attributes.id
