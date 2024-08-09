@@ -2,7 +2,7 @@ run "document_ingestion_tests" {
   command = plan
 
   module {
-    source = "./examples/test-modules/document-ingestion"
+    source = "./tests/test-modules/document-ingestion"
   }
 }
 
@@ -18,7 +18,7 @@ run "persistence_resources_tests" {
   command = plan
 
   module {
-    source = "./examples/test-modules/persistence-resources"
+    source = "./tests/test-modules/persistence-resources"
   }
 }
 
@@ -26,7 +26,7 @@ run "question_answering_tests" {
   command = plan
 
   module {
-    source = "./examples/test-modules/question-answering"
+    source = "./tests/test-modules/question-answering"
   }
 }
 
@@ -34,6 +34,6 @@ run "summarization_tests" {
   command = plan
 
   module {
-    source = "./examples/test-modules/summarization"
+    source = "./tests/test-modules/summarization"
   }
 }
