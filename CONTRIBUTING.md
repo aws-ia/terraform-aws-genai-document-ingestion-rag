@@ -98,7 +98,7 @@ Include tests to validate your examples/<> root modules, at a minimum. This can 
 cd test
 go mod init github.com/aws-ia/terraform-project-ephemeral
 go mod tidy
-go install github.com/gruntwork-io/terratest/modules/terraform
+go install github.com/gruntwork-io/terratest/test-modules/terraform
 go test -timeout 45m
 ```
 
