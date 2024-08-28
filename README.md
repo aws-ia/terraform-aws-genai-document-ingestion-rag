@@ -159,8 +159,7 @@ Out of the box implementation of the module without any override will set the fo
 
 ### Observability
 
-By default the module will enable logging and tracing on all services which support those features. Observability can be turned off by setting the pattern property ```observability
-``` to false.
+By default the module will enable logging and tracing on all services which support those features. Observability can be turned off by setting the pattern property `observability` to `false`.
 - AWS Lambda: AWS X-Ray, Amazon CloudWatch Logs
 - AWS Step Function: AWS X-Ray, Amazon CloudWatch Logs
 - AWS AppSync GraphQL API: AWS X-Ray, Amazon CloudWatch Logs
