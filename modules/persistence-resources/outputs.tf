@@ -68,3 +68,30 @@ output "merged_api_url" {
 output "cognito_user_client_secret" {
   value = aws_secretsmanager_secret.cognito_user_client_secret.arn
 }
+
+output "cognito_domain" {
+  value = aws_cognito_user_pool_domain.merged_api.domain #.value?
+
+}
+
+output "client_id" {
+  value = aws_cognito_user_pool_client.merged_api.id
+
+}
+
+output "identity_pool_id" {
+  value = aws_cognito_identity_pool.merged_api.id
+}
+
+output "client_name" {
+  value = aws_cognito_user_pool_client.merged_api.name
+
+}
+
+output "authenticated_role" {
+  value = aws_iam_role.authenticated_cognito.arn
+}
+
+output "region" {
+  value = data.aws_region.current
+}
