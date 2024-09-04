@@ -311,5 +311,15 @@ When deleting your stack which uses this module, do not forget to go over the fo
 
 | Name | Description |
 |------|-------------|
+| <a name="output_authenticated_role_arn"></a> [authenticated\_role\_arn](#output\_authenticated\_role\_arn) | The Authenticated Role ARN. |
+| <a name="output_client_id"></a> [client\_id](#output\_client\_id) | The Cognito Client ID. |
+| <a name="output_client_name"></a> [client\_name](#output\_client\_name) | The Cognito Client Name. |
+| <a name="output_cognito_domain"></a> [cognito\_domain](#output\_cognito\_domain) | The Cognito Domain. |
 | <a name="output_cognito_user_client_secret"></a> [cognito\_user\_client\_secret](#output\_cognito\_user\_client\_secret) | ARN of the AWS Secrets Manager secret for Cognito client secret key |
+| <a name="output_graphql_endpoint"></a> [graphql\_endpoint](#output\_graphql\_endpoint) | The GraphQL Endpoint. |
+| <a name="output_identity_pool_id"></a> [identity\_pool\_id](#output\_identity\_pool\_id) | The Cognito Identity Pool ID. |
+| <a name="output_region"></a> [region](#output\_region) | The AWS Region. |
+| <a name="output_s3_input_bucket"></a> [s3\_input\_bucket](#output\_s3\_input\_bucket) | The S3 Input Bucket. |
+| <a name="output_s3_processed_bucket"></a> [s3\_processed\_bucket](#output\_s3\_processed\_bucket) | The S3 processed bucket. |
+| <a name="output_user_pool_id"></a> [user\_pool\_id](#output\_user\_pool\_id) | The User Pool ID. |
 <!-- END_TF_DOCS -->
