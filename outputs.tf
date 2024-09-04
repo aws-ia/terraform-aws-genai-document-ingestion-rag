@@ -1,45 +1,45 @@
 output "cognito_user_client_secret" {
-  description = "ARN of the AWS Secrets Manager secret for Cognito client secret key"
+  description = "ARN of the AWS Secrets Manager secret for Cognito client secret key."
   value       = module.persistence_resources.cognito_user_client_secret
 }
 
 output "cognito_domain" {
-  description = "The Cognito Domain."
+  description = "The Cognito domain."
   value       = module.persistence_resources.cognito_domain
 }
 
 output "region" {
-  description = "The AWS Region."
+  description = "The AWS region."
   value       = module.persistence_resources.region
 }
 
 output "user_pool_id" {
-  description = "The User Pool ID."
+  description = "The Cognito user pool ID."
   value       = module.persistence_resources.cognito_user_pool_id
 }
 
 output "client_id" {
-  description = "The Cognito Client ID."
+  description = "The Cognito client ID."
   value       = module.persistence_resources.client_id
 }
 
 output "identity_pool_id" {
-  description = "The Cognito Identity Pool ID."
+  description = "The Cognito identity pool ID."
   value       = module.persistence_resources.identity_pool_id
 }
 
 output "authenticated_role_arn" {
-  description = "The Authenticated Role ARN."
+  description = "The authenticated role ARN."
   value       = module.persistence_resources.authenticated_role
 }
 
 output "graphql_endpoint" {
-  description = "The GraphQL Endpoint."
+  description = "The GraphQL endpoint."
   value       = module.persistence_resources.merged_api_url
 } 
 
 output "s3_input_bucket" {
-  description = "The S3 Input Bucket."
+  description = "The S3 input bucket."
   value       = module.persistence_resources.input_assets_bucket_name
 }
 
@@ -49,6 +49,6 @@ output "s3_processed_bucket" {
 }
 
 output "client_name" {
-  description = "The Cognito Client Name."
+  description = "The Cognito client name."
   value       = module.persistence_resources.client_name
 }

@@ -70,13 +70,11 @@ output "cognito_user_client_secret" {
 }
 
 output "cognito_domain" {
-  value = aws_cognito_user_pool_domain.merged_api.domain #.value?
-
+  value = aws_cognito_user_pool_domain.merged_api.domain
 }
 
 output "client_id" {
   value = aws_cognito_user_pool_client.merged_api.id
-
 }
 
 output "identity_pool_id" {
