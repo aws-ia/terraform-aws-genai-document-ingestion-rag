@@ -83,7 +83,6 @@ output "identity_pool_id" {
 
 output "client_name" {
   value = aws_cognito_user_pool_client.merged_api.name
-
 }
 
 output "authenticated_role" {

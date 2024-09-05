@@ -5,12 +5,12 @@ output "cognito_user_client_secret" {
 
 output "cognito_domain" {
   description = "The Cognito domain."
-  value       = module.persistence_resources.cognito_domain
+  value       = "https://${module.persistence_resources.cognito_domain}.auth.${module.persistence_resources.region.id}.amazoncognito.com"
 }
 
 output "region" {
   description = "The AWS region."
-  value       = module.persistence_resources.region
+  value       = module.persistence_resources.region.id
 }
 
 output "user_pool_id" {
