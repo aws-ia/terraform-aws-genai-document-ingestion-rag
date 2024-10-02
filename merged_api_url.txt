@@ -1,1 +1,0 @@
-https://mbzybj44m5dunb23qzfbf2opfq.appsync-api.us-east-2.amazonaws.com/graphql
