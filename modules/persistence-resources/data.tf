@@ -300,6 +300,16 @@ data "aws_iam_policy_document" "authenticated_cognito" {
       "${aws_s3_bucket.processed_assets.arn}/*",
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+
+    actions = ["kms:GenerateDataKey*"]
+
+    effect = "Allow"
+
+    resources = ["*"]
+  }
 }
 
 data "aws_cloudformation_export" "merged_api_id" {

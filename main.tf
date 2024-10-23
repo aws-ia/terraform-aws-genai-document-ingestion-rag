@@ -40,8 +40,11 @@ module "persistence_resources" {
   force_destroy = var.force_destroy
   target_merge_apis = [
     module.document_ingestion.ingestion_api_arn,
+    "${module.document_ingestion.ingestion_api_arn}/*",
     module.summarization.summarization_api_arn,
+    "${module.summarization.summarization_api_arn}/*",
     module.question_answering.question_answering_arn,
+    "${module.question_answering.question_answering_arn}/*",
   ]
   tags = local.root_combined_tags
 }
