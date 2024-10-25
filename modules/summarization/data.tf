@@ -162,9 +162,7 @@ data "aws_iam_policy_document" "summarization_input_validation" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.summarization_input_validation.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -236,6 +234,13 @@ data "aws_iam_policy_document" "summarization_input_validation" {
       "*"
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+    actions = "kms:*"
+    effect = "Allow"
+    resources = ["*"]
+  }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
 }
@@ -252,9 +257,7 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.summarization_doc_reader.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -327,6 +330,13 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
       "*"
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+    actions = "kms:*"
+    effect = "Allow"
+    resources = ["*"]
+  }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
 }
@@ -343,9 +353,7 @@ data "aws_iam_policy_document" "summarization_generator" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.summarization_generator.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -432,6 +440,13 @@ data "aws_iam_policy_document" "summarization_generator" {
     resources = [
       "*"
     ]
+  }
+
+  statement {
+    sid = "KMSAccess"
+    actions = "kms:*"
+    effect = "Allow"
+    resources = ["*"]
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard

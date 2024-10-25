@@ -36,7 +36,7 @@ class pdf_transformer(BaseLoader):
         """Load documents."""
         try:
             s3 = boto3.resource('s3')
-            obj = s3.Object(self.bucket, self.key)
+            obj = s3.Object(bucket_name=self.bucket,  key=self.key)
             encodedpdf = obj.get()['Body'].read()
             pdfFile = PdfReader(BytesIO(encodedpdf))
             # read pdf

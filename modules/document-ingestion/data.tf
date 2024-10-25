@@ -13,12 +13,8 @@ data "aws_iam_policy_document" "ingestion_api_log" {
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
-
     effect = "Allow"
-
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch.ingestion_api.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 }
 
@@ -50,9 +46,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.ingestion_input_validation.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -131,6 +125,13 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
     resources = [
       "*"
     ]
+  }
+
+  statement {
+    sid = "KMSAccess"
+    actions = "kms:*"
+    effect = "Allow"
+    resources = ["*"]
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
@@ -148,9 +149,7 @@ data "aws_iam_policy_document" "file_transformer" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.file_transformer.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -232,6 +231,13 @@ data "aws_iam_policy_document" "file_transformer" {
     resources = [
       "*"
     ]
+  }
+
+  statement {
+    sid = "KMSAccess"
+    actions = "kms:*"
+    effect = "Allow"
+    resources = ["*"]
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
@@ -249,9 +255,7 @@ data "aws_iam_policy_document" "embeddings_job" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.embeddings_job.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -333,6 +337,13 @@ data "aws_iam_policy_document" "embeddings_job" {
     resources = [
       "*"
     ]
+  }
+
+  statement {
+    sid = "KMSAccess"
+    actions = "kms:*"
+    effect = "Allow"
+    resources = ["*"]
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
