@@ -160,6 +160,9 @@ data "aws_iam_policy_document" "question_answering" {
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_iam_policy_document" "question_answering_kms_key" {
@@ -260,4 +263,5 @@ data "aws_iam_policy_document" "question_answering_kms_key" {
   #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
   #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
   #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
 }
