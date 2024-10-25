@@ -32,6 +32,8 @@ data "aws_iam_policy_document" "ingestion_api_datasource" {
       awscc_events_event_bus.ingestion.arn,
     ]
   }
+  #checkov:skip=CKV_AWS_111:wildcard permission required
+  #checkov:skip=CKV_AWS_356:wildcard permission required
 }
 
 data "aws_iam_policy_document" "ingestion_input_validation" {
@@ -63,9 +65,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
 
     effect = "Allow"
 
-    resources = [
-      "*",
-    ]
+    resources = ["*",]
   }
 
   statement {

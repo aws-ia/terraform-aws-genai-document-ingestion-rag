@@ -310,6 +310,8 @@ data "aws_iam_policy_document" "authenticated_cognito" {
 
     resources = ["*"]
   }
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_cloudformation_export" "merged_api_id" {
