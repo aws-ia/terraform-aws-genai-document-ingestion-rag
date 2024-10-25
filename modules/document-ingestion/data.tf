@@ -16,6 +16,8 @@ data "aws_iam_policy_document" "ingestion_api_log" {
     effect = "Allow"
     resources = ["*"]
   }
+  #checkov:skip=CKV_AWS_111:wildcard permission required
+  #checkov:skip=CKV_AWS_356:wildcard permission required
 }
 
 data "aws_iam_policy_document" "ingestion_api_datasource" {
