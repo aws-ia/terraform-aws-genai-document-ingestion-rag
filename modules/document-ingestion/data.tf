@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
 
   statement {
     sid = "KMSAccess"
-    actions = "kms:*"
+    actions = ["kms:*"]
     effect = "Allow"
     resources = ["*"]
   }
@@ -235,7 +235,7 @@ data "aws_iam_policy_document" "file_transformer" {
 
   statement {
     sid = "KMSAccess"
-    actions = "kms:*"
+    actions = ["kms:*"]
     effect = "Allow"
     resources = ["*"]
   }
@@ -341,7 +341,7 @@ data "aws_iam_policy_document" "embeddings_job" {
 
   statement {
     sid = "KMSAccess"
-    actions = "kms:*"
+    actions = ["kms:*"]
     effect = "Allow"
     resources = ["*"]
   }

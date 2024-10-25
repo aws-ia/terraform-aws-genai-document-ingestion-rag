@@ -237,7 +237,7 @@ data "aws_iam_policy_document" "summarization_input_validation" {
 
   statement {
     sid = "KMSAccess"
-    actions = "kms:*"
+    actions = ["kms:*"]
     effect = "Allow"
     resources = ["*"]
   }
@@ -333,7 +333,7 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
 
   statement {
     sid = "KMSAccess"
-    actions = "kms:*"
+    actions = ["kms:*"]
     effect = "Allow"
     resources = ["*"]
   }
@@ -444,7 +444,7 @@ data "aws_iam_policy_document" "summarization_generator" {
 
   statement {
     sid = "KMSAccess"
-    actions = "kms:*"
+    actions = ["kms:*"]
     effect = "Allow"
     resources = ["*"]
   }
