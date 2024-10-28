@@ -310,6 +310,7 @@ data "aws_iam_policy_document" "authenticated_cognito" {
 
     resources = ["*"]
   }
+  #checkov:skip=CKV_AWS_109:wildcard permission required for kms key
   #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
   #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
