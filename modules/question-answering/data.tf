@@ -151,7 +151,7 @@ data "aws_iam_policy_document" "question_answering" {
     content {
       sid = "OpenSearch"
 
-      actions = [statement.value.actions]
+      actions = statement.value.actions
 
       effect = "Allow"
 
