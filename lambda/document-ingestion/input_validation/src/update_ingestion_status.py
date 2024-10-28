@@ -44,7 +44,7 @@ def get_credentials(secret_id: str, region_name: str) -> str:
 @tracer.capture_method
 def updateIngestionJobStatus(variables):
 
-    print(f"send  status variables :: {variables}")
+    logger.info(f"send  status variables :: {variables}")
 
     query = """
         mutation updateIngestionJobStatus {

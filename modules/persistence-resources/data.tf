@@ -304,7 +304,7 @@ data "aws_iam_policy_document" "authenticated_cognito" {
   statement {
     sid = "KMSAccess"
 
-    actions = ["kms:GenerateDataKey*"]
+    actions = ["kms:*"]
 
     effect = "Allow"
 

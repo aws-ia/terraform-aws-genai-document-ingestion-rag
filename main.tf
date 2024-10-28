@@ -98,6 +98,8 @@ module "document_ingestion" {
 
   container_platform = var.container_platform
   tags               = local.root_combined_tags
+
+  depends_on = [module.persistence_resources, module.document_ingestion]
 }
 
 resource "awscc_appsync_source_api_association" "document_ingestion_association" {

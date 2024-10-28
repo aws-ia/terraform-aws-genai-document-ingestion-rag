@@ -13,7 +13,7 @@
 import base64
 from enum import Enum
 import os
-import nltk
+# import nltk
 import boto3
 import tempfile
 from aws_lambda_powertools import Logger, Tracer
@@ -51,12 +51,12 @@ def read_file_from_s3(bucket, key):
         return None
 
 def download_file(bucket,key )-> str:
-        try: 
-            file_path = os.path.join(tempfile.gettempdir(), os.path.basename(key))
-            s3.download_file(bucket, key,file_path)
-            return file_path
-        except Exception as exp:
-            logger.error(f"Couldn\'t download file {key}/{file_path} from {bucket}: {exp}")
+    file_path = os.path.join(tempfile.gettempdir(), os.path.basename(key))
+    try:
+        s3.download_file(bucket, key,file_path)
+        return file_path
+    except Exception as exp:
+        logger.error(f"Couldn\'t download file {key}/{file_path} from {bucket}: {exp}")
 
 
 def encode_image_to_base64(image_file_path,image_file) -> str:
