@@ -107,7 +107,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
     effect = "Allow"
 
     resources = [
-      "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+      "*"
     ]
   }
 
@@ -216,7 +216,7 @@ data "aws_iam_policy_document" "file_transformer" {
     effect = "Allow"
 
     resources = [
-      "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+      "*"
     ]
   }
 
@@ -325,7 +325,7 @@ data "aws_iam_policy_document" "embeddings_job" {
     effect = "Allow"
 
     resources = [
-      "${aws_appsync_graphql_api.ingestion_api.arn}/*"
+      "*"
     ]
   }
 

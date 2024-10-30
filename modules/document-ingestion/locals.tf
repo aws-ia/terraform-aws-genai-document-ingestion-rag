@@ -12,6 +12,7 @@ locals {
       cloudwatch_log_role_name     = "${var.solution_prefix}-ingestion-api-log"
       field_log_level              = "ALL"
       event_bridge_datasource_name = replace("${var.solution_prefix}-ingestion-datasource", "-", "_") # must match pattern [_A-Za-z][_0-9A-Za-z]*
+      update_ingestion_job_status_datasource_name = replace("${var.solution_prefix}-update-job-status-datasource", "-", "_")
     }
   }
 

@@ -215,9 +215,7 @@ data "aws_iam_policy_document" "summarization_input_validation" {
 
     effect = "Allow"
 
-    resources = [
-      "${aws_appsync_graphql_api.summarization_api.arn}/*"
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -314,9 +312,7 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
 
     effect = "Allow"
 
-    resources = [
-      "${aws_appsync_graphql_api.summarization_api.arn}/*"
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -413,9 +409,7 @@ data "aws_iam_policy_document" "summarization_generator" {
 
     effect = "Allow"
 
-    resources = [
-      "${aws_appsync_graphql_api.summarization_api.arn}/*"
-    ]
+    resources = ["*"]
   }
 
   statement {
