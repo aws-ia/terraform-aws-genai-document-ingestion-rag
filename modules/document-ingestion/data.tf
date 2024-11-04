@@ -9,9 +9,7 @@ data "aws_iam_policy_document" "ingestion_api_log" {
     sid = "IngestionApiLogPermissions"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
     effect = "Allow"
     resources = ["*"]
@@ -43,9 +41,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
     sid = "CloudWatchLog"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
 
     effect = "Allow"
@@ -74,17 +70,7 @@ data "aws_iam_policy_document" "ingestion_input_validation" {
     sid = "S3Access"
 
     actions = [
-      "s3:GetObject",
-      "s3:GetObject*",
-      "s3:GetBucket*",
-      "s3:List*",
-      "s3:PutObjectRetention",
-      "s3:Abort*",
-      "s3:DeleteObject*",
-      "s3:PutObjectLegalHold",
-      "s3:PutObjectTagging",
-      "s3:PutObjectVersionTagging",
-      "s3:PutObject",
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -147,9 +133,7 @@ data "aws_iam_policy_document" "file_transformer" {
     sid = "CloudWatchLog"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
 
     effect = "Allow"
@@ -180,20 +164,7 @@ data "aws_iam_policy_document" "file_transformer" {
     sid = "S3Access"
 
     actions = [
-      "s3:GetObject",
-      "s3:GetObject*",
-      "s3:GetBucket*",
-      "s3:List*",
-      "s3:PutObjectRetention",
-      "s3:List*",
-      "s3:GetBucket*",
-      "s3:Abort*",
-      "s3:DeleteObject*",
-      "s3:PutObjectLegalHold",
-      "s3:PutObjectTagging",
-      "s3:PutObjectVersionTagging",
-      "s3:PutObject",
-      "s3:GetObject*"
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -256,9 +227,7 @@ data "aws_iam_policy_document" "embeddings_job" {
     sid = "CloudWatchLog"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
 
     effect = "Allow"
@@ -289,20 +258,7 @@ data "aws_iam_policy_document" "embeddings_job" {
     sid = "S3Access"
 
     actions = [
-      "s3:GetObject",
-      "s3:GetObject*",
-      "s3:GetBucket*",
-      "s3:List*",
-      "s3:PutObjectRetention",
-      "s3:List*",
-      "s3:GetBucket*",
-      "s3:Abort*",
-      "s3:DeleteObject*",
-      "s3:PutObjectLegalHold",
-      "s3:PutObjectTagging",
-      "s3:PutObjectVersionTagging",
-      "s3:PutObject",
-      "s3:GetObject*"
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -348,6 +304,20 @@ data "aws_iam_policy_document" "embeddings_job" {
   }
 
   statement {
+    sid = "AOSSAccess"
+    actions = ["aoss:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "BedrockAccess"
+    actions = ["bedrock:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
+
+  statement {
     sid = "KMSAccess"
     actions = ["kms:*"]
     effect = "Allow"
@@ -382,20 +352,8 @@ data "aws_iam_policy_document" "ingestion_sm" {
     sid = "LogAndTelemetry"
 
     actions = [
-      "logs:CreateLogDelivery",
-      "logs:CreateLogStream",
-      "logs:GetLogDelivery",
-      "logs:UpdateLogDelivery",
-      "logs:DeleteLogDelivery",
-      "logs:ListLogDeliveries",
-      "logs:PutLogEvents",
-      "logs:PutResourcePolicy",
-      "logs:DescribeResourcePolicies",
-      "logs:DescribeLogGroups",
-      "xray:PutTraceSegments",
-      "xray:PutTelemetryRecords",
-      "xray:GetSamplingRules",
-      "xray:GetSamplingTargets"
+      "logs:*",
+      "xray:*",
     ]
 
     effect = "Allow"
@@ -433,24 +391,7 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
     actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion",
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
+      "kms:*"
     ]
     resources = ["*"]
 
@@ -466,11 +407,7 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
     sid    = "Allow Service CloudWatchLogGroup"
     effect = "Allow"
     actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:Describe*",
-      "kms:GenerateDataKey*"
+      "kms:*"
     ]
     resources = ["*"]
 
@@ -484,9 +421,10 @@ data "aws_iam_policy_document" "ingestion_kms_key" {
       test     = "ArnEquals"
       variable = "kms:EncryptionContext:aws:logs:arn"
       values = [
-        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
-        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
-        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+        # "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
+        # "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
+        # "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
       ]
     }
   }
