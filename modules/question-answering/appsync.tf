@@ -74,12 +74,12 @@ resource "aws_appsync_resolver" "question_answering_api_event_bridge" {
         "detail": {
           "filename": $util.toJson($ctx.arguments.filename),
           "jobid": $util.toJson($ctx.arguments.jobid),
-          "jobstatus": $util.toJson($ctx.arguments.jobid),
-          "max_docs": $util.toJson($ctx.arguments.jobid),
-          "question": $util.toJson($ctx.arguments.jobid),
-          "responseGenerationMethod": $util.toJson($ctx.arguments.jobid),
-          "streaming": $util.toJson($ctx.arguments.jobid),
-          "verbose": $util.toJson($ctx.arguments.jobid)
+          "jobstatus": $util.toJson($ctx.arguments.jobstatus),
+          "max_docs": $util.toJson($ctx.arguments.max_docs),
+          "question": $util.toJson($ctx.arguments.question),
+          "responseGenerationMethod": $util.toJson($ctx.arguments.responseGenerationMethod),
+          "streaming": $util.toJson($ctx.arguments.streaming),
+          "verbose": $util.toJson($ctx.arguments.verbose)
         },
         "detailType": "genAIdemo"
     }]

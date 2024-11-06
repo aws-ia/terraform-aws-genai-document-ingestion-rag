@@ -109,14 +109,15 @@ def load_vector_db_opensearch(region: str,
 
     embedding_function = get_embeddings_llm()
 
+    opensearch_url = opensearch_domain_endpoint if opensearch_domain_endpoint.startswith("https://") else f"https://{opensearch_domain_endpoint}"
+
     vector_db = OpenSearchVectorSearch(index_name=opensearch_index,
-                                       embedding_function=embedding_function,
-                                       opensearch_url=f"https://{opensearch_domain_endpoint}",
-                                       http_auth=http_auth,
-                                       use_ssl = True,
-                                       verify_certs = True,
-                                       connection_class = RequestsHttpConnection,
-                                       is_aoss=False)
+                                        embedding_function=embedding_function,
+                                        opensearch_url=opensearch_url,
+                                        http_auth=http_auth,
+                                        use_ssl = True,
+                                        verify_certs = True,
+                                        connection_class = RequestsHttpConnection)
     print(f"returning handle to OpenSearchVectorSearch, vector_db={vector_db}")
     return vector_db
 

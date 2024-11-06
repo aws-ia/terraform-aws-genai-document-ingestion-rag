@@ -81,6 +81,35 @@ class StreamingCallbackHandler(BaseCallbackHandler):
         send_job_status(self.status_variables)
 
 
+def is_base64(s: str) -> bool:
+    try:
+        if len(s) % 4 != 0 or not all(c in '-_/+=' or c.isalnum() for c in s):
+            return False
+        base64.b64decode(s)
+        return True
+    except Exception:
+        return False
+
+
+def decode_question(question: str) -> str:
+    logger.info(f"Processing question input: {question}")
+    if not question:
+        raise ValueError("Empty question received")
+
+    if is_base64(question):
+        try:
+            sample_string_bytes = base64.b64decode(question)
+            decoded = sample_string_bytes.decode("utf-8")
+            logger.info("Successfully decoded base64 input")
+            return decoded
+        except Exception as e:
+            logger.error(f"Failed to decode base64 input: {str(e)}")
+            raise ValueError(f"Invalid base64 encoding: {str(e)}")
+    else:
+        logger.info(f"Processing as plain text input for question: {question}")
+        return question
+
+
 @tracer.capture_method
 def run_question_answering(arguments):
     response_generation_method = arguments.get('responseGenerationMethod', 'LONG_CONTEXT')
@@ -142,10 +171,7 @@ _current_doc_index = None
 def run_qa_agent_rag_no_memory(input_params):
     logger.info("starting qa agent with rag approach without memory")
 
-    base64_bytes = input_params['question'].encode("utf-8")
-
-    sample_string_bytes = base64.b64decode(base64_bytes)
-    decoded_question = sample_string_bytes.decode("utf-8")
+    decoded_question = decode_question(input_params['question'])
 
     logger.info(decoded_question)
 
@@ -211,8 +237,10 @@ def run_qa_agent_rag_no_memory(input_params):
     template = """\n\nHuman: {context}
     Answer from this text: {question}
     \n\nAssistant:"""
+
+    verbose = input_params.get('verbose', False)
     prompt = PromptTemplate(template=template, input_variables=["context", "question"])
-    chain = LLMChain(llm=_qa_llm, prompt=prompt, verbose=input_params['verbose'])
+    chain = LLMChain(llm=_qa_llm, prompt=prompt, verbose=verbose)
 
     try:
         tmp = chain.predict(context=source_documents, question=decoded_question)
@@ -244,11 +272,7 @@ _current_file_name = None
 def run_qa_agent_from_single_document_no_memory(input_params):
     logger.info("starting qa agent without memory single document")
 
-    base64_bytes = input_params['question'].encode("utf-8")
-
-    sample_string_bytes = base64.b64decode(base64_bytes)
-    decoded_question = sample_string_bytes.decode("utf-8")
-
+    decoded_question = decode_question(input_params['question'])
     logger.info(decoded_question)
 
     status_variables = {
@@ -305,8 +329,9 @@ def run_qa_agent_from_single_document_no_memory(input_params):
     template = """\n\nHuman: {context}
     Answer from this text: {question}
     \n\nAssistant:"""
+    verbose = input_params.get('verbose', False)
     prompt = PromptTemplate(template=template, input_variables=["context", "question"])
-    chain = LLMChain(llm=_qa_llm, prompt=prompt, verbose=input_params['verbose'])
+    chain = LLMChain(llm=_qa_llm, prompt=prompt, verbose=verbose)
 
     try:
         logger.info(f'file content is: {_file_content}')

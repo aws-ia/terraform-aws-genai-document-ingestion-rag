@@ -28,6 +28,8 @@ def handler(event,  context: LambdaContext) -> dict:
 
     arguments = event['detail']
 
+    logger.info(f"received arguments: {arguments}")
+
     job_id = arguments['jobid']
 
     # Add a correlationId (tracking code).
