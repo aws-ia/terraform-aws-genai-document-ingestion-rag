@@ -13,7 +13,7 @@
 import boto3
 from io import BytesIO
 from typing import List
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from langchain.document_loaders.base import BaseLoader
 
 from aws_lambda_powertools import Logger, Tracer
@@ -36,7 +36,7 @@ class pdf_transformer(BaseLoader):
         """Load documents."""
         try:
             s3 = boto3.resource('s3')
-            obj = s3.Object(bucket_name=self.bucket,  key=self.key)
+            obj = s3.Object(self.bucket, self.key)
             encodedpdf = obj.get()['Body'].read()
             pdfFile = PdfReader(BytesIO(encodedpdf))
             # read pdf

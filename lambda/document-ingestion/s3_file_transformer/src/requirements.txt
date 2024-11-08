@@ -5,6 +5,6 @@ typing-extensions
 boto3
 requests
 langchain
-pypdf2
+pypdf
 Pillow
 langchain-community
