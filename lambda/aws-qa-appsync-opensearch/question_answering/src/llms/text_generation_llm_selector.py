@@ -10,11 +10,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 #
-from langchain.llms.bedrock import Bedrock
-from langchain.embeddings import BedrockEmbeddings
+from aiohttp import ClientError
+from langchain_community.llms import Bedrock
+from langchain_community.embeddings import BedrockEmbeddings
 import os
 import boto3
 from .helper import get_credentials
+from .types import Provider, BedrockModel, MAX_TOKENS_MAP
 
 from aws_lambda_powertools import Logger, Tracer, Metrics
 from aws_lambda_powertools.utilities.typing import LambdaContext
@@ -25,69 +27,55 @@ logger = Logger(service="QUESTION_ANSWERING")
 tracer = Tracer(service="QUESTION_ANSWERING")
 metrics = Metrics(namespace="question_answering", service="QUESTION_ANSWERING")
 
-sts_client = boto3.client("sts")
-
-aws_region = boto3.Session().region_name
-
-def get_bedrock_client(service_name="bedrock-runtime"):
-    config = {}
-    bedrock_config = config.get("bedrock", {})
-    bedrock_enabled = bedrock_config.get("enabled", False)
-    if not bedrock_enabled:
-        print("bedrock not enabled")
+def get_bedrock_fm(model_id,modality):
+    bedrock_client = boto3.client('bedrock-runtime')
+    validation_status= validate_model_id_in_bedrock(model_id,modality)
+    logger.info(f' validation_status :: {validation_status}')
+    if(validation_status['status']):
+        return bedrock_client
+    else:
+        logger.error(f"reason ::{validation_status['message']} ")
         return None
 
-    bedrock_config_data = {"service_name": service_name}
-    region_name = bedrock_config.get("region")
-    endpoint_url = bedrock_config.get("endpointUrl")
-    role_arn = bedrock_config.get("roleArn")
+   
+def get_max_tokens(model):
 
-    if region_name:
-        bedrock_config_data["region_name"] = region_name
-    if endpoint_url:
-        bedrock_config_data["endpoint_url"] = endpoint_url
+    # if model_id is not provided, we default to Claude v2
+    if not model:
+        return MAX_TOKENS_MAP[BedrockModel.ANTHROPIC_CLAUDE_V2_1]
+    try:
+        return MAX_TOKENS_MAP[model]
+    except:
+        logger.error('unable to get the max tokens for the specified model')
+        return -1
 
-    if role_arn:
-        assumed_role_object = sts_client.assume_role(
-            RoleArn=role_arn,
-            RoleSessionName="AssumedRoleSession",
-        )
+        
+def validate_model_id_in_bedrock(model_id,modality):
+        """
+        Validate if the listed model id is supported with given modality
+        in bedrock or not.
+        """
+        response={
+            "status":False,
+            "message":f"model {model_id} is not supported in bedrock."
+        }
+        try:
+            bedrock_client = boto3.client(service_name="bedrock")
+            bedrock_model_list = bedrock_client.list_foundation_models()
+            models = bedrock_model_list["modelSummaries"]
+            for model in models:
+                if model["modelId"].lower() == model_id.lower():   
+                    response["message"]=f"model {model_id} does not support modality {modality} "                 
+                    for inputModality in model["inputModalities"]:
+                        if inputModality.lower() == modality.lower():
+                            response["message"]=f"model {model_id} with modality {modality} is supported with bedrock "                 
+                            response["status"] = True
 
-        credentials = assumed_role_object["Credentials"]
-        bedrock_config_data["aws_access_key_id"] = credentials["AccessKeyId"]
-        bedrock_config_data["aws_secret_access_key"] = credentials["SecretAccessKey"]
-        bedrock_config_data["aws_session_token"] = credentials["SessionToken"]
-
-    return boto3.client(**bedrock_config_data)
-
-def get_llm(callbacks=None):
-    bedrock = get_bedrock_client(service_name="bedrock-runtime")
-
-    params = {
-        "max_tokens_to_sample": 600,
-        "temperature": 0,
-        "top_k": 250,
-        "top_p": 1,
-        "stop_sequences": ["\\n\\nHuman:"],
-    }
-
-    kwargs = {
-        "client": bedrock,
-        "model_id": "anthropic.claude-v2",
-        "model_kwargs": params,
-        "streaming": False 
-    }
-
-    if callbacks:
-        kwargs["callbacks"] = callbacks
-        kwargs["streaming"] = True
-
-    return Bedrock(**kwargs)
-
-def get_embeddings_llm():
-    bedrock = get_bedrock_client(service_name="bedrock-runtime")
-    return BedrockEmbeddings(client=bedrock, model_id="amazon.titan-embed-text-v1")
-    
-def get_max_tokens():
-    return 100000
-    
+            logger.info(f' response :: {response}')
+            return response         
+        except ClientError as ce:
+            message=f"error occured while validating model in bedrock {ce}"
+            logger.error(message)
+            response["status"] = False
+            response["message"] = message
+            return response     

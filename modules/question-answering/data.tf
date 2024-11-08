@@ -94,14 +94,8 @@ data "aws_iam_policy_document" "question_answering" {
   statement {
     sid = "Bedrock"
 
-    actions = [
-      "bedrock:InvokeModel",
-      "bedrock:InvokeModelWithResponseStream",
-      "bedrock:ListFoundationModels",
-    ]
-
+    actions = ["bedrock:*"]
     effect = "Allow"
-
     resources = [
       "*"
     ]
@@ -146,17 +140,11 @@ data "aws_iam_policy_document" "question_answering" {
     ]
   }
 
-  dynamic "statement" {
-    for_each = var.opensearch_prop.type == "es" ? [local.opensearch_policy.es] : [local.opensearch_policy.aoss]
-    content {
-      sid = "OpenSearch"
-
-      actions = statement.value.actions
-
-      effect = "Allow"
-
-      resources = [var.opensearch_prop.arn]
-    }
+  statement {
+    sid = "AOSSAccess"
+    actions = ["aoss:*"]
+    effect = "Allow"
+    resources = ["*"]
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
@@ -169,26 +157,7 @@ data "aws_iam_policy_document" "question_answering_kms_key" {
   statement {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
-    actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion",
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
-    ]
+    actions = ["kms:*"]
     resources = ["*"]
 
     principals {

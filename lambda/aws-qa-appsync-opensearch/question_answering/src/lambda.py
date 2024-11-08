@@ -16,6 +16,8 @@ from typing import Dict
 from qa_agent import run_question_answering
 from aws_lambda_powertools import Logger, Tracer, Metrics
 from aws_lambda_powertools.utilities.typing import LambdaContext
+from aws_lambda_powertools.metrics import MetricUnit
+from aws_lambda_powertools.utilities.validation import validate, SchemaValidationError
 
 logger = Logger(service="QUESTION_ANSWERING")
 tracer = Tracer(service="QUESTION_ANSWERING")
@@ -25,10 +27,10 @@ metrics = Metrics(namespace="question_answering", service="QUESTION_ANSWERING")
 @tracer.capture_lambda_handler
 @metrics.log_metrics(capture_cold_start_metric=True)
 def handler(event,  context: LambdaContext) -> dict:
+    logger.info(f"Received event: {event}")
 
     arguments = event['detail']
-
-    logger.info(f"received arguments: {arguments}")
+    logger.info(f"Received arguments: {arguments}")
 
     job_id = arguments['jobid']
 
@@ -41,3 +43,4 @@ def handler(event,  context: LambdaContext) -> dict:
 
     print(f"llm_response is {llm_response}")
     return llm_response
+
