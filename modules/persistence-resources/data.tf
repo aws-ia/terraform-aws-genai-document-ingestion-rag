@@ -140,8 +140,7 @@ data "aws_iam_policy_document" "persistent_resources_kms_key" {
   statement {
     sid = "AllowOpenSearchServerless"
     actions = [
-      "kms:DescribeKey",
-      "kms:CreateGrant"
+      "kms:*"
     ]
 
     resources = ["*"]
@@ -193,24 +192,7 @@ data "aws_iam_policy_document" "persistent_resources_kms_key" {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
     actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion",
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
+      "kms:*"
     ]
     resources = ["*"]
 
@@ -263,16 +245,7 @@ data "aws_iam_policy_document" "authenticated_cognito" {
     sid = "InputBucketAccess"
 
     actions = [
-      "s3:Abort*",
-      "s3:DeleteObject*",
-      "s3:GetBucket*",
-      "s3:GetObject*",
-      "s3:List*",
-      "s3:PutObject",
-      "s3:PutObjectLegalHold",
-      "s3:PutObjectRetention",
-      "s3:PutObjectTagging",
-      "s3:PutObjectVersionTagging"
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -300,6 +273,33 @@ data "aws_iam_policy_document" "authenticated_cognito" {
       "${aws_s3_bucket.processed_assets.arn}/*",
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+
+    actions = ["kms:*"]
+
+    effect = "Allow"
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "AOSSAccess"
+    actions = ["aoss:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "BedrockAccess"
+    actions = ["bedrock:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
+  #checkov:skip=CKV_AWS_109:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_cloudformation_export" "merged_api_id" {

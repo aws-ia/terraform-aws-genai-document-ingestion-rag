@@ -36,7 +36,7 @@ output "authenticated_role_arn" {
 output "graphql_endpoint" {
   description = "The GraphQL endpoint."
   value       = module.persistence_resources.merged_api_url
-} 
+}
 
 output "s3_input_bucket" {
   description = "The S3 input bucket."

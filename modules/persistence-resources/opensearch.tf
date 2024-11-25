@@ -102,6 +102,39 @@ resource "aws_opensearchserverless_security_policy" "collection_policy" {
   ])
 }
 
+resource "aws_opensearchserverless_access_policy" "data-access-policy" {
+  count = var.open_search_service_type == "aoss" ? 1 : 0
+  name = local.opensearch_serverless.collection_name
+  type = "data"
+    policy = jsonencode([
+    {
+      Rules = [
+        {
+          ResourceType = "index",
+          Resource = [
+            "index/${local.opensearch_serverless.collection_name}/*"
+          ],
+          Permission = [
+            "aoss:*"
+          ]
+        },
+        {
+          ResourceType = "collection",
+          Resource = [
+            "collection/${local.opensearch_serverless.collection_name}",
+          ],
+          Permission = [
+            "aoss:*"
+          ]
+        }
+      ],
+      Principal = [
+        "arn:${data.aws_partition.current.id}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+  ])
+}
+
 resource "aws_opensearchserverless_collection" "opensearch_serverless_collection" {
   count = var.open_search_service_type == "aoss" ? 1 : 0
   name  = local.opensearch_serverless.collection_name
@@ -109,7 +142,8 @@ resource "aws_opensearchserverless_collection" "opensearch_serverless_collection
 
   depends_on = [
     aws_opensearchserverless_security_policy.collection_policy,
-    aws_opensearchserverless_security_policy.encryption_policy
+    aws_opensearchserverless_security_policy.encryption_policy,
+    aws_opensearchserverless_access_policy.data-access-policy
   ]
 
   tags = local.combined_tags

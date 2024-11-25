@@ -23,7 +23,8 @@ locals {
     }
     summarization_sm = {
       event_bridge_target_id = "${var.solution_prefix}-summarization-sm-target"
-      log_group_name         = "/aws/state/${var.solution_prefix}-summarization-sm"
+      log_group_name         = "/aws/vendedlogs/states/${var.solution_prefix}-summarization-sm"
+      # log_group_name         = "/aws/state/${var.solution_prefix}-summarization-sm"
     }
   }
 

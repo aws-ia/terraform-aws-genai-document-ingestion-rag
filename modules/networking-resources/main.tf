@@ -51,6 +51,7 @@ resource "aws_opensearchserverless_vpc_endpoint" "opensearch" {
   name       = "${var.solution_prefix}-opensearch"
   subnet_ids = [for _, value in module.vpc.private_subnet_attributes_by_az : value.id]
   vpc_id     = module.vpc.vpc_attributes.id
+  security_group_ids = [aws_security_group.lambda.id]
 }
 
 data "aws_region" "current" {}
