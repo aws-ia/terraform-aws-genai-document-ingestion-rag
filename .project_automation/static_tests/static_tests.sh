@@ -61,16 +61,16 @@ else
 fi
 
 #********** Markdown Lint **************
-#echo 'Starting markdown lint'
-#MYMDL=$(mdl --config ${PROJECT_PATH}/.config/.mdlrc .header.md examples/*/.header.md)
-#if [ -z "$MYMDL" ]
-#then
-#    echo "Success - markdown lint found no linting issues!"
-#else
-#    echo "Failure - markdown lint found linting issues!"
-#    echo "$MYMDL"
-#    exit 1
-#fi
+echo 'Starting markdown lint'
+MYMDL=$(mdl --config ${PROJECT_PATH}/.config/.mdlrc .header.md examples/*/.header.md)
+if [ -z "$MYMDL" ]
+then
+   echo "Success - markdown lint found no linting issues!"
+else
+   echo "Failure - markdown lint found linting issues!"
+   echo "$MYMDL"
+   exit 1
+fi
 
 #********** Terraform Docs *************
 echo 'Starting terraform-docs'
