@@ -9,6 +9,10 @@ echo "Starting Static Tests"
 
 #********** Terraform Validate *************
 cd ${PROJECT_PATH}
+echo "---------------------------------------------------------------------------"
+git log --max-count=1
+echo "---------------------------------------------------------------------------"
+
 terraform init -no-color
 terraform validate -no-color
 if [ $? -eq 0 ]
