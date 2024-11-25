@@ -10,16 +10,26 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 #
-from langchain.vectorstores import OpenSearchVectorSearch
-from opensearchpy import RequestsHttpConnection
-from llms import get_embeddings_llm
-import requests
 import os
+import tempfile
 import boto3
 import json
 import base64
+from pathlib import Path
+from aiohttp import ClientError
+from langchain_community.vectorstores import OpenSearchVectorSearch
+from opensearchpy import RequestsHttpConnection
+import requests
 from enum import Enum
 from requests_aws4auth import AWS4Auth
+s3 = boto3.client('s3')
+from aws_lambda_powertools import Logger, Tracer, Metrics
+
+
+logger = Logger(service="QUESTION_ANSWERING")
+tracer = Tracer(service="QUESTION_ANSWERING")
+metrics = Metrics(namespace="question_answering", service="QUESTION_ANSWERING")
+
 
 class JobStatus(Enum):
     DONE = (
@@ -42,6 +52,10 @@ class JobStatus(Enum):
         'Failed to load document content',
         base64.b64encode("It seems I cannot load the document you are referring to, please verify that the document was correctly ingested or contect an administrator to get more information.".encode('utf-8'))
     )
+    ERROR_LOAD_ARGS = (
+        'Failed to load the llm arguments provided', 
+        base64.b64encode("An internal error happened, and I am not able to load the args, please make sure the arguments provided are correctly structured.".encode('utf-8'))
+    )
     ERROR_LOAD_LLM = (
         'Failed to load the llm', 
         base64.b64encode("An internal error happened, and I am not able to load my brain, please contact an administrator.".encode('utf-8'))
@@ -51,7 +65,11 @@ class JobStatus(Enum):
         base64.b64encode("Sorry, but I am not able to access the document specified.".encode('utf-8'))
     )
     ERROR_PREDICTION = (
-        'Exception during prediction', 
+        'Exception during prediction,Please verify model for the selected modality', 
+        base64.b64encode("Sorry, it seems an issue happened on my end, and I'm not able to answer your question. Please contact an administrator to understand why !".encode('utf-8'))
+    )
+    ERROR_SEMANTIC_SEARCH = (
+        'Exception during similarity search, Please verify model for the selected modality', 
         base64.b64encode("Sorry, it seems an issue happened on my end, and I'm not able to answer your question. Please contact an administrator to understand why !".encode('utf-8'))
     )
 
@@ -72,13 +90,7 @@ aws_auth_appsync = AWS4Auth(
     session_token=credentials.token,
 )
 
-aws_auth_os = AWS4Auth(
-    credentials.access_key,
-    credentials.secret_key,
-    aws_region,
-    'es',
-    session_token=credentials.token,
-)
+
 
 def get_credentials(secret_id: str, region_name: str) -> str:
     client = boto3.client('secretsmanager', region_name=region_name)
@@ -93,10 +105,12 @@ def get_credentials_string(secret_id: str, region_name: str) -> str:
     return secrets_value
 
 def load_vector_db_opensearch(region: str,
+                              opensearch_api_name: str,
                               opensearch_domain_endpoint: str,
                               opensearch_index: str,
-                              secret_id: str) -> OpenSearchVectorSearch:
-    print(f"load_vector_db_opensearch, region={region}, "
+                              secret_id: str,
+                              llm) -> OpenSearchVectorSearch:
+    logger.info(f"load_vector_db_opensearch, region={region}, "
                 f"opensearch_domain_endpoint={opensearch_domain_endpoint}, opensearch_index={opensearch_index}")
     
     # if the secret id is not provided
@@ -105,19 +119,25 @@ def load_vector_db_opensearch(region: str,
         creds = get_credentials(secret_id, aws_region)
         http_auth = (creds['username'], creds['password'])
     else: # sigv4
-        http_auth = aws_auth_os
+        http_auth = AWS4Auth(
+            credentials.access_key,
+            credentials.secret_key,
+            aws_region,
+            opensearch_api_name,
+            session_token=credentials.token,
+        )
 
-    embedding_function = get_embeddings_llm()
-
+    opensearch_url = opensearch_domain_endpoint if opensearch_domain_endpoint.startswith("https://") else f"https://{opensearch_domain_endpoint}"
+    
     vector_db = OpenSearchVectorSearch(index_name=opensearch_index,
-                                       embedding_function=embedding_function,
-                                       opensearch_url=f"https://{opensearch_domain_endpoint}",
-                                       http_auth=http_auth,
-                                       use_ssl = True,
-                                       verify_certs = True,
-                                       connection_class = RequestsHttpConnection,
-                                       is_aoss=False)
-    print(f"returning handle to OpenSearchVectorSearch, vector_db={vector_db}")
+                                        embedding_function=llm,
+                                        opensearch_url=opensearch_url,
+                                        http_auth=http_auth,
+                                        use_ssl = True,
+                                        verify_certs = True,
+                                        connection_class = RequestsHttpConnection)
+   
+    logger.info(f"returning handle to OpenSearchVectorSearch, vector_db={vector_db}")
     return vector_db
 
 def send_job_status(variables):
@@ -133,6 +153,7 @@ def send_job_status(variables):
             jobid, 
             answer, 
             question, 
+            filename,
             sources
         }
     }
@@ -159,4 +180,34 @@ def send_job_status(variables):
         auth=aws_auth_appsync,
         timeout=10
     )
-    print('res :: {}',responseJobstatus)
+    #logger.info('res :: {}',responseJobstatus)
+
+def get_presigned_url(bucket,key) -> str:
+        try:
+             url = s3.generate_presigned_url(
+                ClientMethod='get_object', 
+                Params={'Bucket': bucket, 'Key': key},
+                ExpiresIn=900
+                )
+             logger.info(f"presigned url generated for {key} from {bucket}")
+             return url
+        except Exception as exception:
+            logger.error(f"Reason: {exception}")
+            return None
+
+def download_file(bucket,key )-> str:
+        try: 
+            file_path = os.path.join(tempfile.gettempdir(), os.path.basename(key))
+            s3.download_file(bucket, key,file_path)
+            logger.info(f"file downloaded {file_path}")
+            return file_path
+        except ClientError as client_err:
+            logger.error(f"Couldn\'t download file {key}/{file_path} from {bucket}: {client_err.response['Error']['Message']}")
+        
+        except Exception as exp:
+            logger.error(f"Couldn\'t download file {key}/{file_path} from {bucket}: {exp}")
+ 
+def encode_image_to_base64(image_file_path,image_file) -> str:
+        with open(image_file_path, "rb") as image_file:
+            b64_image = base64.b64encode(image_file.read()).decode('utf8')       
+        return b64_image

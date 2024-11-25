@@ -1,4 +1,6 @@
 <!-- BEGIN_TF_DOCS -->
+# AWS Generative AI Document Ingestion RAG
+
 <!--BEGIN STABILITY BANNER-->
 
 ---
@@ -15,9 +17,6 @@
 ## Table of contents
 
 - [Overview](#overview)
-- [Initializer](#initializer)
-- [Pattern Module Props](#pattern-module-props)
-- [Pattern Properties](#pattern-properties)
 - [Default properties](#default-properties)
 - [Troubleshooting](#troubleshooting)
 - [Architecture](#architecture)
@@ -32,13 +31,13 @@
 This Terraform module creates a pipeline for RAG (retrieval augmented generation) source. It ingests documents and then converts them into text formats. The output can be used for scenarios with long context windows. This means that your system can now consider and analyze a significant amount of surrounding information when processing and understanding text. This is especially valuable in tasks like language understanding and document summarization.
 
 PDF files and images(.jpg,.jpeg,.svg,.png)  are uploaded to an input Amazon Simple Storage Service (S3) bucket. Authorized clients (Amazon Cognito user pool) will trigger an AWS AppSync mutation to start the ingestion process, and can use subscriptions to get notifications on the ingestion status. The mutation call will trigger an AWS Step Function with three different steps:
+
 - Input validation: an AWS Lambda function will verify the input formats of the files requested for ingestion. If the files are in a format which is not supported by the pipeline, an error message will be returned.
-- Transformation: the input files are processed in parallel using a [Map](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html) state through an AWS Lambda. The function uses the [LangChain](https://www.langchain.com/) client to get the content of each file and store the text file in the output bucket. This is useful for workflows which want to use a long context window approach and send the entire file as context to a large language model. If the file name already exists in the output bucket, the input file will not be processed.
-For image files the the transformation step use [Amazon Rekognition](https://aws.amazon.com/rekognition/) to detect lables and image moderation. It then generate a descriptive text of the image using anthropic.claude-v2:1 and save the text file in processed s3 bucket.
-- Embeddings step: Files processed and stored in the output S3 bucket are consumed by an AWS Lambda function. Chunks from documents are created, as well as text embeddings using Amazon Bedrock (model: amazon.titan-embed-text-v1). For uploaded images multimodality embeddings are created using Amazon Bedrock (model: amazon.titan-embed-image-v1)
-The chunks and embeddings are then stored in a knowledge base (OpenSearch provisioned cluster). Make sure the model (amazon.titan-embed-text-v1,amazon.titan-embed-image-v1,anthropic.claude-v2:1) is enabled in your account. Please follow the [Amazon Bedrock User Guide](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) for steps related to enabling model access.
+- Transformation: the input files are processed in parallel using a [Map](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html) state through an AWS Lambda. The function uses the [LangChain](https://www.langchain.com/) client to get the content of each file and store the text file in the output bucket. This is useful for workflows which want to use a long context window approach and send the entire file as context to a large language model. If the file name already exists in the output bucket, the input file will not be processed. For image files the the transformation step use [Amazon Rekognition](https://aws.amazon.com/rekognition/) to detect lables and image moderation. It then generate a descriptive text of the image using anthropic.claude-v2:1 and save the text file in processed s3 bucket.
+- Embeddings step: Files processed and stored in the output S3 bucket are consumed by an AWS Lambda function. Chunks from documents are created, as well as text embeddings using Amazon Bedrock (model: amazon.titan-embed-text-v1). For uploaded images multimodality embeddings are created using Amazon Bedrock (model: amazon.titan-embed-image-v1) The chunks and embeddings are then stored in a knowledge base (OpenSearch provisioned cluster). Make sure the model (amazon.titan-embed-text-v1,amazon.titan-embed-image-v1,anthropic.claude-v2:1) is enabled in your account. Please follow the [Amazon Bedrock User Guide](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) for steps related to enabling model access.
 
 Documents stored in the knowledge base contain the following metadata:
+
 - Timestamp: when the embeddings were created (current time in seconds since the Epoch)
 - Embeddings model used: amazon.titan-embed-text-v1 , amazon.titan-embed-image-v1
 
@@ -60,7 +59,7 @@ The code below provides an example of a mutation call and associated subscriptio
 
 Subscription call to get notifications about the ingestion process:
 
-```
+```graphql
 subscription MySubscription {
   updateIngestionJobStatus(ingestionjobid: "123") {
     files {
@@ -92,15 +91,16 @@ Expected response:
   }
 }
 ```
+
 Where:
-- ingestionjobid: id which can be used to filter subscriptions on client side
-The subscription will display the status and name for each file
+
+- ingestionjobid: id which can be used to filter subscriptions on client side. The subscription will display the status and name for each file
 - files.status: status update of the ingestion for the file specified
 - files.name: name of the file stored in the input S3 bucket
 
 Mutation call to trigger the ingestion process:
 
-```
+```graphql
 mutation MyMutation {
   ingestDocuments(ingestioninput: {
     embeddings_model:
@@ -130,7 +130,9 @@ Expected response:
   }
 }
 ```
+
 Where:
+
 - files.status: this field will be used by the subscription to update the status of the ingestion for the file specified
 - files.name: name of the file stored in the input S3 bucket
 - ingestionjobid: id which can be used to filter subscriptions on client side
@@ -148,18 +150,19 @@ Out of the box implementation of the module without any override will set the fo
 ### Networking
 
 - Set up a VPC
-    - Uses existing VPC if provided, otherwise creates a new one
+  - Uses existing VPC if provided, otherwise creates a new one
 - Set up a Security Group used by the AWS Lambda functions
-    - Uses existing Security Group, otherwise creates a new one
+  - Uses existing Security Group, otherwise creates a new one
 
 ### Amazon S3 Buckets
 
 - Sets up two Amazon S3 Buckets
-    - Uses existing buckets if provided, otherwise creates new ones
+  - Uses existing buckets if provided, otherwise creates new ones
 
 ### Observability
 
 By default the module will enable logging and tracing on all services which support those features. Observability can be turned off by setting the pattern property `observability` to `false`.
+
 - AWS Lambda: AWS X-Ray, Amazon CloudWatch Logs
 - AWS Step Function: AWS X-Ray, Amazon CloudWatch Logs
 - AWS AppSync GraphQL API: AWS X-Ray, Amazon CloudWatch Logs
@@ -175,6 +178,7 @@ By default the module will enable logging and tracing on all services which supp
 | | Error\_Unsupported | The input file document is in a format not supported by the workflow | Provide a file in a supported format |
 
 ## Architecture
+
 ![Architecture Diagram](./architecture.png)
 
 ## Cost
@@ -199,6 +203,7 @@ The following table provides a sample cost breakdown for deploying this solution
 | Total monthly cost | | 2,852.32 |
 
 The resources not created by this module (Amazon Cognito User Pool, Amazon OpenSearch provisioned cluster, AppSync Merged API, AWS Secrets Manager secret) do not appear in the table above. You can refer to the decicated pages to get an estimate of the cost related to those services:
+
 - [Amazon OpenSearch Service Pricing](https://aws.amazon.com/opensearch-service/pricing/)
 - [AWS AppSync pricing (for Merged API if used)](https://aws.amazon.com/appsync/pricing/)
 - [Amazon Cognito Pricing](https://aws.amazon.com/cognito/pricing/)
@@ -212,10 +217,12 @@ The resources not created by this module (Amazon Cognito User Pool, Amazon OpenS
 When you build systems on AWS infrastructure, security responsibilities are shared between you and AWS. This [shared responsibility](http://aws.amazon.com/compliance/shared-responsibility-model/) model reduces your operational burden because AWS operates, manages, and controls the components including the host operating system, virtualization layer, and physical security of the facilities in which the services operate. For more information about AWS security, visit [AWS Cloud Security](http://aws.amazon.com/security/).
 
 This module requires you to provide an existing Amazon Cognito User Pool and a provisioned Amazon OpenSearch cluster. Please refer to the official documentation on best practices to secure those services:
+
 - [Amazon Cognito](https://docs.aws.amazon.com/cognito/latest/developerguide/security.html)
 - [Amazon OpenSearch Service](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/security.html)
 
 Optionnaly, you can provide existing resources to the constructs (marked optional in the module pattern props). If you chose to do so, please refer to the official documentation on best practices to secure each service:
+
 - [Amazon Simple Storage Service](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html)
 - [Amazon VPC](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-best-practices.html)
 - [Amazon EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-security.html)
@@ -249,11 +256,12 @@ To view the service quotas for all AWS services in the documentation without swi
 ## Clean up
 
 When deleting your stack which uses this module, do not forget to go over the following instructions to avoid unexpected charges:
-  - empty and delete the Amazon Simple Storage Bucket(s) created by this module if you didn't provide existing ones during the module creation
-  - empty the data stored in the knowledge base (Amazon OpenSearch provisioned cluster), as well as the index created if an existing one was not provided
-  - if the observability flag is turned on, delete all the associated logs created by the different services in Amazon CloudWatch logs
 
-***
+- empty and delete the Amazon Simple Storage Bucket(s) created by this module if you didn't provide existing ones during the module creation
+- empty the data stored in the knowledge base (Amazon OpenSearch provisioned cluster), as well as the index created if an existing one was not provided
+- if the observability flag is turned on, delete all the associated logs created by the different services in Amazon CloudWatch logs
+
+---
 &copy; Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 ## Requirements
@@ -300,7 +308,7 @@ When deleting your stack which uses this module, do not forget to go over the fo
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_container_platform"></a> [container\_platform](#input\_container\_platform) | The platform for the container image, default is 'linux/arm64' | `string` | `"linux/arm64"` | no |
+| <a name="input_container_platform"></a> [container\_platform](#input\_container\_platform) | The platform for the container image, default is 'linux/amd64' | `string` | `"linux/amd64"` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Set to true if you want to force delete resources created by this module | `bool` | `false` | no |
 | <a name="input_open_search_props"></a> [open\_search\_props](#input\_open\_search\_props) | Properties for the OpenSearch configuration | `any` | <pre>{<br>  "cluster_config": {<br>    "dedicated_master_count": 4,<br>    "dedicated_master_enabled": true,<br>    "dedicated_master_type": "c6g.large.search",<br>    "instance_count": 4,<br>    "instance_type": "r6g.large.search",<br>    "zone_awareness_config": {<br>      "availability_zone_count": 2<br>    },<br>    "zone_awareness_enabled": true<br>  },<br>  "collection_name": "rag-collection",<br>  "domain_name": "opensearch",<br>  "ebs_options": {<br>    "ebs_enabled": true,<br>    "volume_size": 10,<br>    "volume_type": "gp3"<br>  },<br>  "engine_version": "OpenSearch_1.0",<br>  "index_name": "doc-rag-search",<br>  "open_search_service_type": "aoss",<br>  "secret": "NONE",<br>  "standby_replicas": 2<br>}</pre> | no |
 | <a name="input_solution_prefix"></a> [solution\_prefix](#input\_solution\_prefix) | Prefix to be included in all resources deployed by this solution | `string` | `"aws-ia"` | no |

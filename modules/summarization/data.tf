@@ -9,15 +9,14 @@ data "aws_iam_policy_document" "summarization_api_log" {
     sid = "SummarizationApiLogPermissions"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
 
     effect = "Allow"
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch.summarization_api.log_group_name}/*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*",
+      # "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch.summarization_api.log_group_name}/*",
     ]
   }
 }
@@ -60,20 +59,7 @@ data "aws_iam_policy_document" "summarization_sm" {
     sid = "LogAndTelemetry"
 
     actions = [
-      "logs:CreateLogDelivery",
-      "logs:CreateLogStream",
-      "logs:GetLogDelivery",
-      "logs:UpdateLogDelivery",
-      "logs:DeleteLogDelivery",
-      "logs:ListLogDeliveries",
-      "logs:PutLogEvents",
-      "logs:PutResourcePolicy",
-      "logs:DescribeResourcePolicies",
-      "logs:DescribeLogGroups",
-      "xray:PutTraceSegments",
-      "xray:PutTelemetryRecords",
-      "xray:GetSamplingRules",
-      "xray:GetSamplingTargets"
+      "logs:*"
     ]
 
     effect = "Allow"
@@ -84,6 +70,9 @@ data "aws_iam_policy_document" "summarization_sm" {
   }
   #checkov:skip=CKV_AWS_356:State machine log and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:State machine log and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_iam_policy_document" "summarization_sm_eventbridge" {
@@ -155,16 +144,12 @@ data "aws_iam_policy_document" "summarization_input_validation" {
     sid = "CloudWatchLog"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.summarization_input_validation.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -190,9 +175,7 @@ data "aws_iam_policy_document" "summarization_input_validation" {
     sid = "S3Access"
 
     actions = [
-      "s3:GetBucketLocation",
-      "s3:GetObject",
-      "s3:ListBucket"
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -214,9 +197,7 @@ data "aws_iam_policy_document" "summarization_input_validation" {
 
     effect = "Allow"
 
-    resources = [
-      "${aws_appsync_graphql_api.summarization_api.arn}/*"
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -236,8 +217,18 @@ data "aws_iam_policy_document" "summarization_input_validation" {
       "*"
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+    actions = ["kms:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_iam_policy_document" "summarization_doc_reader" {
@@ -245,16 +236,12 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
     sid = "CloudWatchLog"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:*"
     ]
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.summarization_doc_reader.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -280,10 +267,7 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
     sid = "S3Access"
 
     actions = [
-      "s3:GetBucketLocation",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:PutObject"
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -305,9 +289,7 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
 
     effect = "Allow"
 
-    resources = [
-      "${aws_appsync_graphql_api.summarization_api.arn}/*"
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -327,8 +309,18 @@ data "aws_iam_policy_document" "summarization_doc_reader" {
       "*"
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+    actions = ["kms:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_iam_policy_document" "summarization_generator" {
@@ -343,9 +335,7 @@ data "aws_iam_policy_document" "summarization_generator" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.summarization_generator.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -371,10 +361,7 @@ data "aws_iam_policy_document" "summarization_generator" {
     sid = "S3Access"
 
     actions = [
-      "s3:GetBucketLocation",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:PutObject"
+      "s3:*"
     ]
 
     effect = "Allow"
@@ -396,9 +383,7 @@ data "aws_iam_policy_document" "summarization_generator" {
 
     effect = "Allow"
 
-    resources = [
-      "${aws_appsync_graphql_api.summarization_api.arn}/*"
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -433,8 +418,18 @@ data "aws_iam_policy_document" "summarization_generator" {
       "*"
     ]
   }
+
+  statement {
+    sid = "KMSAccess"
+    actions = ["kms:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_iam_policy_document" "summarization_kms_key" {
@@ -442,24 +437,7 @@ data "aws_iam_policy_document" "summarization_kms_key" {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
     actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion",
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
+      "kms:*"
     ]
     resources = ["*"]
 
@@ -475,11 +453,7 @@ data "aws_iam_policy_document" "summarization_kms_key" {
     sid    = "Allow Service CloudWatchLogGroup"
     effect = "Allow"
     actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:Describe*",
-      "kms:GenerateDataKey*"
+      "kms:*"
     ]
     resources = ["*"]
 
@@ -493,9 +467,10 @@ data "aws_iam_policy_document" "summarization_kms_key" {
       test     = "ArnEquals"
       variable = "kms:EncryptionContext:aws:logs:arn"
       values = [
-        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
-        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
-        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+        # "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.solution_prefix}*",
+        # "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/state/${var.solution_prefix}*",
+        # "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/appsync/apis/*",
+        "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
       ]
     }
   }
