@@ -9,3 +9,10 @@ run "mandatory_plan_basic" {
     source = "./examples/basic"
   }
 }
+
+run "mandatory_apply_basic" {
+  command = apply
+  module {
+    source = "./examples/basic"
+  }
+}
