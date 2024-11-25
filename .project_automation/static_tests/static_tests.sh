@@ -26,7 +26,7 @@ fi
 #********** tflint ********************
 echo 'Starting tflint'
 tflint --no-color --init --config ${PROJECT_PATH}/.config/.tflint.hcl
-MYLINT=$(tflint --force --config ${PROJECT_PATH}/.config/.tflint.hcl)
+MYLINT=$(tflint --no-color --force --config ${PROJECT_PATH}/.config/.tflint.hcl)
 if [ -z "$MYLINT" ]
 then
     echo "Success - tflint found no linting issues!"
