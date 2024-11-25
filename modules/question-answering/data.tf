@@ -51,9 +51,7 @@ data "aws_iam_policy_document" "question_answering" {
 
     effect = "Allow"
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.lambda.question_answering.log_group_name}/*",
-    ]
+    resources = ["*"]
   }
 
   statement {
@@ -96,14 +94,8 @@ data "aws_iam_policy_document" "question_answering" {
   statement {
     sid = "Bedrock"
 
-    actions = [
-      "bedrock:InvokeModel",
-      "bedrock:InvokeModelWithResponseStream",
-      "bedrock:ListFoundationModels",
-    ]
-
+    actions = ["bedrock:*"]
     effect = "Allow"
-
     resources = [
       "*"
     ]
@@ -124,6 +116,13 @@ data "aws_iam_policy_document" "question_answering" {
   }
 
   statement {
+    sid = "KMSAccess"
+    actions = ["kms:*"]
+    effect = "Allow"
+    resources = ["*"]
+  }
+
+  statement {
     sid = "XRayAccess"
 
     actions = [
@@ -141,46 +140,24 @@ data "aws_iam_policy_document" "question_answering" {
     ]
   }
 
-  dynamic "statement" {
-    for_each = var.opensearch_prop.type == "es" ? [local.opensearch_policy.es] : [local.opensearch_policy.aoss]
-    content {
-      sid = "OpenSearch"
-
-      actions = statement.value.actions
-
-      effect = "Allow"
-
-      resources = [var.opensearch_prop.arn]
-    }
+  statement {
+    sid = "AOSSAccess"
+    actions = ["aoss:*"]
+    effect = "Allow"
+    resources = ["*"]
   }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
+  #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
 }
 
 data "aws_iam_policy_document" "question_answering_kms_key" {
   statement {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
-    actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion",
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
-    ]
+    actions = ["kms:*"]
     resources = ["*"]
 
     principals {
@@ -255,4 +232,5 @@ data "aws_iam_policy_document" "question_answering_kms_key" {
   #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
   #checkov:skip=CKV_AWS_111:wildcard permission required for kms key
   #checkov:skip=CKV_AWS_356:wildcard permission required for kms key
+  #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
 }

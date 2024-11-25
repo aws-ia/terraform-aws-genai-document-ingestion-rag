@@ -12,6 +12,7 @@ locals {
       cloudwatch_log_role_name     = "${var.solution_prefix}-ingestion-api-log"
       field_log_level              = "ALL"
       event_bridge_datasource_name = replace("${var.solution_prefix}-ingestion-datasource", "-", "_") # must match pattern [_A-Za-z][_0-9A-Za-z]*
+      update_ingestion_job_status_datasource_name = replace("${var.solution_prefix}-update-job-status-datasource", "-", "_")
     }
   }
 
@@ -22,7 +23,7 @@ locals {
     }
     ingestion_sm = {
       event_bridge_target_id = "${var.solution_prefix}-ingestion-sm-target"
-      log_group_name         = "/aws/state/${var.solution_prefix}-ingestion-sm"
+      log_group_name         = "/aws/vendedlogs/states/${var.solution_prefix}-ingestion-sm"
     }
   }
 

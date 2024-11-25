@@ -40,8 +40,11 @@ module "persistence_resources" {
   force_destroy = var.force_destroy
   target_merge_apis = [
     module.document_ingestion.ingestion_api_arn,
+    "${module.document_ingestion.ingestion_api_arn}/*",
     module.summarization.summarization_api_arn,
+    "${module.summarization.summarization_api_arn}/*",
     module.question_answering.question_answering_arn,
+    "${module.question_answering.question_answering_arn}/*",
   ]
   tags = local.root_combined_tags
 }
@@ -105,6 +108,8 @@ resource "awscc_appsync_source_api_association" "document_ingestion_association"
   source_api_association_config = {
     merge_type = "AUTO_MERGE"
   }
+
+  depends_on = [module.persistence_resources, module.document_ingestion]
 }
 
 ############################################################################################################

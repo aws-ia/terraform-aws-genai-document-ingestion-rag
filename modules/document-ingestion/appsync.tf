@@ -34,6 +34,30 @@ resource "aws_appsync_datasource" "ingestion_api" {
   }
 }
 
+resource "aws_appsync_datasource" "update_ingestion_job_status" {
+  api_id = aws_appsync_graphql_api.ingestion_api.id
+  name   = local.graphql.ingestion_api.update_ingestion_job_status_datasource_name
+  type   = "NONE"
+}
+
+resource "aws_appsync_resolver" "update_job_status" {
+  api_id      = aws_appsync_graphql_api.ingestion_api.id
+  type        = "Mutation"
+  field       = "updateIngestionJobStatus"
+  data_source = aws_appsync_datasource.update_ingestion_job_status.name
+
+  request_template  = <<EOF
+    {
+      "version": "2017-02-28",
+      "payload": $util.toJson($context.args)
+    }
+  EOF
+
+  response_template = <<EOF
+    $util.toJson($context.result)
+  EOF
+}
+
 # TODO: move to templatefile
 resource "aws_appsync_resolver" "ingestion_api" {
   api_id      = aws_appsync_graphql_api.ingestion_api.id

@@ -31,7 +31,7 @@ variables {
   tags = {}
   merged_api_arn = ""
   merged_api_url = ""
-  container_platform = "linux/arm64"
+  container_platform = "linux/amd64" # "linux/arm64"
   cloudwatch_log_group_retention = "365"
   lambda_reserved_concurrency = 10
 }
