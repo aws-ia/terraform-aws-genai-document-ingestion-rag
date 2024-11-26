@@ -41,12 +41,15 @@ resource "aws_iam_role" "ingestion_api_datasource" {
     }]
   })
 
-  managed_policy_arns = [
+  tags = local.combined_tags
+}
+
+resource "aws_iam_role_policy_attachments_exclusive" "ingestion_api_datasource" {
+  role_name = aws_iam_role.ingestion_api_datasource.name
+  policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
     "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
   ]
-
-  tags = local.combined_tags
 }
 
 resource "aws_iam_role_policy" "ingestion_api_datasource" {
