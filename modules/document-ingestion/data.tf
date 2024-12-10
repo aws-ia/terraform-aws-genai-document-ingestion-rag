@@ -220,7 +220,7 @@ data "aws_iam_policy_document" "file_transformer" {
     sid = "Rekognition"
 
     actions = [
-      "rekognition:*"
+      "rekognition:DetectModerationLabels"
     ]
 
     effect = "Allow"
