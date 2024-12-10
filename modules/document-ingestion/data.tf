@@ -215,6 +215,18 @@ data "aws_iam_policy_document" "file_transformer" {
     effect = "Allow"
     resources = ["*"]
   }
+
+  statement {
+    sid = "Rekognition"
+
+    actions = [
+      "rekognition:*"
+    ]
+
+    effect = "Allow"
+
+    resources = ["*"]
+  }
   #checkov:skip=CKV_AWS_356:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_111:Lambda VPC and Xray permission require wildcard
   #checkov:skip=CKV_AWS_109:KMS management permission by IAM user
