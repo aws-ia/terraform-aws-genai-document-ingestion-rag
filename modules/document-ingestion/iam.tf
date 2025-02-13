@@ -41,11 +41,6 @@ resource "aws_iam_role" "ingestion_api_datasource" {
     }]
   })
 
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-    "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
-  ]
-
   tags = local.combined_tags
 }
 
@@ -54,6 +49,25 @@ resource "aws_iam_role_policy" "ingestion_api_datasource" {
   role   = aws_iam_role.ingestion_api_datasource.id
   policy = data.aws_iam_policy_document.ingestion_api_datasource.json
 }
+
+data "aws_iam_policy" "AWSLambdaBasicExecutionRole" {
+  arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "aws_iam_policy" "AmazonEventBridgeFullAccess" {
+  arn = "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ingestion_api_datasource_lambda_managed_policies_attach" {
+  role       = aws_iam_role.ingestion_api_datasource.name
+  policy_arn = data.aws_iam_policy.AWSLambdaBasicExecutionRole.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ingestion_api_datasource_eventbridge_managed_policies_attach" {
+  role       = aws_iam_role.ingestion_api_datasource.name
+  policy_arn = data.aws_iam_policy.AmazonEventBridgeFullAccess.arn
+}
+
 
 ############################################################################################################
 # IAM Role for Ingestion Input Validation Lambda
