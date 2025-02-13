@@ -60,12 +60,12 @@ data "aws_iam_policy" "AmazonEventBridgeFullAccess" {
 
 resource "aws_iam_role_policy_attachment" "ingestion_api_datasource_lambda_managed_policies_attach" {
   role       = aws_iam_role.ingestion_api_datasource.name
-  policy_arn = aws_iam_policy.AWSLambdaBasicExecutionRole.arn
+  policy_arn = data.aws_iam_policy.AWSLambdaBasicExecutionRole.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ingestion_api_datasource_eventbridge_managed_policies_attach" {
   role       = aws_iam_role.ingestion_api_datasource.name
-  policy_arn = aws_iam_policy.AmazonEventBridgeFullAccess.arn
+  policy_arn = data.aws_iam_policy.AmazonEventBridgeFullAccess.arn
 }
 
 
